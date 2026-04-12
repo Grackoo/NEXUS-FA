@@ -151,7 +151,14 @@ const SmartTransactionModal: React.FC<Props> = ({ isOpen, onClose, clientId, cli
               </select>
             </div>
             <div className="space-y-2">
-                <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase ml-1">Títulos / Cantidad</label>
+                <div className="flex justify-between items-center px-1">
+                  <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase">Títulos / Cantidad</label>
+                  {sharesOwned > 0 && (
+                    <span className="text-[10px] text-primary-blue font-bold px-1.5 py-0.5 rounded-md bg-primary-blue/10 border border-primary-blue/20">
+                      Balance: {sharesOwned}
+                    </span>
+                  )}
+                </div>
                 <input 
                   type="number" 
                   value={shares || ''}
