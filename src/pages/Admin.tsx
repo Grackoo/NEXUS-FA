@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import { usePortfolio } from '../contexts/PortfolioContext';
 import { useCurrency } from '../contexts/CurrencyContext';
-import { Users, Search, Plus, Filter, ArrowUpRight, BarChart3, AlertCircle, Shield, Eye, Pencil, Check, X, PlusCircle, Info } from 'lucide-react';
+import { Users, Search, Plus, ArrowUpRight, BarChart3, AlertCircle, Shield, Eye, Pencil, Check, X, PlusCircle, Info } from 'lucide-react';
 import SmartTransactionModal from '../components/SmartTransactionModal.tsx';
 import { submitOperation } from '../services/sheetsService';
 
@@ -282,7 +282,13 @@ const AssetBreakdownModal: React.FC<{
                   <td className="px-6 md:px-8 py-4 text-center">
                     {editingTicker === asset.ticker ? (
                       <div className="flex items-center justify-center gap-1.5">
-                        <button onClick={() => saveEdit(asset)} className="p-1.5 bg-emerald/20 text-emerald rounded-lg"><Check className="w-3.5 h-3.5" /></button>
+                        <button 
+                          disabled={isSubmitting}
+                          onClick={() => saveEdit(asset)} 
+                          className={`p-1.5 bg-emerald/20 text-emerald rounded-lg ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-emerald/30'}`}
+                        >
+                          <Check className="w-3.5 h-3.5" />
+                        </button>
                         <button onClick={() => setEditingTicker(null)} className="p-1.5 bg-crimson/20 text-crimson rounded-lg"><X className="w-3.5 h-3.5" /></button>
                       </div>
                     ) : (
