@@ -52,7 +52,7 @@ const Dashboard: React.FC = () => {
     <div className="min-h-screen pb-12">
       <Navbar />
       
-      <main className="max-w-7xl px-8 mt-10 space-y-8 animate-fade-in">
+      <main className="max-w-7xl mx-auto px-8 mt-10 space-y-8 animate-fade-in">
         {/* Header Section */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Performance Card */}
@@ -139,10 +139,10 @@ const Dashboard: React.FC = () => {
               <thead>
                 <tr className="border-b border-white/5 text-gray-400 text-[10px] uppercase tracking-widest bg-white/[0.02]">
                   <th className="px-8 py-5 font-semibold">Activo</th>
-                  <th className="px-6 py-5 font-semibold text-right">Cantidad</th>
-                  <th className="px-6 py-5 font-semibold text-right">Precio Promedio</th>
-                  <th className="px-6 py-5 font-semibold text-right">V. Mercado</th>
-                  <th className="px-6 py-5 font-semibold text-right">Ganancia / Perdida</th>
+                  <th className="px-4 py-5 font-semibold text-right">Cantidad</th>
+                  <th className="px-4 py-5 font-semibold text-right">Precio Prom.</th>
+                  <th className="px-4 py-5 font-semibold text-right">V. Mercado</th>
+                  <th className="px-4 py-5 font-semibold text-right">Ganancia / Perdida</th>
                   <th className="px-8 py-5 font-semibold text-right">Rendimiento</th>
                 </tr>
               </thead>

@@ -25,7 +25,7 @@ const Admin: React.FC = () => {
     <div className="min-h-screen pb-12">
       <Navbar />
 
-      <main className="max-w-7xl px-8 mt-10 space-y-10 animate-fade-in">
+      <main className="max-w-7xl mx-auto px-8 mt-10 space-y-10 animate-fade-in">
         <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-[0.2em]">

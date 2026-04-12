@@ -8,7 +8,8 @@ const Navbar: React.FC = () => {
   const { currency, toggleCurrency } = useCurrency();
 
   return (
-    <nav className="flex items-center justify-between px-8 py-5 sticky top-0 z-50 bg-black/40 backdrop-blur-xl border-b border-white/5 mx-auto max-w-[100vw]">
+    <nav className="sticky top-0 z-50 bg-black/40 backdrop-blur-xl border-b border-white/5">
+      <div className="max-w-7xl mx-auto px-8 py-5 flex items-center justify-between">
       <div className="flex items-center gap-4 group">
         <div className="bg-primary w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white shadow-[0_0_20px_rgba(26,92,255,0.4)] group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
           N
@@ -73,6 +74,7 @@ const Navbar: React.FC = () => {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </nav>
   );
