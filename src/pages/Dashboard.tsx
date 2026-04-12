@@ -2,7 +2,7 @@ import React from 'react';
 import Navbar from '../components/Navbar';
 import { usePortfolio } from '../contexts/PortfolioContext';
 import { useCurrency } from '../contexts/CurrencyContext';
-import { TrendingUp, TrendingDown, PieChart as PieChartIcon, List, DollarSign } from 'lucide-react';
+import { TrendingUp, TrendingDown, PieChart as PieChartIcon, List } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
 
 const Dashboard: React.FC = () => {
@@ -117,10 +117,8 @@ const Dashboard: React.FC = () => {
                   const valueInView = convertToView(currentValue, asset.nativeCurrency);
                   const avgPriceInView = convertToView(
                         currency === 'USD' ? asset.avgPurchasePriceUSD : asset.avgPurchasePriceMXN,
-                        currency // Already in view currency effectively
+                        currency
                   );
-                  // Correct logic for avg price: if we use 'convertToView' on the stored avg price
-                  const currentPriceInView = convertToView(asset.realTimePrice, asset.nativeCurrency);
                   
                   const pl = valueInView - (asset.sharesOwned * avgPriceInView);
                   const plPercentage = (pl / (asset.sharesOwned * avgPriceInView)) * 100;

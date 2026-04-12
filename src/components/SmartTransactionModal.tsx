@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { X, Info, Calculator, DollarSign, RefreshCcw, AlertTriangle } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, Calculator, RefreshCcw, AlertTriangle } from 'lucide-react';
 import { usePortfolio } from '../contexts/PortfolioContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { submitOperation } from '../services/sheetsService';
@@ -33,9 +33,6 @@ const SmartTransactionModal: React.FC<Props> = ({ isOpen, onClose, clientId, cli
   // Logic for New Average Cost Calculation (Advanced)
   // New Avg Price = (Current total cost + New total cost) / Total shares
   const totalTransaction = (shares * price) + commission;
-  
-  // Convert everything to a base currency (USD) for comparison/calculation
-  const transactionValueUSD = currency === 'USD' ? totalTransaction : totalTransaction / exchangeRate;
   
   // Warning check
   const showBalanceWarning = type === 'Sell' && shares > sharesOwned;

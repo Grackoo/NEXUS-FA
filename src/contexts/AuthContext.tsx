@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, type ReactNode } from 'react';
 import { MOCK_CLIENTS, type Client } from '../data/MockData';
 
 interface AuthContextType {

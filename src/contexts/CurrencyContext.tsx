@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { CURRENCY_TRACKER } from '../data/MockData';
 import { fetchCsvData, SHEET_URLS } from '../services/sheetsService';
 

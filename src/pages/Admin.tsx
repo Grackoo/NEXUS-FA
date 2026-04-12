@@ -2,13 +2,12 @@ import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import { usePortfolio } from '../contexts/PortfolioContext';
 import { useCurrency } from '../contexts/CurrencyContext';
-import { useAuth } from '../contexts/AuthContext';
 import { Users, Search, Plus, Filter, ArrowUpRight, BarChart3, AlertCircle } from 'lucide-react';
 import SmartTransactionModal from '../components/SmartTransactionModal';
 
 const Admin: React.FC = () => {
   const { allClients } = usePortfolio();
-  const { formatValue, convertToView, currency } = useCurrency();
+  const { formatValue, currency } = useCurrency();
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);

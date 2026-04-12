@@ -34,7 +34,7 @@ export async function fetchCsvData(url: string) {
 
 export async function submitOperation(data: any) {
   try {
-    const response = await fetch(SCRIPT_URL, {
+    await fetch(SCRIPT_URL, {
       method: 'POST',
       mode: 'no-cors', // Apps Script requires no-cors sometimes for simple POSTs
       headers: {

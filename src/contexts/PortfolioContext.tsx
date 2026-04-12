@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { useAuth } from './AuthContext';
 import { MOCK_CLIENTS, MOCK_OPERACIONES, type Operation, type PortfolioAsset, type Client } from '../data/MockData';
 import { fetchCsvData, SHEET_URLS } from '../services/sheetsService';
@@ -16,8 +16,7 @@ const PortfolioContext = createContext<PortfolioContextType | undefined>(undefin
 export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { user } = useAuth();
   const [clientPortfolio, setClientPortfolio] = useState<PortfolioAsset[]>([]);
-  const [operations, setOperations] = useState<Operation[]>(MOCK_OPERACIONES);
-  const [allClients, setAllClients] = useState<Client[]>(MOCK_CLIENTS);
+  const [allClients] = useState<Client[]>(MOCK_CLIENTS);
 
   useEffect(() => {
     const loadPortfolio = async () => {
