@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { CURRENCY_TRACKER } from '../data/MockData';
+import { fetchCsvData, SHEET_URLS } from '../services/sheetsService';
 
 type Currency = 'USD' | 'MXN';
 
@@ -15,7 +16,21 @@ const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined
 
 export const CurrencyProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [currency, setCurrency] = useState<Currency>('USD');
-  const exchangeRate = CURRENCY_TRACKER.USD_MXN_RATE;
+  const [exchangeRate, setExchangeRate] = useState(CURRENCY_TRACKER.USD_MXN_RATE);
+
+  useEffect(() => {
+    const loadRate = async () => {
+      if (SHEET_URLS.CURRENCY_TRACKER) {
+        const data = await fetchCsvData(SHEET_URLS.CURRENCY_TRACKER);
+        if (data && data.length > 0) {
+          // Expecting a column 'FX_Rate' or similar
+          const rate = parseFloat(data[0].FX_Rate || data[0].rate);
+          if (!isNaN(rate)) setExchangeRate(rate);
+        }
+      }
+    };
+    loadRate();
+  }, []);
 
   const toggleCurrency = () => {
     setCurrency(prev => (prev === 'USD' ? 'MXN' : 'USD'));

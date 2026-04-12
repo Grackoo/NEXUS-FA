@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useAuth } from './AuthContext';
-import { MOCK_CLIENTS, MOCK_OPERACIONES, Operation, PortfolioAsset, Client } from '../data/MockData';
+import { MOCK_CLIENTS, MOCK_OPERACIONES, type Operation, type PortfolioAsset, type Client } from '../data/MockData';
+import { fetchCsvData, SHEET_URLS } from '../services/sheetsService';
 
 interface PortfolioContextType {
   clientPortfolio: PortfolioAsset[];
@@ -19,15 +20,39 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [allClients, setAllClients] = useState<Client[]>(MOCK_CLIENTS);
 
   useEffect(() => {
-    if (user) {
-      // Logic to calculate portfolio from operations or use summary
-      // For this MVP, we use the pre-calculated summary in MOCK_CLIENTS
-      // but in a real app, we'd aggregate 'operations' here.
-      const foundClient = allClients.find(c => c.id === user.id);
-      if (foundClient) {
-        setClientPortfolio(foundClient.portfolio);
+    const loadPortfolio = async () => {
+      if (user) {
+        if (SHEET_URLS.PORTFOLIO_SUMMARY) {
+          const data = await fetchCsvData(SHEET_URLS.PORTFOLIO_SUMMARY);
+          // Map CSV columns to PortfolioAsset interface
+          // Expecting: Ticker, Shares_Owned, Avg_Price_MXN, Avg_Price_USD, Live_Price, Currency
+          const mapped: PortfolioAsset[] = data.map(row => {
+            // Robust mapping: find key regardless of case or spaces
+            const findKey = (keys: string[]) => {
+              const found = Object.keys(row).find(k => keys.some(target => k.toLowerCase().trim() === target.toLowerCase()));
+              return found ? row[found] : '';
+            };
+
+            return {
+              ticker: findKey(['Ticker', 'Symbol', 'Activo']),
+              type: (findKey(['Type', 'Tipo', 'Category']) as any) || 'Stocks',
+              sharesOwned: parseFloat(findKey(['Shares_Owned', 'Shares', 'Titulos', 'Cantidad']) || '0'),
+              avgPurchasePriceMXN: parseFloat(findKey(['Avg_Price_MXN', 'Costo_MXN', 'Precio_Promedio_MXN']) || '0'),
+              avgPurchasePriceUSD: parseFloat(findKey(['Avg_Price_USD', 'Costo_USD', 'Precio_Promedio_USD']) || '0'),
+              realTimePrice: parseFloat(findKey(['Live_Price', 'Real_Time_Price', 'Precio_Mercado', 'Price']) || '0'),
+              nativeCurrency: (findKey(['Currency', 'Moneda', 'Divisa']) as any) || 'USD'
+            };
+          });
+          setClientPortfolio(mapped);
+        } else {
+          const foundClient = allClients.find(c => c.id === user.id);
+          if (foundClient) {
+            setClientPortfolio(foundClient.portfolio);
+          }
+        }
       }
-    }
+    };
+    loadPortfolio();
   }, [user, allClients]);
 
   const addOperation = (op: Operation) => {

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Info, Calculator, DollarSign, RefreshCcw, AlertTriangle } from 'lucide-react';
 import { usePortfolio } from '../contexts/PortfolioContext';
 import { useCurrency } from '../contexts/CurrencyContext';
+import { submitOperation } from '../services/sheetsService';
 
 interface Props {
   isOpen: boolean;
@@ -22,6 +23,8 @@ const SmartTransactionModal: React.FC<Props> = ({ isOpen, onClose, clientId, cli
   const [price, setPrice] = useState<number>(0);
   const [commission, setCommission] = useState<number>(0);
   const [currency, setCurrency] = useState<'USD' | 'MXN'>('USD');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   // Stats for the selected asset
   const currentAsset = client?.portfolio.find(a => a.ticker === ticker);
@@ -50,6 +53,28 @@ const SmartTransactionModal: React.FC<Props> = ({ isOpen, onClose, clientId, cli
   };
 
   const newAvgUSD = calculateNewAvg();
+
+  const handleConfirm = async () => {
+    setIsSubmitting(true);
+    const success = await submitOperation({
+      clientId,
+      type,
+      ticker,
+      shares,
+      price,
+      commission,
+      originalCurrency: currency
+    });
+    
+    setIsSubmitting(false);
+    if (success) {
+      setIsSuccess(true);
+      setTimeout(() => {
+        setIsSuccess(false);
+        onClose();
+      }, 2000);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -169,10 +194,17 @@ const SmartTransactionModal: React.FC<Props> = ({ isOpen, onClose, clientId, cli
           </div>
 
           <button 
-            disabled={showBalanceWarning || shares <= 0 || price <= 0}
-            className="glass-button w-full shadow-[0_0_20px_rgba(26,92,255,0.3)] disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+            disabled={showBalanceWarning || shares <= 0 || price <= 0 || isSubmitting}
+            onClick={handleConfirm}
+            className="glass-button w-full shadow-[0_0_20px_rgba(26,92,255,0.3)] disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none relative overflow-hidden"
           >
-            Confirmar y Registrar Operación
+            {isSubmitting ? (
+              <RefreshCcw className="w-5 h-5 animate-spin mx-auto" />
+            ) : isSuccess ? (
+              "¡Operación Registrada!"
+            ) : (
+              "Confirmar y Registrar Operación"
+            )}
           </button>
         </div>
       </div>
