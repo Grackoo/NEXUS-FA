@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { LogIn, Shield, Lock, ChevronRight, Globe, TrendingUp } from 'lucide-react';
+import { Shield, Lock, ChevronRight, Globe, TrendingUp } from 'lucide-react';
 
 const Login: React.FC = () => {
   const [userId, setUserId] = useState('');

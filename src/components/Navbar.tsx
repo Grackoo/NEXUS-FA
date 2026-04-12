@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCurrency } from '../contexts/CurrencyContext';
-import { LogOut, RefreshCw, User, Settings, ShieldCheck } from 'lucide-react';
+import { LogOut, RefreshCw, Settings, ShieldCheck } from 'lucide-react';
 
 const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
