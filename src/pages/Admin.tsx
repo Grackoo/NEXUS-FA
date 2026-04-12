@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar';
 import { usePortfolio } from '../contexts/PortfolioContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { Users, Search, Plus, Filter, ArrowUpRight, BarChart3, AlertCircle } from 'lucide-react';
-import SmartTransactionModal from '../components/SmartTransactionModal';
+import SmartTransactionModal from '../components/SmartTransactionModal.tsx';
 
 const Admin: React.FC = () => {
   const { allClients } = usePortfolio();

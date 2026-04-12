@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { useAuth } from './AuthContext';
-import { MOCK_CLIENTS, MOCK_OPERACIONES, type Operation, type PortfolioAsset, type Client } from '../data/MockData';
+import { MOCK_CLIENTS, type Operation, type PortfolioAsset, type Client } from '../data/MockData';
 import { fetchCsvData, SHEET_URLS } from '../services/sheetsService';
 
 interface PortfolioContextType {
@@ -54,10 +54,9 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
     loadPortfolio();
   }, [user, allClients]);
 
-  const addOperation = (op: Operation) => {
-    setOperations(prev => [...prev, op]);
-    // Here we would recalculate the specific client's portfolio based on the rules:
-    // Total Bought - Total Sold = Current Holding
+  const addOperation = (_op: Operation) => {
+    // Operations are now handled by Google Sheets directly.
+    // The portfolio will refresh upon next fetch.
   };
 
   // Simplified calculation for the MVP dashboard
