@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import Admin from './pages/Admin';
+import Login from './pages/Login.tsx';
+import Dashboard from './pages/Dashboard.tsx';
+import Admin from './pages/Admin.tsx';
 import { useAuth } from './contexts/AuthContext';
 
 function App() {
