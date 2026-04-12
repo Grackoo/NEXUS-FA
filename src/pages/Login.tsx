@@ -141,8 +141,8 @@ const OnboardingModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-md animate-fade-in">
-      <div className="glass-card w-full max-w-lg p-0 overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,1)] border-white/10">
+    <div className="modal-overlay">
+      <div className="glass-card w-full max-w-lg p-0 overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,1)] border-white/10 animate-fade-in mx-auto">
         <div className="px-8 py-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
            <div>
               <h2 className="text-xl font-bold flex items-center gap-2">
@@ -234,8 +234,9 @@ const OnboardingModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                   {['Bajo', 'Media', 'Alta'].map(r => (
                     <button
                       key={r}
+                      type="button"
                       onClick={() => setFormData({...formData, risk: r})}
-                      className={`flex-1 py-2 rounded-lg text-xs font-bold border transition-all ${formData.risk === r ? 'bg-primary border-primary' : 'bg-white/5 border-white/10 text-gray-500 hover:bg-white/10'}`}
+                      className={`risk-btn ${formData.risk === r ? 'active' : ''}`}
                     >
                       {r}
                     </button>
