@@ -32,9 +32,25 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
               return found ? row[found] : '';
             };
 
+            const rawType = findKey(['Type', 'Tipo', 'Category', 'AssetType']);
+            const typeMapping: Record<string, any> = {
+              'stocks': 'Stocks',
+              'acciones': 'Stocks',
+              'etfs': 'ETFs',
+              'fixed income': 'Fixed Income',
+              'renta fija': 'Fixed Income',
+              'cetes': 'Fixed Income',
+              'crypto': 'Crypto',
+              'cripto': 'Crypto',
+              'fibras': 'FIBRAs',
+              'fibra': 'FIBRAs',
+              'commodities': 'Commodities',
+              'materias primas': 'Commodities'
+            };
+
             return {
               ticker: findKey(['Ticker', 'Symbol', 'Activo']),
-              type: (findKey(['Type', 'Tipo', 'Category']) as any) || 'Stocks',
+              type: typeMapping[rawType.toLowerCase()] || 'Stocks',
               sharesOwned: parseFloat(findKey(['Shares_Owned', 'Shares', 'Titulos', 'Cantidad']) || '0'),
               avgPurchasePriceMXN: parseFloat(findKey(['Avg_Price_MXN', 'Costo_MXN', 'Precio_Promedio_MXN']) || '0'),
               avgPurchasePriceUSD: parseFloat(findKey(['Avg_Price_USD', 'Costo_USD', 'Precio_Promedio_USD']) || '0'),

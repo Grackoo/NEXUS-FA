@@ -19,6 +19,7 @@ const SmartTransactionModal: React.FC<Props> = ({ isOpen, onClose, clientId, cli
   
   const [ticker, setTicker] = useState('AAPL');
   const [type, setType] = useState<'Buy' | 'Sell'>('Buy');
+  const [assetType, setAssetType] = useState<'Stocks' | 'ETFs' | 'Fixed Income' | 'Crypto' | 'FIBRAs' | 'Commodities'>('Stocks');
   const [shares, setShares] = useState<number>(0);
   const [price, setPrice] = useState<number>(0);
   const [commission, setCommission] = useState<number>(0);
@@ -56,6 +57,7 @@ const SmartTransactionModal: React.FC<Props> = ({ isOpen, onClose, clientId, cli
     const success = await submitOperation({
       clientId,
       type,
+      assetType,
       ticker,
       shares,
       price,
@@ -120,6 +122,24 @@ const SmartTransactionModal: React.FC<Props> = ({ isOpen, onClose, clientId, cli
               />
             </div>
             <div className="space-y-2">
+              <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase ml-1">Tipo de Activo</label>
+              <select 
+                value={assetType} 
+                onChange={(e) => setAssetType(e.target.value as any)}
+                className="glass-input cursor-pointer"
+              >
+                <option value="Stocks">Acciones (Stocks)</option>
+                <option value="ETFs">ETFs</option>
+                <option value="Crypto">Criptomonedas</option>
+                <option value="FIBRAs">FIBRAs / Real Estate</option>
+                <option value="Fixed Income">Renta Fija (CETES)</option>
+                <option value="Commodities">Commodities</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
               <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase ml-1">Moneda</label>
               <select 
                 value={currency} 
@@ -130,11 +150,8 @@ const SmartTransactionModal: React.FC<Props> = ({ isOpen, onClose, clientId, cli
                 <option value="MXN">Peso (MXN)</option>
               </select>
             </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-             <div className="space-y-2">
-                <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase ml-1">Títulos</label>
+            <div className="space-y-2">
+                <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase ml-1">Títulos / Cantidad</label>
                 <input 
                   type="number" 
                   value={shares || ''}
@@ -143,27 +160,28 @@ const SmartTransactionModal: React.FC<Props> = ({ isOpen, onClose, clientId, cli
                   placeholder="0"
                 />
              </div>
-             <div className="space-y-2">
-                <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase ml-1">Precio Unitario</label>
-                <input 
-                  type="number" 
-                  value={price || ''}
-                  onChange={(e) => setPrice(Number(e.target.value))}
-                  className="glass-input" 
-                  placeholder="0.00"
-                />
-             </div>
           </div>
-
-          <div className="space-y-2">
-            <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase ml-1">Comisión (Total)</label>
-            <input 
-               type="number" 
-               value={commission || ''}
-               onChange={(e) => setCommission(Number(e.target.value))}
-               className="glass-input" 
-               placeholder="0.00"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase ml-1">Precio Unitario</label>
+              <input 
+                type="number" 
+                value={price || ''}
+                onChange={(e) => setPrice(Number(e.target.value))}
+                className="glass-input" 
+                placeholder="0.00"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase ml-1">Comisión (Total)</label>
+              <input 
+                 type="number" 
+                 value={commission || ''}
+                 onChange={(e) => setCommission(Number(e.target.value))}
+                 className="glass-input" 
+                 placeholder="0.00"
+              />
+            </div>
           </div>
 
           {/* Dynamic Logic Summary */}
