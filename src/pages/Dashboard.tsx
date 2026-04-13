@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import { usePortfolio } from '../contexts/PortfolioContext';
 import { useCurrency } from '../contexts/CurrencyContext';
@@ -19,13 +19,22 @@ import {
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
 import SmartTransactionModal from '../components/SmartTransactionModal';
 
+// Available categories for the UI tabs
+const CATEGORIES = ['All', 'Stocks', 'ETFs', 'Crypto', 'Fixed Income', 'FIBRAs', 'Commodities', 'Forex'];
+
 const Dashboard: React.FC = () => {
   const { clientPortfolio, totalNetWorthUSD, totalNetWorthMXN } = usePortfolio();
   const { currency, formatValue, convertToView } = useCurrency();
   const { user } = useAuth();
   const [isTxModalOpen, setIsTxModalOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('All');
 
   const netWorth = currency === 'USD' ? totalNetWorthUSD : totalNetWorthMXN;
+
+  // Filter portfolio based on selected category
+  const displayedPortfolio = selectedCategory === 'All' 
+    ? clientPortfolio 
+    : clientPortfolio.filter(asset => asset.type === selectedCategory);
 
   // Pie chart data grouping
   const allocation = clientPortfolio.reduce((acc: any[], asset) => {
@@ -126,6 +135,38 @@ const Dashboard: React.FC = () => {
           </div>
         </section>
 
+        {/* Category Tabs */}
+        <section className="flex items-center gap-2 overflow-x-auto scrollbar-hide py-2">
+          {CATEGORIES.map(category => {
+            const isActive = selectedCategory === category;
+
+            const labelMapping: Record<string, string> = {
+              'All': 'Todos los Activos',
+              'Stocks': 'Acciones',
+              'ETFs': 'ETFs',
+              'Crypto': 'Criptomonedas',
+              'Fixed Income': 'Renta Fija',
+              'FIBRAs': 'FIBRAs',
+              'Commodities': 'Materias Primas',
+              'Forex': 'Forex'
+            };
+
+            return (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`whitespace-nowrap px-4 py-2 rounded-xl text-[11px] font-bold tracking-widest uppercase transition-all duration-300 ${
+                  isActive 
+                  ? 'bg-primary text-white shadow-[0_0_15px_rgba(26,92,255,0.4)]' 
+                  : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                {labelMapping[category]}
+              </button>
+            );
+          })}
+        </section>
+
         {/* Positions Table Section */}
         <section className="glass-card p-0 overflow-hidden">
           <div className="px-6 md:px-8 py-5 md:py-6 border-b border-white/5 flex items-center justify-between bg-white/[0.01]">
@@ -133,14 +174,14 @@ const Dashboard: React.FC = () => {
               <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
                 <List className="w-4 h-4 md:w-5 md:h-5 text-primary" />
               </div>
-              Posiciones Actuales
+              Posiciones Actuales {selectedCategory !== 'All' && <span>- {selectedCategory}</span>}
             </h3>
             <div className="flex gap-2">
                <button 
                  onClick={() => setIsTxModalOpen(true)}
                  className="glass-button flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 text-[10px] md:text-xs"
                >
-                 <Plus className="w-3.5 h-3.5" /> Operar
+                 <Plus className="w-3.5 h-3.5" /> Operar {selectedCategory !== 'All' ? selectedCategory : ''}
                </button>
                <button className="glass-button secondary px-3 md:px-4 py-1.5 md:py-2 text-[10px] md:text-xs">Exportar</button>
             </div>
@@ -159,7 +200,7 @@ const Dashboard: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {clientPortfolio.map((asset) => {
+                {displayedPortfolio.map((asset) => {
                   const currentValue = asset.sharesOwned * asset.realTimePrice;
                   const valueInView = convertToView(currentValue, asset.nativeCurrency);
                   const avgPriceInView = convertToView(
@@ -220,6 +261,7 @@ const Dashboard: React.FC = () => {
           onClose={() => setIsTxModalOpen(false)} 
           clientId={user.id}
           clientName={user.name}
+          defaultAssetType={selectedCategory as any}
         />
       )}
     </div>

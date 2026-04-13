@@ -9,9 +9,10 @@ interface Props {
   onClose: () => void;
   clientId: string;
   clientName: string;
+  defaultAssetType?: 'Stocks' | 'ETFs' | 'Fixed Income' | 'Crypto' | 'FIBRAs' | 'Commodities' | 'Forex' | 'All';
 }
 
-const SmartTransactionModal: React.FC<Props> = ({ isOpen, onClose, clientId, clientName }) => {
+const SmartTransactionModal: React.FC<Props> = ({ isOpen, onClose, clientId, clientName, defaultAssetType }) => {
   const { allClients } = usePortfolio();
   const { exchangeRate, formatValue } = useCurrency();
   
@@ -19,7 +20,8 @@ const SmartTransactionModal: React.FC<Props> = ({ isOpen, onClose, clientId, cli
   
   const [ticker, setTicker] = useState('AAPL');
   const [type, setType] = useState<'Buy' | 'Sell'>('Buy');
-  const [assetType, setAssetType] = useState<'Stocks' | 'ETFs' | 'Fixed Income' | 'Crypto' | 'FIBRAs' | 'Commodities'>('Stocks');
+  const initialAssetType = (defaultAssetType && defaultAssetType !== 'All') ? defaultAssetType : 'Stocks';
+  const [assetType, setAssetType] = useState(initialAssetType);
   const [shares, setShares] = useState<number>(0);
   const [price, setPrice] = useState<number>(0);
   const [commission, setCommission] = useState<number>(0);
@@ -134,6 +136,7 @@ const SmartTransactionModal: React.FC<Props> = ({ isOpen, onClose, clientId, cli
                 <option value="FIBRAs">FIBRAs / Real Estate</option>
                 <option value="Fixed Income">Renta Fija (CETES)</option>
                 <option value="Commodities">Commodities</option>
+                <option value="Forex">Forex</option>
               </select>
             </div>
           </div>

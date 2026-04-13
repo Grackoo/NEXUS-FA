@@ -44,7 +44,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           return {
             id: find(['ID']),
             name: find(['Nombre', 'NOMBRE']),
-            role: 'client',
+            role: 'client' as 'client',
             password: find(['Password', 'PASSWORD']),
             email: find(['Email', 'EMAIL']),
             phone: find(['Telefono', 'TELEFONO'])
@@ -76,9 +76,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             return {
                 id: find(['ID']),
                 name: find(['Nombre', 'NOMBRE']),
-                role: 'client',
+                role: 'client' as 'client',
                 password: find(['Password', 'PASSWORD']),
-            };
+            } as ClientProfile;
         }).filter(c => c.id);
         setAuthorizedClients(currentClients);
     }

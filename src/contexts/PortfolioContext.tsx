@@ -35,7 +35,8 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
       'stocks': 'Stocks', 'acciones': 'Stocks', 'etfs': 'ETFs',
       'fixed income': 'Fixed Income', 'renta fija': 'Fixed Income',
       'cetes': 'Fixed Income', 'crypto': 'Crypto', 'cripto': 'Crypto',
-      'fibras': 'FIBRAs', 'fibra': 'FIBRAs', 'commodities': 'Commodities'
+      'fibras': 'FIBRAs', 'fibra': 'FIBRAs', 'commodities': 'Commodities',
+      'forex': 'Forex', 'divisas': 'Forex'
     };
 
     return {
@@ -54,19 +55,32 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
     const syncData = async () => {
       setIsLoading(true);
       try {
-        if (!SHEET_URLS.CLIENTS_DATA || !SHEET_URLS.PORTFOLIO_SUMMARY) {
+        if (!SHEET_URLS.CLIENTS_DATA) {
           setIsLoading(false);
           return;
         }
 
-        const [clientsRaw, portfolioRaw] = await Promise.all([
+        const portfolioSources = [
+          SHEET_URLS.PORTFOLIO_SUMMARY,
+          SHEET_URLS.SUMMARY_STOCKS,
+          SHEET_URLS.SUMMARY_ETFS,
+          SHEET_URLS.SUMMARY_CRYPTO,
+          SHEET_URLS.SUMMARY_FIXED_INCOME,
+          SHEET_URLS.SUMMARY_FIBRAS,
+          SHEET_URLS.SUMMARY_COMMODITIES,
+          SHEET_URLS.SUMMARY_FOREX
+        ].filter(url => url && url.trim() !== '');
+
+        const [clientsRaw, ...portfolioRaws] = await Promise.all([
           fetchCsvData(SHEET_URLS.CLIENTS_DATA),
-          fetchCsvData(SHEET_URLS.PORTFOLIO_SUMMARY)
+          ...portfolioSources.map(url => fetchCsvData(url))
         ]);
+
+        const combinedPortfolioRaw = portfolioRaws.flat();
 
         // Map Portfolios
         const portfolioByClient: Record<string, PortfolioAsset[]> = {};
-        portfolioRaw.forEach(row => {
+        combinedPortfolioRaw.forEach(row => {
           const clientId = row.ClientID || row.clientid || row.ID || row.id;
           if (clientId) {
             if (!portfolioByClient[clientId]) portfolioByClient[clientId] = [];
