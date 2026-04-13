@@ -299,7 +299,7 @@ const OnboardingModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
               <div className="flex gap-4 pt-4">
                 <button onClick={() => setStep(1)} className="glass-button secondary flex-1">Atrás</button>
-                <button onClick={handleSend} className="glass-button flex-[2] bg-emerald hover:bg-emerald/80 border-none shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+                <button onClick={handleSend} className="glass-button flex-[2] bg-emerald/20 border border-emerald/50 text-emerald hover:bg-emerald/30 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
                   Finalizar solicitud
                 </button>
               </div>
