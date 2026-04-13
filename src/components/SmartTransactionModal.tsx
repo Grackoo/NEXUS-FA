@@ -56,6 +56,9 @@ const SmartTransactionModal: React.FC<Props> = ({ isOpen, onClose, clientId, cli
 
   const handleConfirm = async () => {
     setIsSubmitting(true);
+    const totalTrans = (shares * price) + commission;
+    const calculatedTotalMXN = currency === 'USD' ? totalTrans * exchangeRate : totalTrans;
+
     const success = await submitOperation({
       clientId,
       type,
@@ -64,7 +67,18 @@ const SmartTransactionModal: React.FC<Props> = ({ isOpen, onClose, clientId, cli
       shares,
       price,
       commission,
-      originalCurrency: currency
+      originalCurrency: currency,
+      // Mapeo crudo para que coincida exactamente con las columnas de tu Apps Script:
+      Cliente_ID: clientId,
+      Tipo_Operacion: type,
+      Ticker: ticker,
+      Tipo_Activo: assetType,
+      Cantidad: shares,
+      Precio: price,
+      Comision: commission, // Sin tilde por precaución
+      Comisión: commission,  // Con tilde en caso de validación estricta
+      Moneda: currency,
+      Total_MXN: calculatedTotalMXN
     });
     
     setIsSubmitting(false);
