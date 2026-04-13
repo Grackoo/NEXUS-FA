@@ -1,24 +1,82 @@
-import React, { createContext, useContext, useState, type ReactNode } from 'react';
-import { MOCK_CLIENTS, type Client } from '../data/MockData';
+import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { fetchCsvData, SHEET_URLS } from '../services/sheetsService';
+
+// PROTECTED CREDENTIALS
+const ADMIN_CREDENTIALS = {
+  id: 'Admin',
+  password: 'Grackoo039'
+};
+
+export interface ClientProfile {
+  id: string;
+  name: string;
+  role: 'admin' | 'client';
+  password?: string;
+  email?: string;
+  phone?: string;
+}
 
 interface AuthContextType {
-  user: Client | null;
-  login: (clientId: string) => boolean;
+  user: ClientProfile | null;
+  login: (id: string, pass: string) => Promise<{ success: boolean; message?: string }>;
   logout: () => void;
+  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<Client | null>(null);
+  const [user, setUser] = useState<ClientProfile | null>(null);
+  const [authorizedClients, setAuthorizedClients] = useState<ClientProfile[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const login = (clientId: string): boolean => {
-    const client = MOCK_CLIENTS.find(c => c.id === clientId);
+  useEffect(() => {
+    const loadAuthorizedClients = async () => {
+      if (SHEET_URLS.CLIENTS_DATA) {
+        const data = await fetchCsvData(SHEET_URLS.CLIENTS_DATA);
+        const mapped: ClientProfile[] = data.map(row => ({
+          id: row.ID || row.id || '',
+          name: row.Nombre || row.name || '',
+          role: 'client',
+          password: row.Password || row.password || '',
+          email: row.Email || row.email || '',
+          phone: row.Telefono || row.phone || ''
+        })).filter(c => c.id);
+        setAuthorizedClients(mapped);
+      }
+      setIsLoading(false);
+    };
+    loadAuthorizedClients();
+  }, []);
+
+  const login = async (id: string, pass: string): Promise<{ success: boolean; message?: string }> => {
+    // 1. Check Admin (Normalized to Uppercase for matching the UI)
+    if (id.toUpperCase() === ADMIN_CREDENTIALS.id.toUpperCase() && pass === ADMIN_CREDENTIALS.password) {
+      setUser({ id: 'Admin', name: 'Administrador', role: 'admin' });
+      return { success: true };
+    }
+
+    // 2. Refresh client list from sheet (optional but good for real-time)
+    let currentClients = authorizedClients;
+    if (SHEET_URLS.CLIENTS_DATA) {
+        const data = await fetchCsvData(SHEET_URLS.CLIENTS_DATA);
+        currentClients = data.map(row => ({
+            id: row.ID || row.id || '',
+            name: row.Nombre || row.name || '',
+            role: 'client',
+            password: row.Password || row.password || '',
+        })).filter(c => c.id);
+        setAuthorizedClients(currentClients);
+    }
+
+    // 3. Check Clients
+    const client = currentClients.find(c => c.id === id && c.password === pass);
     if (client) {
       setUser(client);
-      return true;
+      return { success: true };
     }
-    return false;
+
+    return { success: false, message: 'ID o Contraseña incorrectos.' };
   };
 
   const logout = () => {
@@ -26,7 +84,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

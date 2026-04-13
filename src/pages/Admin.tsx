@@ -7,13 +7,25 @@ import SmartTransactionModal from '../components/SmartTransactionModal.tsx';
 import { submitOperation } from '../services/sheetsService';
 
 const Admin: React.FC = () => {
-  const { allClients } = usePortfolio();
+  const { allClients, isLoading } = usePortfolio();
   const { formatValue, currency } = useCurrency();
   const [searchTerm, setSearchTerm] = useState('');
   const [isTxModalOpen, setIsTxModalOpen] = useState(false);
   const [isAssetsModalOpen, setIsAssetsModalOpen] = useState(false);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [showAddClientInfo, setShowAddClientInfo] = useState(false);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen">
+        <Navbar />
+        <div className="flex flex-col items-center justify-center pt-32 gap-4">
+          <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+          <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Sincronizando Carteras...</p>
+        </div>
+      </div>
+    );
+  }
 
   const filteredClients = allClients.filter(c => 
     c.name.toLowerCase().includes(searchTerm.toLowerCase()) && c.role === 'client'

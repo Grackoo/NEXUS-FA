@@ -1,14 +1,18 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import { useAuth } from './AuthContext';
-import { MOCK_CLIENTS, type Operation, type PortfolioAsset, type Client } from '../data/MockData';
+import { useAuth, type ClientProfile } from './AuthContext';
 import { fetchCsvData, SHEET_URLS } from '../services/sheetsService';
+import { type PortfolioAsset } from '../data/MockData';
+
+export interface ClientWithPortfolio extends ClientProfile {
+  portfolio: PortfolioAsset[];
+}
 
 interface PortfolioContextType {
   clientPortfolio: PortfolioAsset[];
   totalNetWorthUSD: number;
   totalNetWorthMXN: number;
-  addOperation: (op: Operation) => void;
-  allClients: Client[]; // For admin view
+  allClients: ClientWithPortfolio[]; // Enriched with portfolio data
+  isLoading: boolean;
 }
 
 const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
@@ -16,78 +20,99 @@ const PortfolioContext = createContext<PortfolioContextType | undefined>(undefin
 export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { user } = useAuth();
   const [clientPortfolio, setClientPortfolio] = useState<PortfolioAsset[]>([]);
-  const [allClients] = useState<Client[]>(MOCK_CLIENTS);
+  const [allClients, setAllClients] = useState<ClientWithPortfolio[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const loadPortfolio = async () => {
-      if (user) {
-        if (SHEET_URLS.PORTFOLIO_SUMMARY) {
-          const data = await fetchCsvData(SHEET_URLS.PORTFOLIO_SUMMARY);
-          // Map CSV columns to PortfolioAsset interface
-          // Expecting: Ticker, Shares_Owned, Avg_Price_MXN, Avg_Price_USD, Live_Price, Currency
-          const mapped: PortfolioAsset[] = data.map(row => {
-            // Robust mapping: find key regardless of case or spaces
-            const findKey = (keys: string[]) => {
-              const found = Object.keys(row).find(k => keys.some(target => k.toLowerCase().trim() === target.toLowerCase()));
-              return found ? row[found] : '';
-            };
-
-            const rawType = findKey(['Type', 'Tipo', 'Category', 'AssetType']);
-            const typeMapping: Record<string, any> = {
-              'stocks': 'Stocks',
-              'acciones': 'Stocks',
-              'etfs': 'ETFs',
-              'fixed income': 'Fixed Income',
-              'renta fija': 'Fixed Income',
-              'cetes': 'Fixed Income',
-              'crypto': 'Crypto',
-              'cripto': 'Crypto',
-              'fibras': 'FIBRAs',
-              'fibra': 'FIBRAs',
-              'commodities': 'Commodities',
-              'materias primas': 'Commodities'
-            };
-
-            return {
-              ticker: findKey(['Ticker', 'Symbol', 'Activo']),
-              type: typeMapping[rawType.toLowerCase()] || 'Stocks',
-              sharesOwned: parseFloat(findKey(['Shares_Owned', 'Shares', 'Titulos', 'Cantidad']) || '0'),
-              avgPurchasePriceMXN: parseFloat(findKey(['Avg_Price_MXN', 'Costo_MXN', 'Precio_Promedio_MXN']) || '0'),
-              avgPurchasePriceUSD: parseFloat(findKey(['Avg_Price_USD', 'Costo_USD', 'Precio_Promedio_USD']) || '0'),
-              realTimePrice: parseFloat(findKey(['Live_Price', 'Real_Time_Price', 'Precio_Mercado', 'Price']) || '0'),
-              nativeCurrency: (findKey(['Currency', 'Moneda', 'Divisa']) as any) || 'USD'
-            };
-          });
-          setClientPortfolio(mapped);
-        } else {
-          const foundClient = allClients.find(c => c.id === user.id);
-          if (foundClient) {
-            setClientPortfolio(foundClient.portfolio);
-          }
-        }
-      }
+  // Helper to map CSV row to PortfolioAsset
+  const mapRowToAsset = (row: any): PortfolioAsset => {
+    const findKey = (keys: string[]) => {
+      const found = Object.keys(row).find(k => keys.some(target => k.toLowerCase().trim() === target.toLowerCase()));
+      return found ? row[found] : '';
     };
-    loadPortfolio();
-  }, [user, allClients]);
 
-  const addOperation = (_op: Operation) => {
-    // Operations are now handled by Google Sheets directly.
-    // The portfolio will refresh upon next fetch.
+    const rawType = findKey(['Type', 'Tipo', 'Category', 'AssetType']);
+    const typeMapping: Record<string, any> = {
+      'stocks': 'Stocks', 'acciones': 'Stocks', 'etfs': 'ETFs',
+      'fixed income': 'Fixed Income', 'renta fija': 'Fixed Income',
+      'cetes': 'Fixed Income', 'crypto': 'Crypto', 'cripto': 'Crypto',
+      'fibras': 'FIBRAs', 'fibra': 'FIBRAs', 'commodities': 'Commodities'
+    };
+
+    return {
+      ticker: findKey(['Ticker', 'Symbol', 'Activo']),
+      type: typeMapping[rawType.toLowerCase()] || 'Stocks',
+      sharesOwned: parseFloat(findKey(['Shares_Owned', 'Shares', 'Titulos', 'Cantidad']) || '0'),
+      avgPurchasePriceMXN: parseFloat(findKey(['Avg_Price_MXN', 'Costo_MXN', 'Precio_Promedio_MXN']) || '0'),
+      avgPurchasePriceUSD: parseFloat(findKey(['Avg_Price_USD', 'Costo_USD', 'Precio_Promedio_USD']) || '0'),
+      realTimePrice: parseFloat(findKey(['Live_Price', 'Real_Time_Price', 'Precio_Mercado', 'Price']) || '0'),
+      nativeCurrency: (findKey(['Currency', 'Moneda', 'Divisa']) as any) || 'USD'
+    };
   };
 
-  // Simplified calculation for the MVP dashboard
+  // 1. Sync All Clients & Portfolios
+  useEffect(() => {
+    const syncData = async () => {
+      setIsLoading(true);
+      try {
+        if (!SHEET_URLS.CLIENTS_DATA || !SHEET_URLS.PORTFOLIO_SUMMARY) {
+          setIsLoading(false);
+          return;
+        }
+
+        const [clientsRaw, portfolioRaw] = await Promise.all([
+          fetchCsvData(SHEET_URLS.CLIENTS_DATA),
+          fetchCsvData(SHEET_URLS.PORTFOLIO_SUMMARY)
+        ]);
+
+        // Map Portfolios
+        const portfolioByClient: Record<string, PortfolioAsset[]> = {};
+        portfolioRaw.forEach(row => {
+          const clientId = row.ClientID || row.clientid || row.ID || row.id;
+          if (clientId) {
+            if (!portfolioByClient[clientId]) portfolioByClient[clientId] = [];
+            const asset = mapRowToAsset(row);
+            if (asset.ticker && asset.sharesOwned > 0) {
+              portfolioByClient[clientId].push(asset);
+            }
+          }
+        });
+
+        // Map Clients
+        const mappedClients: ClientWithPortfolio[] = clientsRaw.map(row => {
+          const id = row.ID || row.id || '';
+          return {
+            id,
+            name: row.Nombre || row.name || '',
+            role: (row.Role || row.role || 'client') as 'admin' | 'client',
+            email: row.Email || row.email || '',
+            phone: row.Telefono || row.phone || '',
+            portfolio: portfolioByClient[id] || []
+          };
+        }).filter(c => c.id);
+
+        setAllClients(mappedClients);
+
+        // Update current user's specific portfolio
+        if (user) {
+          setClientPortfolio(portfolioByClient[user.id] || []);
+        }
+      } catch (error) {
+        console.error('Error syncing portfolios:', error);
+      }
+      setIsLoading(false);
+    };
+    syncData();
+  }, [user]);
+
   const totalNetWorthUSD = clientPortfolio.reduce((acc, asset) => {
     const value = asset.sharesOwned * (asset.nativeCurrency === 'USD' ? asset.realTimePrice : asset.realTimePrice / 16.5);
     return acc + value;
   }, 0);
 
-  const totalNetWorthMXN = clientPortfolio.reduce((acc, asset) => {
-    const value = asset.sharesOwned * (asset.nativeCurrency === 'MXN' ? asset.realTimePrice : asset.realTimePrice * 16.5);
-    return acc + value;
-  }, 0);
+  const totalNetWorthMXN = totalNetWorthUSD * 16.5;
 
   return (
-    <PortfolioContext.Provider value={{ clientPortfolio, totalNetWorthUSD, totalNetWorthMXN, addOperation, allClients }}>
+    <PortfolioContext.Provider value={{ clientPortfolio, totalNetWorthUSD, totalNetWorthMXN, allClients, isLoading }}>
       {children}
     </PortfolioContext.Provider>
   );

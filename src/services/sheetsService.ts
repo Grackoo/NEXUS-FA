@@ -9,7 +9,9 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyDHJhTsmvrbnBFwcLMa
 export const SHEET_URLS = {
   PORTFOLIO_SUMMARY: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMbHAoAnLIzHBO7iGu9ETipHcbSXmvBuc-bsR4vBsaciYzmipRlmk36kLz83miN692Dkgt7MyuLnLK/pub?gid=96904810&single=true&output=csv',
   CURRENCY_TRACKER: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMbHAoAnLIzHBO7iGu9ETipHcbSXmvBuc-bsR4vBsaciYzmipRlmk36kLz83miN692Dkgt7MyuLnLK/pub?gid=1688734912&single=true&output=csv',
-  OPERACIONES: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMbHAoAnLIzHBO7iGu9ETipHcbSXmvBuc-bsR4vBsaciYzmipRlmk36kLz83miN692Dkgt7MyuLnLK/pub?gid=418925467&single=true&output=csv'
+  OPERACIONES: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMbHAoAnLIzHBO7iGu9ETipHcbSXmvBuc-bsR4vBsaciYzmipRlmk36kLz83miN692Dkgt7MyuLnLK/pub?gid=418925467&single=true&output=csv',
+  // URL for the new CLIENTES_DATA sheet (needs update with correct GID)
+  CLIENTS_DATA: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMbHAoAnLIzHBO7iGu9ETipHcbSXmvBuc-bsR4vBsaciYzmipRlmk36kLz83miN692Dkgt7MyuLnLK/pub?gid=418925467&single=true&output=csv' 
 };
 
 export async function fetchCsvData(url: string) {
