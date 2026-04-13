@@ -2,6 +2,7 @@ import React from 'react';
 import Navbar from '../components/Navbar';
 import { usePortfolio } from '../contexts/PortfolioContext';
 import { useCurrency } from '../contexts/CurrencyContext';
+import { useAuth } from '../contexts/AuthContext';
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -12,13 +13,17 @@ import {
   Landmark, 
   Gem, 
   Activity,
-  Layers
+  Layers,
+  Plus
 } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
+import SmartTransactionModal from '../components/SmartTransactionModal';
 
 const Dashboard: React.FC = () => {
   const { clientPortfolio, totalNetWorthUSD, totalNetWorthMXN } = usePortfolio();
   const { currency, formatValue, convertToView } = useCurrency();
+  const { user } = useAuth();
+  const [isTxModalOpen, setIsTxModalOpen] = useState(false);
 
   const netWorth = currency === 'USD' ? totalNetWorthUSD : totalNetWorthMXN;
 
@@ -131,6 +136,12 @@ const Dashboard: React.FC = () => {
               Posiciones Actuales
             </h3>
             <div className="flex gap-2">
+               <button 
+                 onClick={() => setIsTxModalOpen(true)}
+                 className="glass-button flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 text-[10px] md:text-xs"
+               >
+                 <Plus className="w-3.5 h-3.5" /> Operar
+               </button>
                <button className="glass-button secondary px-3 md:px-4 py-1.5 md:py-2 text-[10px] md:text-xs">Exportar</button>
             </div>
           </div>
@@ -202,6 +213,15 @@ const Dashboard: React.FC = () => {
           </div>
         </section>
       </main>
+
+      {isTxModalOpen && user && (
+        <SmartTransactionModal 
+          isOpen={isTxModalOpen} 
+          onClose={() => setIsTxModalOpen(false)} 
+          clientId={user.id}
+          clientName={user.name}
+        />
+      )}
     </div>
   );
 };

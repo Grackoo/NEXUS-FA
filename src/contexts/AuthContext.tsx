@@ -34,14 +34,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const loadAuthorizedClients = async () => {
       if (SHEET_URLS.CLIENTS_DATA) {
         const data = await fetchCsvData(SHEET_URLS.CLIENTS_DATA);
-        const mapped: ClientProfile[] = data.map(row => ({
-          id: row.ID || row.id || '',
-          name: row.Nombre || row.name || '',
-          role: 'client',
-          password: row.Password || row.password || '',
-          email: row.Email || row.email || '',
-          phone: row.Telefono || row.phone || ''
-        })).filter(c => c.id);
+        const mapped: ClientProfile[] = data.map(row => {
+          // Helper para encontrar campos sin importar mayúsculas/minúsculas
+          const find = (keys: string[]) => {
+            const found = Object.keys(row).find(k => keys.some(target => k.toLowerCase().trim() === target.toLowerCase()));
+            return found ? row[found] : '';
+          };
+
+          return {
+            id: find(['ID']),
+            name: find(['Nombre', 'NOMBRE']),
+            role: 'client',
+            password: find(['Password', 'PASSWORD']),
+            email: find(['Email', 'EMAIL']),
+            phone: find(['Telefono', 'TELEFONO'])
+          };
+        }).filter(c => c.id);
         setAuthorizedClients(mapped);
       }
       setIsLoading(false);
@@ -56,16 +64,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       return { success: true };
     }
 
-    // 2. Refresh client list from sheet (optional but good for real-time)
+    // 2. Refresh client list from sheet
     let currentClients = authorizedClients;
     if (SHEET_URLS.CLIENTS_DATA) {
         const data = await fetchCsvData(SHEET_URLS.CLIENTS_DATA);
-        currentClients = data.map(row => ({
-            id: row.ID || row.id || '',
-            name: row.Nombre || row.name || '',
-            role: 'client',
-            password: row.Password || row.password || '',
-        })).filter(c => c.id);
+        currentClients = data.map(row => {
+            const find = (keys: string[]) => {
+                const found = Object.keys(row).find(k => keys.some(target => k.toLowerCase().trim() === target.toLowerCase()));
+                return found ? row[found] : '';
+            };
+            return {
+                id: find(['ID']),
+                name: find(['Nombre', 'NOMBRE']),
+                role: 'client',
+                password: find(['Password', 'PASSWORD']),
+            };
+        }).filter(c => c.id);
         setAuthorizedClients(currentClients);
     }
 
