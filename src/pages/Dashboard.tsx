@@ -160,7 +160,7 @@ const AssetLogo: React.FC<{ ticker: string; logoUrl?: string; className?: string
 
 // ─── Dashboard ────────────────────────────────────────────────────────────────
 const Dashboard: React.FC = () => {
-  const { clientPortfolio, totalNetWorthUSD, totalNetWorthMXN } = usePortfolio();
+  const { clientPortfolio, totalNetWorthUSD, totalNetWorthMXN, refreshPortfolio } = usePortfolio();
   const { currency, formatValue, convertToView } = useCurrency();
   const { user } = useAuth();
 
@@ -222,6 +222,7 @@ const Dashboard: React.FC = () => {
     if (!deleteTarget || !user) return;
     setIsDeleting(true);
     await deletePosition(user.id, deleteTarget.ticker, deleteTarget.assetType);
+    await refreshPortfolio();
     setIsDeleting(false);
     setDeleteTarget(null);
   };
@@ -347,15 +348,17 @@ const Dashboard: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-white/5">
                 {displayedPortfolio.map(asset => {
-                  const currentValue = asset.sharesOwned * asset.realTimePrice;
-                  const valueInView = convertToView(currentValue, asset.nativeCurrency);
-                  const avgPriceInView = convertToView(
-                    currency === 'USD' ? asset.avgPurchasePriceUSD : asset.avgPurchasePriceMXN,
-                    currency
-                  );
+                  // realTimePrice from Google Sheets is now ALWAYS in MXN
+                  const currentValueMXN = asset.sharesOwned * asset.realTimePrice;
+                  const valueInView = convertToView(currentValueMXN, 'MXN');
+                  
+                  // Use the explicit avg purchase prices from the backend
+                  const avgPriceInView = currency === 'USD' ? asset.avgPurchasePriceUSD : asset.avgPurchasePriceMXN;
+                  const costBasisInView = asset.sharesOwned * avgPriceInView;
 
-                  const pl = valueInView - asset.sharesOwned * avgPriceInView;
-                  const plPercentage = (pl / (asset.sharesOwned * avgPriceInView)) * 100;
+                  const pl = valueInView - costBasisInView;
+                  // Avoid Division by 0 (Infinity%) if costBasis is 0 or missing
+                  const plPercentage = costBasisInView > 0 ? (pl / costBasisInView) * 100 : 0;
                   const isPositive = pl >= 0;
 
                   return (

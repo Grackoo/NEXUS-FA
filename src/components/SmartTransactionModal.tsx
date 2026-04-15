@@ -104,7 +104,7 @@ const SmartTransactionModal: React.FC<Props> = ({
 }) => {
   const isEditMode = !!editAsset;
 
-  const { allClients } = usePortfolio();
+  const { allClients, refreshPortfolio } = usePortfolio();
   const { exchangeRate, formatValue } = useCurrency();
 
   const client = allClients.find(c => c.id === clientId);
@@ -204,6 +204,7 @@ const SmartTransactionModal: React.FC<Props> = ({
 
     setIsSubmitting(false);
     if (success) {
+      await refreshPortfolio();
       setIsSuccess(true);
       setTimeout(() => {
         setIsSuccess(false);
