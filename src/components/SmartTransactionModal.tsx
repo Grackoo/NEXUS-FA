@@ -125,6 +125,7 @@ const SmartTransactionModal: React.FC<Props> = ({
   const [price, setPrice] = useState<number | string>(initialPrice);
   const [commission, setCommission] = useState<number | string>(isEditMode ? 0 : '');
   const [currency, setCurrency] = useState<'USD' | 'MXN'>(initialCurrency);
+  const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -176,8 +177,8 @@ const SmartTransactionModal: React.FC<Props> = ({
     const totalTrans = (numShares * numPrice) + numCommission;
     const calculatedTotalMXN = currency === 'USD' ? totalTrans * exchangeRate : totalTrans;
 
-    // Edit mode sends as Adjustment, new operation keeps Buy/Sell
-    const operationType = isEditMode ? 'Adjustment' : type;
+    // Edit mode sends as Edit, new operation keeps Buy/Sell
+    const operationType = isEditMode ? 'Edit' : type;
 
     const success = await submitOperation({
       clientId,
@@ -198,6 +199,7 @@ const SmartTransactionModal: React.FC<Props> = ({
       Comisión: numCommission,
       Moneda: currency,
       Total_MXN: calculatedTotalMXN,
+      date: date
     });
 
     setIsSubmitting(false);
@@ -379,6 +381,19 @@ const SmartTransactionModal: React.FC<Props> = ({
                 placeholder="0.00"
               />
             </div>
+          </div>
+
+          {/* ── Date ── */}
+          <div className="space-y-2">
+            <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase ml-1">
+              Fecha de Operación
+            </label>
+            <input
+              type="date"
+              value={date}
+              onChange={e => setDate(e.target.value)}
+              className="glass-input cursor-pointer w-full"
+            />
           </div>
 
           {/* ── Summary ── */}

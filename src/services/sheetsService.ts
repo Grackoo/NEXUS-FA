@@ -52,7 +52,7 @@ export async function submitOperation(data: any) {
       },
       body: JSON.stringify({
         ...data,
-        date: new Date().toISOString().split('T')[0]
+        date: data.date || new Date().toISOString().split('T')[0]
       }),
     });
     return true; // Simple confirmation
