@@ -82,12 +82,15 @@ const SUGGESTIONS: Record<string, { ticker: string; name: string }[]> = {
     { ticker: 'WEAT', name: 'Wheat (Teucrium Wheat Fund)' },
   ],
   'Forex': [
-    { ticker: 'EURUSD', name: 'Euro / US Dollar' },
-    { ticker: 'USDMXN', name: 'US Dollar / Mexican Peso' },
-    { ticker: 'GBPUSD', name: 'British Pound / US Dollar' },
-    { ticker: 'USDJPY', name: 'US Dollar / Japanese Yen' },
-    { ticker: 'AUDUSD', name: 'Australian Dollar / US Dollar' },
-    { ticker: 'USDCAD', name: 'US Dollar / Canadian Dollar' },
+    { ticker: 'USD', name: 'US Dollar (Dólar estadounidense)' },
+    { ticker: 'MXN', name: 'Mexican Peso (Peso mexicano)' },
+    { ticker: 'EUR', name: 'Euro' },
+    { ticker: 'GBP', name: 'British Pound (Libra esterlina)' },
+    { ticker: 'JPY', name: 'Japanese Yen (Yen japonés)' },
+    { ticker: 'CAD', name: 'Canadian Dollar' },
+    { ticker: 'CHF', name: 'Swiss Franc (Franco suizo)' },
+    { ticker: 'AUD', name: 'Australian Dollar' },
+    { ticker: 'CNY', name: 'Chinese Yuan (Yuan chino)' }
   ]
 };
 
@@ -113,10 +116,15 @@ const SmartTransactionModal: React.FC<Props> = ({
     ? (editAsset!.type as any)
     : (defaultAssetType && defaultAssetType !== 'All') ? defaultAssetType : 'Stocks';
   const [assetType, setAssetType] = useState(initialAssetType);
-  const [shares, setShares] = useState<number>(editAsset?.sharesOwned ?? 0);
-  const [price, setPrice] = useState<number>(editAsset?.avgPurchasePriceUSD ?? 0);
-  const [commission, setCommission] = useState<number>(0);
-  const [currency, setCurrency] = useState<'USD' | 'MXN'>(editAsset?.nativeCurrency ?? 'USD');
+  const initialCurrency = editAsset?.nativeCurrency ?? 'USD';
+  const initialPrice = editAsset 
+    ? (initialCurrency === 'USD' ? editAsset.avgPurchasePriceUSD : editAsset.avgPurchasePriceMXN) 
+    : '';
+
+  const [shares, setShares] = useState<number | string>(editAsset?.sharesOwned ?? '');
+  const [price, setPrice] = useState<number | string>(initialPrice);
+  const [commission, setCommission] = useState<number | string>(isEditMode ? 0 : '');
+  const [currency, setCurrency] = useState<'USD' | 'MXN'>(initialCurrency);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -144,16 +152,20 @@ const SmartTransactionModal: React.FC<Props> = ({
   const currentAsset = client?.portfolio.find(a => a.ticker === ticker);
   const sharesOwned = currentAsset?.sharesOwned || 0;
 
-  const totalTransaction = (shares * price) + commission;
+  const numShares = Number(shares) || 0;
+  const numPrice = Number(price) || 0;
+  const numCommission = Number(commission) || 0;
 
-  const showBalanceWarning = type === 'Sell' && shares > sharesOwned;
+  const totalTransaction = (numShares * numPrice) + numCommission;
+
+  const showBalanceWarning = type === 'Sell' && numShares > sharesOwned;
 
   const calculateNewAvg = () => {
-    if (!currentAsset) return price;
+    if (!currentAsset) return numPrice;
     if (type === 'Sell') return currentAsset.avgPurchasePriceUSD;
     const currentTotalCostUSD = currentAsset.avgPurchasePriceUSD * currentAsset.sharesOwned;
     const newTotalCostUSD = currency === 'USD' ? totalTransaction : totalTransaction / exchangeRate;
-    const totalNewShares = currentAsset.sharesOwned + shares;
+    const totalNewShares = currentAsset.sharesOwned + numShares;
     return totalNewShares > 0 ? (currentTotalCostUSD + newTotalCostUSD) / totalNewShares : 0;
   };
 
@@ -161,7 +173,7 @@ const SmartTransactionModal: React.FC<Props> = ({
 
   const handleConfirm = async () => {
     setIsSubmitting(true);
-    const totalTrans = (shares * price) + commission;
+    const totalTrans = (numShares * numPrice) + numCommission;
     const calculatedTotalMXN = currency === 'USD' ? totalTrans * exchangeRate : totalTrans;
 
     // Edit mode sends as Adjustment, new operation keeps Buy/Sell
@@ -172,18 +184,18 @@ const SmartTransactionModal: React.FC<Props> = ({
       type: operationType,
       assetType,
       ticker,
-      shares,
-      price,
-      commission,
+      shares: numShares,
+      price: numPrice,
+      commission: numCommission,
       originalCurrency: currency,
       Cliente_ID: clientId,
       Tipo_Operacion: operationType,
       Ticker: ticker,
       Tipo_Activo: assetType,
-      Cantidad: shares,
-      Precio: price,
-      Comision: commission,
-      Comisión: commission,
+      Cantidad: numShares,
+      Precio: numPrice,
+      Comision: numCommission,
+      Comisión: numCommission,
       Moneda: currency,
       Total_MXN: calculatedTotalMXN,
     });
@@ -333,8 +345,8 @@ const SmartTransactionModal: React.FC<Props> = ({
               </div>
               <input
                 type="number"
-                value={shares || ''}
-                onChange={e => setShares(Number(e.target.value))}
+                value={shares}
+                onChange={e => setShares(e.target.value === '' ? '' : Number(e.target.value))}
                 className="glass-input"
                 placeholder="0"
               />
@@ -349,8 +361,8 @@ const SmartTransactionModal: React.FC<Props> = ({
               </label>
               <input
                 type="number"
-                value={price || ''}
-                onChange={e => setPrice(Number(e.target.value))}
+                value={price}
+                onChange={e => setPrice(e.target.value === '' ? '' : Number(e.target.value))}
                 className="glass-input"
                 placeholder="0.00"
               />
@@ -361,8 +373,8 @@ const SmartTransactionModal: React.FC<Props> = ({
               </label>
               <input
                 type="number"
-                value={commission || ''}
-                onChange={e => setCommission(Number(e.target.value))}
+                value={commission}
+                onChange={e => setCommission(e.target.value === '' ? '' : Number(e.target.value))}
                 className="glass-input"
                 placeholder="0.00"
               />
@@ -397,7 +409,7 @@ const SmartTransactionModal: React.FC<Props> = ({
 
           {/* ── Confirm button ── */}
           <button
-            disabled={showBalanceWarning || shares <= 0 || price <= 0 || isSubmitting}
+            disabled={showBalanceWarning || numShares <= 0 || numPrice <= 0 || isSubmitting}
             onClick={handleConfirm}
             className="glass-button w-full shadow-[0_0_20px_rgba(26,92,255,0.3)] disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
           >
