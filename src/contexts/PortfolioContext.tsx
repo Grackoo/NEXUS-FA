@@ -36,8 +36,8 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
     const rawType = findKey(['Type', 'Tipo', 'Category', 'AssetType']);
     const typeMapping: Record<string, any> = {
       'stocks': 'Stocks', 'acciones': 'Stocks', 'etfs': 'ETFs',
-      'fixed income': 'Fixed Income', 'renta fija': 'Fixed Income',
-      'cetes': 'Fixed Income', 'crypto': 'Crypto', 'cripto': 'Crypto',
+      'Renta Fija': 'Renta Fija', 'renta fija': 'Renta Fija',
+      'cetes': 'Renta Fija', 'crypto': 'Crypto', 'cripto': 'Crypto',
       'fibras': 'FIBRAs', 'fibra': 'FIBRAs', 'commodities': 'Commodities',
       'forex': 'Forex', 'divisas': 'Forex'
     };

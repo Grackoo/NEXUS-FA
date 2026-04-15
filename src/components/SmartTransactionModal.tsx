@@ -18,7 +18,7 @@ interface Props {
   onClose: () => void;
   clientId: string;
   clientName: string;
-  defaultAssetType?: 'Stocks' | 'ETFs' | 'Fixed Income' | 'Crypto' | 'FIBRAs' | 'Commodities' | 'Forex' | 'All';
+  defaultAssetType?: 'Stocks' | 'ETFs' | 'Renta Fija' | 'Crypto' | 'FIBRAs' | 'Commodities' | 'Forex' | 'All';
   /** When passed, the modal opens pre-filled with this asset's data for editing */
   editAsset?: EditAsset;
 }
@@ -56,7 +56,7 @@ const SUGGESTIONS: Record<string, { ticker: string; name: string }[]> = {
     { ticker: 'ADA', name: 'Cardano' },
     { ticker: 'DOGE', name: 'Dogecoin' }
   ],
-  'Fixed Income': [
+  'Renta fija': [
     { ticker: 'CETES28', name: 'CETES 28 Días' },
     { ticker: 'CETES91', name: 'CETES 91 Días' },
     { ticker: 'CETES182', name: 'CETES 182 Días' },
@@ -315,7 +315,7 @@ const SmartTransactionModal: React.FC<Props> = ({
                 <option value="ETFs">ETFs</option>
                 <option value="Crypto">Criptomonedas</option>
                 <option value="FIBRAs">FIBRAs / Real Estate</option>
-                <option value="Fixed Income">Renta Fija (CETES)</option>
+                <option value="Renta Fija">Renta Fija (CETES)</option>
                 <option value="Commodities">Commodities</option>
                 <option value="Forex">Forex</option>
               </select>

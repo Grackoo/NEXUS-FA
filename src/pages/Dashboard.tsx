@@ -121,7 +121,7 @@ const DeleteConfirmModal: React.FC<DeleteConfirmProps> = ({
 );
 
 // ─── Available categories ─────────────────────────────────────────────────────
-const CATEGORIES = ['All', 'Stocks', 'ETFs', 'Crypto', 'Fixed Income', 'FIBRAs', 'Commodities', 'Forex'];
+const CATEGORIES = ['All', 'Stocks', 'ETFs', 'Crypto', 'Renta Fija', 'FIBRAs', 'Commodities', 'Forex'];
 
 // ─── Asset Logo Helper ───────────────────────────────────────────────────────
 export const cleanTickerName = (ticker: string) => ticker.replace(/(STOCKS|ETFS|CRYPTO|FIBRAS|COMMODITIES|FOREX|EQUITY|INC)$/i, '').trim();
@@ -195,7 +195,7 @@ const Dashboard: React.FC = () => {
       case 'ETFs':         return <Layers className="w-5 h-5" />;
       case 'Crypto':       return <Coins className="w-5 h-5" />;
       case 'FIBRAs':       return <Building2 className="w-5 h-5" />;
-      case 'Fixed Income': return <Landmark className="w-5 h-5" />;
+      case 'Renta Fija': return <Landmark className="w-5 h-5" />;
       case 'Commodities':  return <Gem className="w-5 h-5" />;
       default:             return <Activity className="w-5 h-5" />;
     }
@@ -291,7 +291,7 @@ const Dashboard: React.FC = () => {
             const isActive = selectedCategory === category;
             const labelMapping: Record<string, string> = {
               'All': 'Todos los Activos', 'Stocks': 'Acciones', 'ETFs': 'ETFs',
-              'Crypto': 'Criptomonedas', 'Fixed Income': 'Renta Fija',
+              'Crypto': 'Criptomonedas', 'Renta Fija': 'Renta Fija',
               'FIBRAs': 'FIBRAs', 'Commodities': 'Materias Primas', 'Forex': 'Forex',
             };
             return (

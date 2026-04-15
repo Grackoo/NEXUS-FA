@@ -1,6 +1,6 @@
 export interface PortfolioAsset {
   ticker: string;
-  type: 'Stocks' | 'ETFs' | 'Fixed Income' | 'Crypto' | 'FIBRAs' | 'Commodities' | 'Real Estate' | 'Forex';
+  type: 'Stocks' | 'ETFs' | 'Renta Fija' | 'Crypto' | 'FIBRAs' | 'Commodities' | 'Real Estate' | 'Forex';
   sharesOwned: number;
   avgPurchasePriceMXN: number;
   avgPurchasePriceUSD: number;
@@ -34,7 +34,7 @@ export const MOCK_CLIENTS: Client[] = [
     portfolio: [
       { ticker: 'AAPL', type: 'Stocks', sharesOwned: 10, avgPurchasePriceMXN: 2500, avgPurchasePriceUSD: 145, realTimePrice: 170, nativeCurrency: 'USD' },
       { ticker: 'IVV', type: 'ETFs', sharesOwned: 5, avgPurchasePriceMXN: 8000, avgPurchasePriceUSD: 450, realTimePrice: 510, nativeCurrency: 'USD' },
-      { ticker: 'CETES', type: 'Fixed Income', sharesOwned: 1000, avgPurchasePriceMXN: 10, avgPurchasePriceUSD: 0.60, realTimePrice: 10.5, nativeCurrency: 'MXN' },
+      { ticker: 'CETES', type: 'Renta Fija', sharesOwned: 1000, avgPurchasePriceMXN: 10, avgPurchasePriceUSD: 0.60, realTimePrice: 10.5, nativeCurrency: 'MXN' },
       { ticker: 'FIBRAPL14', type: 'FIBRAs', sharesOwned: 100, avgPurchasePriceMXN: 55, avgPurchasePriceUSD: 3.33, realTimePrice: 58.5, nativeCurrency: 'MXN' }
     ]
   },
@@ -54,7 +54,7 @@ export interface Operation {
   id: string;
   clientId: string;
   type: 'Buy' | 'Sell';
-  assetType: 'Stocks' | 'ETFs' | 'Fixed Income' | 'Crypto' | 'FIBRAs' | 'Commodities';
+  assetType: 'Stocks' | 'ETFs' | 'Renta Fija' | 'Crypto' | 'FIBRAs' | 'Commodities';
   ticker: string;
   shares: number;
   price: number;
