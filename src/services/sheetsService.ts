@@ -3,7 +3,7 @@
  * and Google Apps Script (Write).
  */
 
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyDHJhTsmvrbnBFwcLMaIzJg594iLR3258V0t2hE9bCJ98_dTCpjQu12nf8YA2M3ZvQJQ/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwOwelcOqLZsPLWPgmx72h6LUe5nylvnlkboEfY1qm5aUSsxMeJ96tUB0zPXrMu-aBRtQ/exec';
 
 // These are the real CSV URLs constructed from the user's published sheet
 export const SHEET_URLS = {
