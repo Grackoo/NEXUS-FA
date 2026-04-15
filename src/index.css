@@ -208,6 +208,77 @@ select.glass-input option {
 .glass-button.secondary {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border-light);
+  color: var(--text-main);
+}
+
+.glass-button.secondary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.glass-button.emerald {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: var(--emerald);
+}
+
+.glass-button.emerald:hover:not(:disabled) {
+  background: rgba(16, 185, 129, 0.25);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+  transform: translateY(-2px);
+}
+
+.glass-button.danger {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--crimson);
+}
+
+.glass-button.danger:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.25);
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Icon action buttons inside tables */
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-light);
+  background: rgba(255, 255, 255, 0.04);
+  color: #94A3B8;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0;
+}
+
+.action-btn:hover {
+  background: rgba(255, 255, 255, 0.10);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.action-btn.edit:hover {
+  background: rgba(26, 92, 255, 0.15);
+  color: var(--primary);
+  border-color: rgba(26, 92, 255, 0.3);
+}
+
+.action-btn.confirm:hover {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--emerald);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.action-btn.cancel:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--crimson);
+  border-color: rgba(239, 68, 68, 0.3);
 }
 
 .text-gradient {

@@ -61,3 +61,28 @@ export async function submitOperation(data: any) {
     return false;
   }
 }
+
+export async function deletePosition(clientId: string, ticker: string, assetType: string) {
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        clientId,
+        type: 'Delete',
+        ticker,
+        assetType,
+        Cliente_ID: clientId,
+        Tipo_Operacion: 'Delete',
+        Ticker: ticker,
+        Tipo_Activo: assetType,
+        date: new Date().toISOString().split('T')[0],
+      }),
+    });
+    return true;
+  } catch (error) {
+    console.error('Error deleting position:', error);
+    return false;
+  }
+}

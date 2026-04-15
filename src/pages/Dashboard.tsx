@@ -3,48 +3,152 @@ import Navbar from '../components/Navbar';
 import { usePortfolio } from '../contexts/PortfolioContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { useAuth } from '../contexts/AuthContext';
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  PieChart as PieChartIcon, 
-  List, 
-  Coins, 
-  Building2, 
-  Landmark, 
-  Gem, 
+import { deletePosition } from '../services/sheetsService';
+import {
+  TrendingUp,
+  TrendingDown,
+  PieChart as PieChartIcon,
+  List,
+  Coins,
+  Building2,
+  Landmark,
+  Gem,
   Activity,
   Layers,
-  Plus
+  Plus,
+  Pencil,
+  Trash2,
+  AlertTriangle,
+  RefreshCcw,
 } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
-import SmartTransactionModal from '../components/SmartTransactionModal';
+import SmartTransactionModal, { type EditAsset } from '../components/SmartTransactionModal';
 
-// Available categories for the UI tabs
+// ─── Delete Confirmation Modal ────────────────────────────────────────────────
+interface DeleteConfirmProps {
+  ticker: string;
+  assetType: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+  isDeleting: boolean;
+}
+
+const DeleteConfirmModal: React.FC<DeleteConfirmProps> = ({
+  ticker,
+  assetType,
+  onConfirm,
+  onCancel,
+  isDeleting,
+}) => (
+  <div className="fixed inset-0 z-[70] flex items-center justify-center p-6 bg-black/70 backdrop-blur-sm animate-fade-in">
+    <div
+      className="glass-card w-full max-w-md p-0 overflow-hidden"
+      style={{ border: '1px solid rgba(239,68,68,0.25)' }}
+    >
+      {/* Red gradient header bar */}
+      <div
+        style={{
+          height: '4px',
+          background: 'linear-gradient(90deg, #EF4444, #F87171)',
+        }}
+      />
+
+      <div className="p-8 space-y-6">
+        {/* Icon + title */}
+        <div className="flex items-start gap-4">
+          <div
+            className="shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center"
+            style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.25)' }}
+          >
+            <AlertTriangle className="w-6 h-6 text-crimson" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold leading-tight">
+              ¿Eliminar posición?
+            </h2>
+            <p className="text-xs text-gray-500 mt-1">
+              Posición: <span className="text-white font-bold">{ticker}</span>
+              <span className="ml-2 text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-gray-400 uppercase tracking-wider">{assetType}</span>
+            </p>
+          </div>
+        </div>
+
+        {/* Warning message */}
+        <div
+          className="p-4 rounded-xl space-y-2"
+          style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.18)' }}
+        >
+          <p className="text-sm font-semibold text-white leading-relaxed">
+            ¿Está seguro de que desea eliminar esta posición?
+          </p>
+          <p className="text-xs text-gray-400 leading-relaxed">
+            Al eliminar esta posición, se eliminarán todas las transacciones
+            asociadas a <span className="text-white font-bold">{ticker}</span> en el registro.
+            <span className="block mt-1 font-semibold text-crimson/80">Esta acción no se puede deshacer.</span>
+          </p>
+        </div>
+
+        {/* Action buttons */}
+        <div className="flex gap-3">
+          <button
+            onClick={onCancel}
+            disabled={isDeleting}
+            className="glass-button secondary flex-1 py-3 text-sm disabled:opacity-50"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={isDeleting}
+            className="flex-1 py-3 rounded-xl text-sm font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            style={{
+              background: isDeleting ? 'rgba(239,68,68,0.15)' : 'rgba(239,68,68,0.85)',
+              border: '1px solid rgba(239,68,68,0.5)',
+              color: 'white',
+              boxShadow: isDeleting ? 'none' : '0 0 20px rgba(239,68,68,0.35)',
+            }}
+          >
+            {isDeleting ? (
+              <><RefreshCcw className="w-4 h-4 animate-spin" /> Eliminando...</>
+            ) : (
+              <><Trash2 className="w-4 h-4" /> Sí, eliminar</>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// ─── Available categories ─────────────────────────────────────────────────────
 const CATEGORIES = ['All', 'Stocks', 'ETFs', 'Crypto', 'Fixed Income', 'FIBRAs', 'Commodities', 'Forex'];
 
+// ─── Dashboard ────────────────────────────────────────────────────────────────
 const Dashboard: React.FC = () => {
   const { clientPortfolio, totalNetWorthUSD, totalNetWorthMXN } = usePortfolio();
   const { currency, formatValue, convertToView } = useCurrency();
   const { user } = useAuth();
+
   const [isTxModalOpen, setIsTxModalOpen] = useState(false);
+  const [editAsset, setEditAsset] = useState<EditAsset | undefined>(undefined);
   const [selectedCategory, setSelectedCategory] = useState('All');
+
+  // Delete confirm state
+  const [deleteTarget, setDeleteTarget] = useState<{ ticker: string; assetType: string } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const netWorth = currency === 'USD' ? totalNetWorthUSD : totalNetWorthMXN;
 
-  // Filter portfolio based on selected category
-  const displayedPortfolio = selectedCategory === 'All' 
-    ? clientPortfolio 
-    : clientPortfolio.filter(asset => asset.type === selectedCategory);
+  const displayedPortfolio =
+    selectedCategory === 'All'
+      ? clientPortfolio
+      : clientPortfolio.filter(a => a.type === selectedCategory);
 
-  // Pie chart data grouping
   const allocation = clientPortfolio.reduce((acc: any[], asset) => {
     const existing = acc.find(item => item.name === asset.type);
-    const valueInView = convertToView(asset.sharesOwned * asset.realTimePrice, asset.nativeCurrency);
-    if (existing) {
-      existing.value += valueInView;
-    } else {
-      acc.push({ name: asset.type, value: valueInView });
-    }
+    const val = convertToView(asset.sharesOwned * asset.realTimePrice, asset.nativeCurrency);
+    if (existing) existing.value += val;
+    else acc.push({ name: asset.type, value: val });
     return acc;
   }, []);
 
@@ -52,24 +156,49 @@ const Dashboard: React.FC = () => {
 
   const getAssetIcon = (type: string) => {
     switch (type) {
-      case 'Stocks': return <Activity className="w-5 h-5" />;
-      case 'ETFs': return <Layers className="w-5 h-5" />;
-      case 'Crypto': return <Coins className="w-5 h-5" />;
-      case 'FIBRAs': return <Building2 className="w-5 h-5" />;
+      case 'Stocks':       return <Activity className="w-5 h-5" />;
+      case 'ETFs':         return <Layers className="w-5 h-5" />;
+      case 'Crypto':       return <Coins className="w-5 h-5" />;
+      case 'FIBRAs':       return <Building2 className="w-5 h-5" />;
       case 'Fixed Income': return <Landmark className="w-5 h-5" />;
-      case 'Commodities': return <Gem className="w-5 h-5" />;
-      default: return <Activity className="w-5 h-5" />;
+      case 'Commodities':  return <Gem className="w-5 h-5" />;
+      default:             return <Activity className="w-5 h-5" />;
     }
+  };
+
+  const handleOpenEdit = (asset: any) => {
+    setEditAsset({
+      ticker: asset.ticker,
+      type: asset.type,
+      sharesOwned: asset.sharesOwned,
+      avgPurchasePriceUSD: asset.avgPurchasePriceUSD,
+      avgPurchasePriceMXN: asset.avgPurchasePriceMXN,
+      nativeCurrency: asset.nativeCurrency,
+    });
+    setIsTxModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsTxModalOpen(false);
+    setEditAsset(undefined);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget || !user) return;
+    setIsDeleting(true);
+    await deletePosition(user.id, deleteTarget.ticker, deleteTarget.assetType);
+    setIsDeleting(false);
+    setDeleteTarget(null);
   };
 
   return (
     <div className="min-h-screen pb-12">
       <Navbar />
-      
+
       <main className="max-w-7xl mx-auto px-4 md:px-8 mt-6 md:mt-10 space-y-6 md:space-y-8 animate-fade-in">
-        {/* Header Section */}
+
+        {/* ── Header cards ── */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Performance Card */}
           <div className="md:col-span-2 glass-card flex flex-col justify-between overflow-hidden relative p-6 md:p-8">
             <div className="relative z-10">
               <p className="text-gray-400 font-medium text-[10px] md:text-xs mb-1 uppercase tracking-widest">Patrimonio Neto Total</p>
@@ -78,50 +207,35 @@ const Dashboard: React.FC = () => {
               </h1>
               <div className="flex flex-wrap items-center gap-3 md:gap-4">
                 <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald/10 text-emerald text-[10px] md:text-xs font-bold border border-emerald/20">
-                  <TrendingUp className="w-3.5 h-3.5" />
-                  +12.40%
+                  <TrendingUp className="w-3.5 h-3.5" /> +12.40%
                 </div>
                 <p className="text-[10px] md:text-xs text-gray-400">vs. mes pasado: +$1,240.00 USD</p>
               </div>
             </div>
-            
-            {/* Visual background element */}
             <div className="absolute right-0 bottom-0 top-0 w-1/3 bg-gradient-to-l from-primary/10 to-transparent flex items-center justify-end pr-4 md:pr-8">
-               <TrendingUp className="w-20 h-20 md:w-32 md:h-32 text-primary/10 rotate-12" />
+              <TrendingUp className="w-20 h-20 md:w-32 md:h-32 text-primary/10 rotate-12" />
             </div>
           </div>
 
-          {/* Asset Allocation Mini Card */}
           <div className="glass-card p-6">
             <div className="flex items-center justify-between mb-6">
-               <h3 className="font-bold text-[10px] md:text-sm tracking-widest flex items-center gap-2 uppercase text-gray-400">
-                 <PieChartIcon className="w-4 h-4 text-primary" />
-                 Distribución
-               </h3>
+              <h3 className="font-bold text-[10px] md:text-sm tracking-widest flex items-center gap-2 uppercase text-gray-400">
+                <PieChartIcon className="w-4 h-4 text-primary" /> Distribución
+              </h3>
             </div>
             <div style={{ height: '200px', width: '100%', position: 'relative' }}>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie
-                    data={allocation}
-                    innerRadius={60}
-                    outerRadius={85}
-                    paddingAngle={5}
-                    dataKey="value"
-                    stroke="none"
-                  >
-                    {allocation.map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Pie data={allocation} innerRadius={60} outerRadius={85} paddingAngle={5} dataKey="value" stroke="none">
+                    {allocation.map((_: any, i: number) => (
+                      <Cell key={`cell-${i}`} fill={COLORS[i % COLORS.length]} />
                     ))}
                   </Pie>
-                  <RechartsTooltip 
-                    contentStyle={{ 
-                      background: 'rgba(5, 5, 5, 0.9)', 
-                      backdropFilter: 'blur(8px)',
-                      border: '1px solid rgba(255,255,255,0.1)', 
-                      borderRadius: '12px',
-                      boxShadow: '0 10px 15px rgba(0,0,0,0.5)',
-                      padding: '8px'
+                  <RechartsTooltip
+                    contentStyle={{
+                      background: 'rgba(5,5,5,0.9)', backdropFilter: 'blur(8px)',
+                      border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px',
+                      boxShadow: '0 10px 15px rgba(0,0,0,0.5)', padding: '8px',
                     }}
                     itemStyle={{ color: '#fff', fontSize: '11px', textTransform: 'uppercase' }}
                   />
@@ -135,30 +249,23 @@ const Dashboard: React.FC = () => {
           </div>
         </section>
 
-        {/* Category Tabs */}
+        {/* ── Category Tabs ── */}
         <section className="flex items-center gap-2 overflow-x-auto scrollbar-hide py-2">
           {CATEGORIES.map(category => {
             const isActive = selectedCategory === category;
-
             const labelMapping: Record<string, string> = {
-              'All': 'Todos los Activos',
-              'Stocks': 'Acciones',
-              'ETFs': 'ETFs',
-              'Crypto': 'Criptomonedas',
-              'Fixed Income': 'Renta Fija',
-              'FIBRAs': 'FIBRAs',
-              'Commodities': 'Materias Primas',
-              'Forex': 'Forex'
+              'All': 'Todos los Activos', 'Stocks': 'Acciones', 'ETFs': 'ETFs',
+              'Crypto': 'Criptomonedas', 'Fixed Income': 'Renta Fija',
+              'FIBRAs': 'FIBRAs', 'Commodities': 'Materias Primas', 'Forex': 'Forex',
             };
-
             return (
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
                 className={`whitespace-nowrap px-4 py-2 rounded-xl text-[11px] font-bold tracking-widest uppercase transition-all duration-300 ${
-                  isActive 
-                  ? 'bg-primary text-white shadow-[0_0_15px_rgba(26,92,255,0.4)]' 
-                  : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'
+                  isActive
+                    ? 'bg-primary text-white shadow-[0_0_15px_rgba(26,92,255,0.4)]'
+                    : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'
                 }`}
               >
                 {labelMapping[category]}
@@ -167,28 +274,31 @@ const Dashboard: React.FC = () => {
           })}
         </section>
 
-        {/* Positions Table Section */}
+        {/* ── Positions Table ── */}
         <section className="glass-card p-0 overflow-hidden">
           <div className="px-6 md:px-8 py-5 md:py-6 border-b border-white/5 flex items-center justify-between bg-white/[0.01]">
             <h3 className="font-bold text-base md:text-lg flex items-center gap-3">
               <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
                 <List className="w-4 h-4 md:w-5 md:h-5 text-primary" />
               </div>
-              Posiciones Actuales {selectedCategory !== 'All' && <span>- {selectedCategory}</span>}
+              Posiciones Actuales {selectedCategory !== 'All' && <span>— {selectedCategory}</span>}
             </h3>
             <div className="flex gap-2">
-               <button 
-                 onClick={() => setIsTxModalOpen(true)}
-                 className="glass-button flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 text-[10px] md:text-xs"
-               >
-                 <Plus className="w-3.5 h-3.5" /> Operar {selectedCategory !== 'All' ? selectedCategory : ''}
-               </button>
-               <button className="glass-button secondary px-3 md:px-4 py-1.5 md:py-2 text-[10px] md:text-xs">Exportar</button>
+              <button
+                onClick={() => { setEditAsset(undefined); setIsTxModalOpen(true); }}
+                className="glass-button flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 text-[10px] md:text-xs"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                Operar {selectedCategory !== 'All' ? selectedCategory : ''}
+              </button>
+              <button className="glass-button secondary px-3 md:px-4 py-1.5 md:py-2 text-[10px] md:text-xs">
+                Exportar
+              </button>
             </div>
           </div>
-          
+
           <div className="overflow-x-auto scrollbar-hide">
-            <table className="w-full text-left border-collapse min-w-[700px] md:min-w-0">
+            <table className="w-full text-left border-collapse min-w-[780px] md:min-w-0">
               <thead>
                 <tr className="border-b border-white/5 text-gray-400 text-[9px] md:text-[10px] uppercase tracking-widest bg-white/[0.02]">
                   <th className="px-6 md:px-8 py-4 md:py-5 font-semibold">Activo</th>
@@ -196,24 +306,26 @@ const Dashboard: React.FC = () => {
                   <th className="px-4 py-4 md:py-5 font-semibold text-right">Precio Prom.</th>
                   <th className="px-4 py-4 md:py-5 font-semibold text-right">V. Mercado</th>
                   <th className="px-4 py-4 md:py-5 font-semibold text-right">Ganancia</th>
-                  <th className="px-6 md:px-8 py-4 md:py-5 font-semibold text-right">Rend.</th>
+                  <th className="px-4 py-4 md:py-5 font-semibold text-right">Rend.</th>
+                  <th className="px-6 md:px-8 py-4 md:py-5 font-semibold text-center">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {displayedPortfolio.map((asset) => {
+                {displayedPortfolio.map(asset => {
                   const currentValue = asset.sharesOwned * asset.realTimePrice;
                   const valueInView = convertToView(currentValue, asset.nativeCurrency);
                   const avgPriceInView = convertToView(
-                        currency === 'USD' ? asset.avgPurchasePriceUSD : asset.avgPurchasePriceMXN,
-                        currency
+                    currency === 'USD' ? asset.avgPurchasePriceUSD : asset.avgPurchasePriceMXN,
+                    currency
                   );
-                  
-                  const pl = valueInView - (asset.sharesOwned * avgPriceInView);
+
+                  const pl = valueInView - asset.sharesOwned * avgPriceInView;
                   const plPercentage = (pl / (asset.sharesOwned * avgPriceInView)) * 100;
                   const isPositive = pl >= 0;
 
                   return (
                     <tr key={asset.ticker} className="group hover:bg-white/[0.03] transition-colors">
+                      {/* Asset info */}
                       <td className="px-6 md:px-8 py-5 md:py-6">
                         <div className="flex items-center gap-3 md:gap-4">
                           <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-white/5 flex items-center justify-center text-primary border border-white/5 group-hover:border-primary/30 transition-all duration-300">
@@ -222,7 +334,7 @@ const Dashboard: React.FC = () => {
                           <div>
                             <div className="flex items-center gap-1.5 md:gap-2 mb-0.5 md:mb-1">
                               <p className="font-bold text-xs md:text-sm tracking-tight">{asset.ticker}</p>
-                              <span className="text-[8px] px-1.2 py-0.5 rounded bg-white/5 text-gray-400 font-medium uppercase tracking-wider">
+                              <span className="text-[8px] px-1.5 py-0.5 rounded bg-white/5 text-gray-400 font-medium uppercase tracking-wider">
                                 {asset.type}
                               </span>
                             </div>
@@ -230,20 +342,56 @@ const Dashboard: React.FC = () => {
                           </div>
                         </div>
                       </td>
+
                       <td className="px-4 py-5 md:py-6 text-right font-semibold tabular-nums text-xs md:text-sm">{asset.sharesOwned}</td>
-                      <td className="px-4 py-5 md:py-6 text-right tabular-nums text-gray-400 text-xs md:text-sm">
-                        {formatValue(avgPriceInView)}
-                      </td>
-                      <td className="px-4 py-5 md:py-6 text-right font-bold tabular-nums text-xs md:text-sm">
-                        {formatValue(valueInView)}
-                      </td>
+                      <td className="px-4 py-5 md:py-6 text-right tabular-nums text-gray-400 text-xs md:text-sm">{formatValue(avgPriceInView)}</td>
+                      <td className="px-4 py-5 md:py-6 text-right font-bold tabular-nums text-xs md:text-sm">{formatValue(valueInView)}</td>
+
                       <td className={`px-4 py-5 md:py-6 text-right font-bold tabular-nums text-xs md:text-sm ${isPositive ? 'text-emerald' : 'text-crimson'}`}>
                         {isPositive ? '+' : ''}{formatValue(pl)}
                       </td>
-                      <td className="px-6 md:px-8 py-5 md:py-6 text-right">
+
+                      <td className="px-4 py-5 md:py-6 text-right">
                         <div className={`inline-flex items-center gap-1.5 px-2 md:px-2.5 py-1 rounded-lg font-bold text-[10px] md:text-xs ${isPositive ? 'bg-emerald/10 text-emerald border border-emerald/20' : 'bg-crimson/10 text-crimson border border-crimson/20'}`}>
                           {isPositive ? <TrendingUp className="w-3 md:w-3.5 h-3 md:h-3.5" /> : <TrendingDown className="w-3 md:w-3.5 h-3 md:h-3.5" />}
                           {plPercentage.toFixed(1)}%
+                        </div>
+                      </td>
+
+                      {/* Actions: Edit + Delete */}
+                      <td className="px-6 md:px-8 py-5 md:py-6 text-center">
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                          {/* Edit */}
+                          <button
+                            onClick={() => handleOpenEdit(asset)}
+                            className="action-btn edit"
+                            title={`Editar posición de ${asset.ticker}`}
+                          >
+                            <Pencil className="w-3.5 h-3.5" />
+                          </button>
+
+                          {/* Delete */}
+                          <button
+                            onClick={() => setDeleteTarget({ ticker: asset.ticker, assetType: asset.type })}
+                            className="action-btn"
+                            title={`Eliminar posición de ${asset.ticker}`}
+                            style={{
+                              color: 'rgba(239,68,68,0.7)',
+                              borderColor: 'rgba(239,68,68,0.2)',
+                            }}
+                            onMouseEnter={e => {
+                              (e.currentTarget as HTMLButtonElement).style.color = 'var(--crimson)';
+                              (e.currentTarget as HTMLButtonElement).style.background = 'rgba(239,68,68,0.12)';
+                              (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(239,68,68,0.35)';
+                            }}
+                            onMouseLeave={e => {
+                              (e.currentTarget as HTMLButtonElement).style.color = 'rgba(239,68,68,0.7)';
+                              (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.04)';
+                              (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(239,68,68,0.2)';
+                            }}
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -255,13 +403,26 @@ const Dashboard: React.FC = () => {
         </section>
       </main>
 
+      {/* ── Transaction Modal (Nueva Operación / Editar) ── */}
       {isTxModalOpen && user && (
-        <SmartTransactionModal 
-          isOpen={isTxModalOpen} 
-          onClose={() => setIsTxModalOpen(false)} 
+        <SmartTransactionModal
+          isOpen={isTxModalOpen}
+          onClose={handleCloseModal}
           clientId={user.id}
           clientName={user.name}
           defaultAssetType={selectedCategory as any}
+          editAsset={editAsset}
+        />
+      )}
+
+      {/* ── Delete Confirmation Modal ── */}
+      {deleteTarget && (
+        <DeleteConfirmModal
+          ticker={deleteTarget.ticker}
+          assetType={deleteTarget.assetType}
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setDeleteTarget(null)}
+          isDeleting={isDeleting}
         />
       )}
     </div>
