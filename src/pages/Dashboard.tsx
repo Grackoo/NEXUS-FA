@@ -40,7 +40,7 @@ const DeleteConfirmModal: React.FC<DeleteConfirmProps> = ({
   onCancel,
   isDeleting,
 }) => (
-  <div className="fixed inset-0 z-[70] flex items-center justify-center p-6 bg-black/70 backdrop-blur-sm animate-fade-in">
+  <div className="modal-overlay animate-fade-in">
     <div
       className="glass-card w-full max-w-md p-0 overflow-hidden"
       style={{ border: '1px solid rgba(239,68,68,0.25)' }}
@@ -122,6 +122,41 @@ const DeleteConfirmModal: React.FC<DeleteConfirmProps> = ({
 
 // ─── Available categories ─────────────────────────────────────────────────────
 const CATEGORIES = ['All', 'Stocks', 'ETFs', 'Crypto', 'Fixed Income', 'FIBRAs', 'Commodities', 'Forex'];
+
+// ─── Asset Logo Helper ───────────────────────────────────────────────────────
+export const cleanTickerName = (ticker: string) => ticker.replace(/(STOCKS|ETFS|CRYPTO|FIBRAS|COMMODITIES|FOREX|EQUITY|INC)$/i, '').trim();
+
+const AssetLogo: React.FC<{ ticker: string; logoUrl?: string; className?: string }> = ({ ticker, logoUrl, className = '' }) => {
+  const [hasError, setHasError] = useState(false);
+  const cleanTicker = cleanTickerName(ticker);
+  const firstLetter = cleanTicker.charAt(0).toUpperCase();
+
+  const colors = ['#1A5CFF', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4'];
+  const colorHex = colors[firstLetter.charCodeAt(0) % colors.length];
+
+  const finalLogoUrl = logoUrl || `https://logo.clearbit.com/${cleanTicker.toLowerCase()}.com`;
+
+  if (hasError || !finalLogoUrl) {
+    return (
+      <div 
+        className={`flex items-center justify-center text-white font-bold text-xs ${className}`}
+        style={{ width: '32px', height: '32px', borderRadius: '50%', flexShrink: 0, backgroundColor: colorHex, outline: '2px solid rgba(255,255,255,0.1)' }}
+      >
+        {firstLetter}
+      </div>
+    );
+  }
+
+  return (
+    <img 
+      src={finalLogoUrl} 
+      alt={`${cleanTicker} logo`} 
+      className={className}
+      style={{ width: '32px', height: '32px', borderRadius: '50%', flexShrink: 0, objectFit: 'cover', backgroundColor: '#fff', outline: '2px solid rgba(255,255,255,0.1)' }}
+      onError={() => setHasError(true)} 
+    />
+  );
+};
 
 // ─── Dashboard ────────────────────────────────────────────────────────────────
 const Dashboard: React.FC = () => {
@@ -332,11 +367,14 @@ const Dashboard: React.FC = () => {
                             {getAssetIcon(asset.type)}
                           </div>
                           <div>
-                            <div className="flex items-center gap-1.5 md:gap-2 mb-0.5 md:mb-1">
-                              <p className="font-bold text-xs md:text-sm tracking-tight">{asset.ticker}</p>
-                              <span className="text-[8px] px-1.5 py-0.5 rounded bg-white/5 text-gray-400 font-medium uppercase tracking-wider">
-                                {asset.type}
-                              </span>
+                            <div className="flex items-center gap-2 md:gap-3 mb-0.5 md:mb-1">
+                              <AssetLogo ticker={asset.ticker} logoUrl={asset.logoUrl} />
+                              <div className="flex items-center gap-1.5 md:gap-2">
+                                <p className="font-bold text-xs md:text-sm tracking-tight">{cleanTickerName(asset.ticker)}</p>
+                                <span className="text-[8px] px-1.5 py-0.5 rounded bg-white/5 text-gray-400 font-medium uppercase tracking-wider">
+                                  {asset.type}
+                                </span>
+                              </div>
                             </div>
                             <p className="text-[9px] text-gray-500 font-medium uppercase tracking-widest">{asset.nativeCurrency}</p>
                           </div>

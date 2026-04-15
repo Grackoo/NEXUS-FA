@@ -23,6 +23,74 @@ interface Props {
   editAsset?: EditAsset;
 }
 
+const SUGGESTIONS: Record<string, { ticker: string; name: string }[]> = {
+  'Stocks': [
+    { ticker: 'AAPL', name: 'Apple Inc.' },
+    { ticker: 'MSFT', name: 'Microsoft Corp.' },
+    { ticker: 'AMZN', name: 'Amazon.com Inc.' },
+    { ticker: 'NVDA', name: 'Nvidia Corp.' },
+    { ticker: 'TSLA', name: 'Tesla Inc.' },
+    { ticker: 'META', name: 'Meta Platforms' },
+    { ticker: 'GOOGL', name: 'Alphabet Inc.' },
+    { ticker: 'WALMEX', name: 'Walmart de México' },
+    { ticker: 'BIMBOA', name: 'Grupo Bimbo' },
+    { ticker: 'FEMSAUBD', name: 'FEMSA' },
+    { ticker: 'GFNORTEO', name: 'Banorte' },
+    { ticker: 'AMX', name: 'América Móvil' },
+    { ticker: 'CEMEXCPO', name: 'Cemex' }
+  ],
+  'ETFs': [
+    { ticker: 'SPY', name: 'SPDR S&P 500 ETF Trust' },
+    { ticker: 'IVV', name: 'iShares Core S&P 500 ETF' },
+    { ticker: 'VOO', name: 'Vanguard S&P 500 ETF' },
+    { ticker: 'QQQ', name: 'Invesco QQQ Trust (Nasdaq 100)' },
+    { ticker: 'NAFTRAC', name: 'iShares NAFTRAC (IPC Mexico)' },
+    { ticker: 'VTI', name: 'Vanguard Total Stock Market' }
+  ],
+  'Crypto': [
+    { ticker: 'BTC', name: 'Bitcoin' },
+    { ticker: 'ETH', name: 'Ethereum' },
+    { ticker: 'SOL', name: 'Solana' },
+    { ticker: 'BNB', name: 'Binance Coin' },
+    { ticker: 'XRP', name: 'Ripple' },
+    { ticker: 'ADA', name: 'Cardano' },
+    { ticker: 'DOGE', name: 'Dogecoin' }
+  ],
+  'Fixed Income': [
+    { ticker: 'CETES28', name: 'CETES 28 Días' },
+    { ticker: 'CETES91', name: 'CETES 91 Días' },
+    { ticker: 'CETES182', name: 'CETES 182 Días' },
+    { ticker: 'CETES364', name: 'CETES 364 Días' },
+    { ticker: 'BONOS', name: 'Bonos Gubernamentales (Bonos M)' },
+    { ticker: 'UDIBONOS', name: 'Udibonos' },
+    { ticker: 'BPAG', name: 'Bonos de Protección al Ahorro' },
+  ],
+  'FIBRAs': [
+    { ticker: 'FUNO11', name: 'Fibra Uno' },
+    { ticker: 'FMTY14', name: 'Fibra Monterrey' },
+    { ticker: 'FIBRAPL14', name: 'Fibra Prologis' },
+    { ticker: 'DANHOS13', name: 'Fibra Danhos' },
+    { ticker: 'TERRA13', name: 'Fibra Terrafina' },
+    { ticker: 'FIHO12', name: 'Fibra Hotel' },
+    { ticker: 'FCFE18', name: 'Fibra CFE' }
+  ],
+  'Commodities': [
+    { ticker: 'GLD', name: 'Gold (SPDR Gold Shares)' },
+    { ticker: 'SLV', name: 'Silver (iShares Silver Trust)' },
+    { ticker: 'USO', name: 'Crude Oil (US Oil Fund)' },
+    { ticker: 'CORN', name: 'Corn (Teucrium Corn Fund)' },
+    { ticker: 'WEAT', name: 'Wheat (Teucrium Wheat Fund)' },
+  ],
+  'Forex': [
+    { ticker: 'EURUSD', name: 'Euro / US Dollar' },
+    { ticker: 'USDMXN', name: 'US Dollar / Mexican Peso' },
+    { ticker: 'GBPUSD', name: 'British Pound / US Dollar' },
+    { ticker: 'USDJPY', name: 'US Dollar / Japanese Yen' },
+    { ticker: 'AUDUSD', name: 'Australian Dollar / US Dollar' },
+    { ticker: 'USDCAD', name: 'US Dollar / Canadian Dollar' },
+  ]
+};
+
 const SmartTransactionModal: React.FC<Props> = ({
   isOpen,
   onClose,
@@ -51,6 +119,26 @@ const SmartTransactionModal: React.FC<Props> = ({
   const [currency, setCurrency] = useState<'USD' | 'MXN'>(editAsset?.nativeCurrency ?? 'USD');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+
+  // Autocomplete state
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const suggestionsRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (suggestionsRef.current && !suggestionsRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const availableSuggestions = SUGGESTIONS[assetType] || [];
+  const filteredSuggestions = availableSuggestions.filter(s =>
+    s.ticker.toLowerCase().includes(ticker.toLowerCase()) || 
+    s.name.toLowerCase().includes(ticker.toLowerCase())
+  );
 
   // Current holdings for balance badge
   const currentAsset = client?.portfolio.find(a => a.ticker === ticker);
@@ -113,7 +201,7 @@ const SmartTransactionModal: React.FC<Props> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm animate-fade-in">
+    <div className="modal-overlay animate-fade-in">
       <div className="glass-card w-full max-w-lg p-0 overflow-hidden">
 
         {/* ── Header ── */}
@@ -160,16 +248,44 @@ const SmartTransactionModal: React.FC<Props> = ({
 
           {/* ── Ticker + Asset Type ── */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
+            <div className="space-y-2 relative" ref={suggestionsRef}>
               <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase ml-1">
                 Instrumento (Ticker)
               </label>
               <input
                 value={ticker}
-                onChange={e => setTicker(e.target.value.toUpperCase())}
+                onChange={e => {
+                  setTicker(e.target.value.toUpperCase());
+                  setShowSuggestions(true);
+                }}
+                onFocus={() => setShowSuggestions(true)}
                 className="glass-input"
-                placeholder="AAPL"
+                placeholder="Ej. AAPL"
               />
+              {/* Autocomplete Dropdown */}
+              {showSuggestions && (ticker.length > 0 || availableSuggestions.length > 0) && (
+                <div className="absolute top-[100%] mt-1 left-0 right-0 max-h-48 overflow-y-auto bg-[#0a0a0a] border border-white/10 rounded-xl z-50 shadow-2xl scrollbar-hide py-1">
+                  {filteredSuggestions.length > 0 ? (
+                    filteredSuggestions.map((suggestion) => (
+                      <div 
+                        key={suggestion.ticker}
+                        onClick={() => {
+                          setTicker(suggestion.ticker);
+                          setShowSuggestions(false);
+                        }}
+                        className="px-4 py-2.5 hover:bg-white/5 cursor-pointer flex items-center justify-between transition-colors"
+                      >
+                        <span className="font-bold text-white text-sm">{suggestion.ticker}</span>
+                        <span className="text-xs text-gray-400 truncate ml-2 text-right">{suggestion.name}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="px-4 py-3 text-xs text-gray-500 text-center italic">
+                      Pulsa Enter para añadir "{ticker}" como nuevo
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
             <div className="space-y-2">
               <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase ml-1">

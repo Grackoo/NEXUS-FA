@@ -46,7 +46,8 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
       avgPurchasePriceMXN: parseFloat(findKey(['Avg_Price_MXN', 'Costo_MXN', 'Precio_Promedio_MXN']) || '0'),
       avgPurchasePriceUSD: parseFloat(findKey(['Avg_Price_USD', 'Costo_USD', 'Precio_Promedio_USD']) || '0'),
       realTimePrice: parseFloat(findKey(['Live_Price', 'Real_Time_Price', 'Precio_Mercado', 'Price']) || '0'),
-      nativeCurrency: (findKey(['Currency', 'Moneda', 'Divisa']) as any) || 'USD'
+      nativeCurrency: (findKey(['Currency', 'Moneda', 'Divisa']) as any) || 'USD',
+      logoUrl: findKey(['LogoURL', 'Logo_URL', 'Logo']) || undefined
     };
   };
 

@@ -1,11 +1,12 @@
 export interface PortfolioAsset {
   ticker: string;
-  type: 'Stocks' | 'ETFs' | 'Fixed Income' | 'Crypto' | 'FIBRAs' | 'Commodities' | 'Real Estate';
+  type: 'Stocks' | 'ETFs' | 'Fixed Income' | 'Crypto' | 'FIBRAs' | 'Commodities' | 'Real Estate' | 'Forex';
   sharesOwned: number;
   avgPurchasePriceMXN: number;
   avgPurchasePriceUSD: number;
   realTimePrice: number; // Stored in its native currency
   nativeCurrency: 'USD' | 'MXN';
+  logoUrl?: string;
 }
 
 export interface Client {
