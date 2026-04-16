@@ -160,8 +160,8 @@ const AssetLogo: React.FC<{ ticker: string; logoUrl?: string; className?: string
 
 // ─── Dashboard ────────────────────────────────────────────────────────────────
 const Dashboard: React.FC = () => {
-  const { clientPortfolio, totalNetWorthUSD, totalNetWorthMXN, refreshPortfolio } = usePortfolio();
-  const { currency, formatValue, convertToView } = useCurrency();
+  const { clientPortfolio, refreshPortfolio } = usePortfolio();
+  const { currency, exchangeRate, formatValue, convertToView } = useCurrency();
   const { user } = useAuth();
 
   const [isTxModalOpen, setIsTxModalOpen] = useState(false);
