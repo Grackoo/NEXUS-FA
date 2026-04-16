@@ -36,19 +36,26 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
     const rawType = findKey(['Type', 'Tipo', 'Category', 'AssetType']);
     const typeMapping: Record<string, any> = {
       'stocks': 'Stocks', 'acciones': 'Stocks', 'etfs': 'ETFs',
-      'Renta Fija': 'Renta Fija', 'renta fija': 'Renta Fija',
-      'cetes': 'Renta Fija', 'crypto': 'Crypto', 'cripto': 'Crypto',
+      'Renta Fija': 'Fixed Income', 'renta fija': 'Fixed Income',
+      'cetes': 'Fixed Income', 'crypto': 'Crypto', 'cripto': 'Crypto',
       'fibras': 'FIBRAs', 'fibra': 'FIBRAs', 'commodities': 'Commodities',
       'forex': 'Forex', 'divisas': 'Forex'
+    };
+
+    const safeParseFloat = (val: string) => {
+      // Remove everything except digits, minus signs, and decimal points (e.g., strips '$', ',', '€', '#N/A')
+      const cleaned = (val || '0').toString().replace(/[^0-9.-]+/g, '');
+      const parsed = parseFloat(cleaned);
+      return isNaN(parsed) ? 0 : parsed;
     };
 
     return {
       ticker: findKey(['Ticker', 'Symbol', 'Activo']),
       type: typeMapping[rawType.toLowerCase()] || 'Stocks',
-      sharesOwned: parseFloat(findKey(['Shares_Owned', 'Shares', 'Titulos', 'Cantidad']) || '0'),
-      avgPurchasePriceMXN: parseFloat(findKey(['Avg_Price_MXN', 'Costo_MXN', 'Precio_Promedio_MXN']) || '0'),
-      avgPurchasePriceUSD: parseFloat(findKey(['Avg_Price_USD', 'Costo_USD', 'Precio_Promedio_USD']) || '0'),
-      realTimePrice: parseFloat(findKey(['Live_Price', 'Real_Time_Price', 'Precio_Mercado', 'Price']) || '0'),
+      sharesOwned: safeParseFloat(findKey(['Shares_Owned', 'Shares', 'Titulos', 'Cantidad'])),
+      avgPurchasePriceMXN: safeParseFloat(findKey(['Avg_Price_MXN', 'Costo_MXN', 'Precio_Promedio_MXN'])),
+      avgPurchasePriceUSD: safeParseFloat(findKey(['Avg_Price_USD', 'Costo_USD', 'Precio_Promedio_USD'])),
+      realTimePrice: safeParseFloat(findKey(['Live_Price', 'Real_Time_Price', 'Precio_Mercado', 'Price'])),
       nativeCurrency: (findKey(['Currency', 'Moneda', 'Divisa']) as any) || 'USD',
       logoUrl: findKey(['LogoURL', 'Logo_URL', 'Logo']) || undefined
     };
