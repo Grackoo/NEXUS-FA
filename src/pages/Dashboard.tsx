@@ -179,9 +179,26 @@ const Dashboard: React.FC = () => {
       ? clientPortfolio
       : clientPortfolio.filter(a => a.type === selectedCategory);
 
+  let globalCostBasisView = 0;
+  let globalCurrentView = 0;
+
+  clientPortfolio.forEach(asset => {
+    const currentValueMXN = asset.sharesOwned * asset.realTimePrice;
+    const valueInView = convertToView(currentValueMXN, 'MXN');
+    const avgPriceInView = currency === 'USD' ? asset.avgPurchasePriceUSD : asset.avgPurchasePriceMXN;
+    const costBasisInView = asset.sharesOwned * avgPriceInView;
+
+    globalCurrentView += valueInView;
+    globalCostBasisView += costBasisInView;
+  });
+
+  const globalPL = globalCurrentView - globalCostBasisView;
+  const globalPLPercent = globalCostBasisView > 0 ? (globalPL / globalCostBasisView) * 100 : 0;
+  const isGlobalPositive = globalPL >= 0;
+
   const allocation = clientPortfolio.reduce((acc: any[], asset) => {
     const existing = acc.find(item => item.name === asset.type);
-    const val = convertToView(asset.sharesOwned * asset.realTimePrice, asset.nativeCurrency);
+    const val = convertToView(asset.sharesOwned * asset.realTimePrice, 'MXN');
     if (existing) existing.value += val;
     else acc.push({ name: asset.type, value: val });
     return acc;
@@ -242,10 +259,13 @@ const Dashboard: React.FC = () => {
                 {formatValue(netWorth)}
               </h1>
               <div className="flex flex-wrap items-center gap-3 md:gap-4">
-                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald/10 text-emerald text-[10px] md:text-xs font-bold border border-emerald/20">
-                  <TrendingUp className="w-3.5 h-3.5" /> +12.40%
+                <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] md:text-xs font-bold border ${isGlobalPositive ? 'bg-emerald/10 text-emerald border-emerald/20' : 'bg-crimson/10 text-crimson border-crimson/20'}`}>
+                  {isGlobalPositive ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />}
+                  {isGlobalPositive ? '+' : ''}{globalPLPercent.toFixed(2)}%
                 </div>
-                <p className="text-[10px] md:text-xs text-gray-400">vs. mes pasado: +$1,240.00 USD</p>
+                <p className="text-[10px] md:text-xs text-gray-400">
+                  Total G/P: <span className={isGlobalPositive ? 'text-emerald font-bold' : 'text-crimson font-bold'}>{isGlobalPositive ? '+' : ''}{formatValue(globalPL)}</span>
+                </p>
               </div>
             </div>
             <div className="absolute right-0 bottom-0 top-0 w-1/3 bg-gradient-to-l from-primary/10 to-transparent flex items-center justify-end pr-4 md:pr-8">

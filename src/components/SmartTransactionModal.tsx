@@ -75,11 +75,19 @@ const SUGGESTIONS: Record<string, { ticker: string; name: string }[]> = {
     { ticker: 'FCFE18', name: 'Fibra CFE' }
   ],
   'Commodities': [
-    { ticker: 'GLD', name: 'Gold (SPDR Gold Shares)' },
-    { ticker: 'SLV', name: 'Silver (iShares Silver Trust)' },
-    { ticker: 'USO', name: 'Crude Oil (US Oil Fund)' },
-    { ticker: 'CORN', name: 'Corn (Teucrium Corn Fund)' },
-    { ticker: 'WEAT', name: 'Wheat (Teucrium Wheat Fund)' },
+    { ticker: 'GLD', name: 'Oro (SPDR Gold Shares ETF)' },
+    { ticker: 'IAU', name: 'Oro (iShares Gold Trust)' },
+    { ticker: 'SLV', name: 'Plata (iShares Silver Trust)' },
+    { ticker: 'USO', name: 'Petróleo WTI (US Oil Fund)' },
+    { ticker: 'BNO', name: 'Petróleo Brent (US Brent Oil)' },
+    { ticker: 'UNG', name: 'Gas Natural (US Natural Gas)' },
+    { ticker: 'CORN', name: 'Maíz (Teucrium Corn Fund)' },
+    { ticker: 'WEAT', name: 'Trigo (Teucrium Wheat Fund)' },
+    { ticker: 'SOYB', name: 'Soya (Teucrium Soybean Fund)' },
+    { ticker: 'CPER', name: 'Cobre (US Copper Index Fund)' },
+    { ticker: 'PPLT', name: 'Platino (abrdn Physical Platinum)' },
+    { ticker: 'DBC', name: 'Índice de Commodities (Invesco DB)' },
+    { ticker: 'DBA', name: 'Índice de Agricultura (Invesco DB)' }
   ],
   'Forex': [
     { ticker: 'USD', name: 'US Dollar (Dólar estadounidense)' },
