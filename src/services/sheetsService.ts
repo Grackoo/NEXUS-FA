@@ -25,9 +25,27 @@ export const SHEET_URLS = {
 export async function fetchCsvData(url: string) {
   if (!url) return [];
   try {
-    const response = await fetch(url);
+    const uniqueUrl = url.includes('?') ? `${url}&_t=${Date.now()}` : `${url}?_t=${Date.now()}`;
+    const response = await fetch(uniqueUrl, {
+      cache: 'no-store',
+      headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+    });
     const text = await response.text();
-    const rows = text.split('\n').map(row => row.split(','));
+    const parseCsvRow = (row: string) => {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      for (let i = 0; i < row.length; i++) {
+        const char = row[i];
+        if (char === '"') inQuotes = !inQuotes;
+        else if (char === ',' && !inQuotes) { result.push(current); current = ''; }
+        else current += char;
+      }
+      result.push(current);
+      return result;
+    };
+    
+    const rows = text.split('\n').filter(r => r.trim() !== '').map(parseCsvRow);
     const headers = rows[0];
     return rows.slice(1).map(row => {
       const obj: any = {};

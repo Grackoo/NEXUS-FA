@@ -172,8 +172,6 @@ const Dashboard: React.FC = () => {
   const [deleteTarget, setDeleteTarget] = useState<{ ticker: string; assetType: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const netWorth = currency === 'USD' ? totalNetWorthUSD : totalNetWorthMXN;
-
   const displayedPortfolio =
     selectedCategory === 'All'
       ? clientPortfolio
@@ -182,7 +180,7 @@ const Dashboard: React.FC = () => {
   let globalCostBasisView = 0;
   let globalCurrentView = 0;
 
-  clientPortfolio.forEach(asset => {
+  displayedPortfolio.forEach(asset => {
     const currentValueMXN = asset.sharesOwned * asset.realTimePrice;
     const valueInView = convertToView(currentValueMXN, 'MXN');
     const avgPriceInView = currency === 'USD' ? asset.avgPurchasePriceUSD : asset.avgPurchasePriceMXN;
@@ -192,11 +190,12 @@ const Dashboard: React.FC = () => {
     globalCostBasisView += costBasisInView;
   });
 
+  const netWorth = globalCurrentView;
   const globalPL = globalCurrentView - globalCostBasisView;
   const globalPLPercent = globalCostBasisView > 0 ? (globalPL / globalCostBasisView) * 100 : 0;
   const isGlobalPositive = globalPL >= 0;
 
-  const allocation = clientPortfolio.reduce((acc: any[], asset) => {
+  const allocation = displayedPortfolio.reduce((acc: any[], asset) => {
     const existing = acc.find(item => item.name === asset.type);
     const val = convertToView(asset.sharesOwned * asset.realTimePrice, 'MXN');
     if (existing) existing.value += val;
@@ -317,7 +316,10 @@ const Dashboard: React.FC = () => {
             return (
               <button
                 key={category}
-                onClick={() => setSelectedCategory(category)}
+                onClick={() => {
+                  setSelectedCategory(category);
+                  refreshPortfolio();
+                }}
                 className={`whitespace-nowrap px-4 py-2 rounded-xl text-[11px] font-bold tracking-widest uppercase transition-all duration-300 ${
                   isActive
                     ? 'bg-primary text-white shadow-[0_0_15px_rgba(26,92,255,0.4)]'
