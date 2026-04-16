@@ -370,18 +370,31 @@ const Dashboard: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-white/5">
                 {displayedPortfolio.map(asset => {
+                  const oppositeCurrency = currency === 'USD' ? 'MXN' : 'USD';
+                  
                   // realTimePrice from Google Sheets is now ALWAYS in MXN
                   const currentValueMXN = asset.sharesOwned * asset.realTimePrice;
-                  const valueInView = convertToView(currentValueMXN, 'MXN');
+                  const valueInUSD = currentValueMXN / exchangeRate;
+                  
+                  const valueMain = currency === 'USD' ? valueInUSD : currentValueMXN;
+                  const valueSub = currency === 'USD' ? currentValueMXN : valueInUSD;
                   
                   // Use the explicit avg purchase prices from the backend
-                  const avgPriceInView = currency === 'USD' ? asset.avgPurchasePriceUSD : asset.avgPurchasePriceMXN;
-                  const costBasisInView = asset.sharesOwned * avgPriceInView;
+                  const avgMain = currency === 'USD' ? asset.avgPurchasePriceUSD : asset.avgPurchasePriceMXN;
+                  const avgSub = currency === 'USD' ? asset.avgPurchasePriceMXN : asset.avgPurchasePriceUSD;
+                  
+                  const costBasisMain = asset.sharesOwned * avgMain;
+                  const costBasisSub = asset.sharesOwned * avgSub;
 
-                  const pl = valueInView - costBasisInView;
+                  const plMain = valueMain - costBasisMain;
+                  const plSub = valueSub - costBasisSub;
+                  
                   // Avoid Division by 0 (Infinity%) if costBasis is 0 or missing
-                  const plPercentage = costBasisInView > 0 ? (pl / costBasisInView) * 100 : 0;
-                  const isPositive = pl >= 0;
+                  const plPercentageMain = costBasisMain > 0 ? (plMain / costBasisMain) * 100 : 0;
+                  const plPercentageSub = costBasisSub > 0 ? (plSub / costBasisSub) * 100 : 0;
+                  
+                  const isPositiveMain = plMain >= 0;
+                  const isPositiveSub = plSub >= 0;
 
                   return (
                     <tr key={asset.ticker} className="group hover:bg-white/[0.03] transition-colors">
@@ -407,17 +420,44 @@ const Dashboard: React.FC = () => {
                       </td>
 
                       <td className="px-4 py-5 md:py-6 text-right font-semibold tabular-nums text-xs md:text-sm">{asset.sharesOwned}</td>
-                      <td className="px-4 py-5 md:py-6 text-right tabular-nums text-gray-400 text-xs md:text-sm">{formatValue(avgPriceInView)}</td>
-                      <td className="px-4 py-5 md:py-6 text-right font-bold tabular-nums text-xs md:text-sm">{formatValue(valueInView)}</td>
-
-                      <td className={`px-4 py-5 md:py-6 text-right font-bold tabular-nums text-xs md:text-sm ${isPositive ? 'text-emerald' : 'text-crimson'}`}>
-                        {isPositive ? '+' : ''}{formatValue(pl)}
+                      
+                      {/* Avg Price */}
+                      <td className="px-4 py-5 md:py-6 text-right tabular-nums text-gray-400 text-xs md:text-sm">
+                        <div className="flex flex-col gap-1 items-end">
+                          <span>{formatValue(avgMain)}</span>
+                          {avgSub > 0 && <span className="text-[10px] text-gray-600 font-medium">{formatValue(avgSub, oppositeCurrency)}</span>}
+                        </div>
+                      </td>
+                      
+                      {/* Market Value */}
+                      <td className="px-4 py-5 md:py-6 text-right font-bold tabular-nums text-xs md:text-sm">
+                        <div className="flex flex-col gap-1 items-end">
+                          <span>{formatValue(valueMain)}</span>
+                          <span className="text-[10px] text-gray-600 font-medium">{formatValue(valueSub, oppositeCurrency)}</span>
+                        </div>
                       </td>
 
+                      {/* Profit/Loss */}
+                      <td className={`px-4 py-5 md:py-6 text-right font-bold tabular-nums text-xs md:text-sm`}>
+                        <div className="flex flex-col gap-1 items-end">
+                          <span className={isPositiveMain ? 'text-emerald' : 'text-crimson'}>{isPositiveMain ? '+' : ''}{formatValue(plMain)}</span>
+                          <span className={`text-[10px] font-medium ${isPositiveSub ? 'text-emerald/50' : 'text-crimson/50'}`}>{isPositiveSub ? '+' : ''}{formatValue(plSub, oppositeCurrency)}</span>
+                        </div>
+                      </td>
+
+                      {/* Return (PlPercentage) */}
                       <td className="px-4 py-5 md:py-6 text-right">
-                        <div className={`inline-flex items-center gap-1.5 px-2 md:px-2.5 py-1 rounded-lg font-bold text-[10px] md:text-xs ${isPositive ? 'bg-emerald/10 text-emerald border border-emerald/20' : 'bg-crimson/10 text-crimson border border-crimson/20'}`}>
-                          {isPositive ? <TrendingUp className="w-3 md:w-3.5 h-3 md:h-3.5" /> : <TrendingDown className="w-3 md:w-3.5 h-3 md:h-3.5" />}
-                          {plPercentage.toFixed(1)}%
+                        <div className="flex flex-col gap-1.5 items-end">
+                          <div className={`inline-flex items-center gap-1.5 px-2 md:px-2.5 py-1 rounded-lg font-bold text-[10px] md:text-xs ${isPositiveMain ? 'bg-emerald/10 text-emerald border border-emerald/20' : 'bg-crimson/10 text-crimson border border-crimson/20'}`}>
+                            {isPositiveMain ? <TrendingUp className="w-3 md:w-3.5 h-3 md:h-3.5" /> : <TrendingDown className="w-3 md:w-3.5 h-3 md:h-3.5" />}
+                            {plPercentageMain.toFixed(1)}%
+                          </div>
+                          {avgSub > 0 && (
+                            <div className={`inline-flex items-center gap-1 text-[9px] font-bold ${isPositiveSub ? 'text-emerald/50' : 'text-crimson/50'}`}>
+                              {isPositiveSub ? <TrendingUp className="w-2.5 h-2.5" /> : <TrendingDown className="w-2.5 h-2.5" />}
+                              <span>{plPercentageSub.toFixed(1)}% {oppositeCurrency}</span>
+                            </div>
+                          )}
                         </div>
                       </td>
 
