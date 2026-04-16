@@ -323,7 +323,7 @@ const Dashboard: React.FC = () => {
                 className={`whitespace-nowrap px-4 py-2 rounded-xl text-[11px] font-bold tracking-widest uppercase transition-all duration-300 ${
                   isActive
                     ? 'bg-primary text-white shadow-[0_0_15px_rgba(26,92,255,0.4)]'
-                    : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'
+                    : 'bg-white/[0.05] text-gray-400 hover:text-white hover:bg-white/[0.1]'
                 }`}
               >
                 {labelMapping[category]}
