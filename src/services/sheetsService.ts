@@ -22,8 +22,20 @@ export const SHEET_URLS = {
   SUMMARY_FOREX: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMbHAoAnLIzHBO7iGu9ETipHcbSXmvBuc-bsR4vBsaciYzmipRlmk36kLz83miN692Dkgt7MyuLnLK/pub?gid=1831667518&single=true&output=csv'
 };
 
+const cache = new Map<string, { data: any, timestamp: number }>();
+const CACHE_TTL_MS = 1000 * 60 * 5; // 5 minutes cache
+
+export function invalidateCache() {
+  cache.clear();
+}
+
 export async function fetchCsvData(url: string) {
   if (!url) return [];
+  
+  const cached = cache.get(url);
+  if (cached && (Date.now() - cached.timestamp < CACHE_TTL_MS)) {
+    return cached.data;
+  }
   try {
     const uniqueUrl = url.includes('?') ? `${url}&_t=${Date.now()}` : `${url}?_t=${Date.now()}`;
     const response = await fetch(uniqueUrl, {
@@ -47,13 +59,16 @@ export async function fetchCsvData(url: string) {
     
     const rows = text.split('\n').filter(r => r.trim() !== '').map(parseCsvRow);
     const headers = rows[0];
-    return rows.slice(1).map(row => {
+    const parsedData = rows.slice(1).map(row => {
       const obj: any = {};
       headers.forEach((header, i) => {
         obj[header.trim()] = row[i]?.trim();
       });
       return obj;
     });
+
+    cache.set(url, { data: parsedData, timestamp: Date.now() });
+    return parsedData;
   } catch (error) {
     console.error('Error fetching CSV:', error);
     return [];
@@ -73,6 +88,7 @@ export async function submitOperation(data: any) {
         date: data.date || new Date().toISOString().split('T')[0]
       }),
     });
+    invalidateCache();
     return true; // Simple confirmation
   } catch (error) {
     console.error('Error submitting operation:', error);
@@ -98,6 +114,7 @@ export async function deletePosition(clientId: string, ticker: string, assetType
         date: new Date().toISOString().split('T')[0],
       }),
     });
+    invalidateCache();
     return true;
   } catch (error) {
     console.error('Error deleting position:', error);

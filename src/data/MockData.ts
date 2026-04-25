@@ -1,6 +1,8 @@
+export type AssetCategory = 'Renta Variable' | 'Criptomonedas' | 'Renta Fija' | 'Liquidez';
+
 export interface PortfolioAsset {
   ticker: string;
-  type: 'Stocks' | 'ETFs' | 'Renta Fija' | 'Crypto' | 'FIBRAs' | 'Commodities' | 'Real Estate' | 'Forex';
+  type: AssetCategory;
   sharesOwned: number;
   avgPurchasePriceMXN: number;
   avgPurchasePriceUSD: number;
@@ -32,10 +34,10 @@ export const MOCK_CLIENTS: Client[] = [
     name: 'Aketzali Garcia',
     role: 'client',
     portfolio: [
-      { ticker: 'AAPL', type: 'Stocks', sharesOwned: 10, avgPurchasePriceMXN: 2500, avgPurchasePriceUSD: 145, realTimePrice: 170, nativeCurrency: 'USD' },
-      { ticker: 'IVV', type: 'ETFs', sharesOwned: 5, avgPurchasePriceMXN: 8000, avgPurchasePriceUSD: 450, realTimePrice: 510, nativeCurrency: 'USD' },
+      { ticker: 'AAPL', type: 'Renta Variable', sharesOwned: 10, avgPurchasePriceMXN: 2500, avgPurchasePriceUSD: 145, realTimePrice: 170, nativeCurrency: 'USD' },
+      { ticker: 'IVV', type: 'Renta Variable', sharesOwned: 5, avgPurchasePriceMXN: 8000, avgPurchasePriceUSD: 450, realTimePrice: 510, nativeCurrency: 'USD' },
       { ticker: 'CETES', type: 'Renta Fija', sharesOwned: 1000, avgPurchasePriceMXN: 10, avgPurchasePriceUSD: 0.60, realTimePrice: 10.5, nativeCurrency: 'MXN' },
-      { ticker: 'FIBRAPL14', type: 'FIBRAs', sharesOwned: 100, avgPurchasePriceMXN: 55, avgPurchasePriceUSD: 3.33, realTimePrice: 58.5, nativeCurrency: 'MXN' }
+      { ticker: 'FIBRAPL14', type: 'Renta Variable', sharesOwned: 100, avgPurchasePriceMXN: 55, avgPurchasePriceUSD: 3.33, realTimePrice: 58.5, nativeCurrency: 'MXN' }
     ]
   },
   {
@@ -43,9 +45,9 @@ export const MOCK_CLIENTS: Client[] = [
     name: 'Aldo Lopez',
     role: 'client',
     portfolio: [
-      { ticker: 'NVDA', type: 'Stocks', sharesOwned: 20, avgPurchasePriceMXN: 10000, avgPurchasePriceUSD: 550, realTimePrice: 900, nativeCurrency: 'USD' },
-      { ticker: 'BTC', type: 'Crypto', sharesOwned: 0.5, avgPurchasePriceMXN: 800000, avgPurchasePriceUSD: 45000, realTimePrice: 65000, nativeCurrency: 'USD' },
-      { ticker: 'GOLD', type: 'Commodities', sharesOwned: 10, avgPurchasePriceMXN: 33000, avgPurchasePriceUSD: 2000, realTimePrice: 2350, nativeCurrency: 'USD' }
+      { ticker: 'NVDA', type: 'Renta Variable', sharesOwned: 20, avgPurchasePriceMXN: 10000, avgPurchasePriceUSD: 550, realTimePrice: 900, nativeCurrency: 'USD' },
+      { ticker: 'BTC', type: 'Criptomonedas', sharesOwned: 0.5, avgPurchasePriceMXN: 800000, avgPurchasePriceUSD: 45000, realTimePrice: 65000, nativeCurrency: 'USD' },
+      { ticker: 'GOLD', type: 'Renta Variable', sharesOwned: 10, avgPurchasePriceMXN: 33000, avgPurchasePriceUSD: 2000, realTimePrice: 2350, nativeCurrency: 'USD' }
     ]
   }
 ];
@@ -54,7 +56,7 @@ export interface Operation {
   id: string;
   clientId: string;
   type: 'Buy' | 'Sell';
-  assetType: 'Stocks' | 'ETFs' | 'Renta Fija' | 'Crypto' | 'FIBRAs' | 'Commodities';
+  assetType: AssetCategory;
   ticker: string;
   shares: number;
   price: number;
@@ -64,7 +66,7 @@ export interface Operation {
 }
 
 export const MOCK_OPERACIONES: Operation[] = [
-  { id: 'op1', clientId: 'client-1', type: 'Buy', assetType: 'Stocks', ticker: 'AAPL', shares: 10, price: 145, commission: 2, originalCurrency: 'USD', date: '2024-01-10' },
-  { id: 'op2', clientId: 'client-1', type: 'Buy', assetType: 'ETFs', ticker: 'IVV', shares: 5, price: 450, commission: 5, originalCurrency: 'USD', date: '2024-02-15' },
-  { id: 'op3', clientId: 'client-2', type: 'Buy', assetType: 'Stocks', ticker: 'NVDA', shares: 20, price: 550, commission: 10, originalCurrency: 'USD', date: '2024-03-01' }
+  { id: 'op1', clientId: 'client-1', type: 'Buy', assetType: 'Renta Variable', ticker: 'AAPL', shares: 10, price: 145, commission: 2, originalCurrency: 'USD', date: '2024-01-10' },
+  { id: 'op2', clientId: 'client-1', type: 'Buy', assetType: 'Renta Variable', ticker: 'IVV', shares: 5, price: 450, commission: 5, originalCurrency: 'USD', date: '2024-02-15' },
+  { id: 'op3', clientId: 'client-2', type: 'Buy', assetType: 'Renta Variable', ticker: 'NVDA', shares: 20, price: 550, commission: 10, originalCurrency: 'USD', date: '2024-03-01' }
 ];

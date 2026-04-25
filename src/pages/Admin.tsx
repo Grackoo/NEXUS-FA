@@ -2,13 +2,17 @@ import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import { usePortfolio } from '../contexts/PortfolioContext';
 import { useCurrency } from '../contexts/CurrencyContext';
-import { Users, Search, Plus, ArrowUpRight, BarChart3, AlertCircle, Shield, Eye, Pencil, Check, X, PlusCircle, Info } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { Users, Search, Plus, BarChart3, AlertCircle, Shield, Eye, Pencil, Check, X, PlusCircle, Info, LogIn } from 'lucide-react';
 import SmartTransactionModal from '../components/SmartTransactionModal.tsx';
 import { submitOperation } from '../services/sheetsService';
 
 const Admin: React.FC = () => {
   const { allClients, isLoading } = usePortfolio();
   const { formatValue, currency } = useCurrency();
+  const { impersonateClient } = useAuth();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [isTxModalOpen, setIsTxModalOpen] = useState(false);
   const [isAssetsModalOpen, setIsAssetsModalOpen] = useState(false);
@@ -40,6 +44,24 @@ const Admin: React.FC = () => {
     setSelectedClientId(clientId);
     setIsAssetsModalOpen(true);
   };
+
+  const handleImpersonate = (clientId: string) => {
+    const client = allClients.find(c => c.id === clientId);
+    if (client && impersonateClient) {
+      impersonateClient(client);
+      navigate('/');
+    }
+  };
+
+  const globalAUM = allClients.reduce((acc, client) => {
+    if (client.role === 'admin') return acc;
+    const clientUSD = client.portfolio.reduce((sum, asset) => {
+        return sum + (asset.sharesOwned * (asset.nativeCurrency === 'USD' ? asset.realTimePrice : asset.realTimePrice / 16.5));
+    }, 0);
+    return acc + clientUSD;
+  }, 0);
+
+  const globalAUMDisplay = currency === 'USD' ? globalAUM : globalAUM * 16.5;
 
   return (
     <div className="min-h-screen pb-12">
@@ -75,7 +97,33 @@ const Admin: React.FC = () => {
           </div>
         </header>
 
-        <section className="grid grid-cols-1 md\:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+        {/* Global Metrics Row */}
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="glass-card p-6 md:p-8 col-span-1 md:col-span-2 relative overflow-hidden bg-white/[0.01]">
+            <div className="relative z-10">
+              <p className="text-[10px] md:text-xs text-primary font-bold uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
+                <BarChart3 className="w-4 h-4" /> Global AUM (Assets Under Management)
+              </p>
+              <h2 className="text-4xl md:text-5xl font-bold tabular-nums text-white mb-2">
+                {formatValue(globalAUMDisplay)}
+              </h2>
+              <p className="text-xs text-gray-400">Total de fondos administrados en la plataforma</p>
+            </div>
+            <div className="absolute right-0 bottom-0 top-0 w-1/3 bg-gradient-to-l from-primary/10 to-transparent flex items-center justify-end pr-8">
+              <Shield className="w-24 h-24 text-primary/10 rotate-12" />
+            </div>
+          </div>
+          <div className="glass-card p-6 md:p-8 flex flex-col justify-center bg-white/[0.01]">
+            <p className="text-[10px] md:text-xs text-gray-400 font-bold uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
+              <Users className="w-4 h-4 text-emerald" /> Clientes Activos
+            </p>
+            <h2 className="text-4xl md:text-5xl font-bold tabular-nums text-white">
+              {allClients.filter(c => c.role === 'client').length}
+            </h2>
+          </div>
+        </section>
+
+        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {filteredClients.map(client => {
             const totalUSD = client.portfolio.reduce((acc, asset) => {
                 return acc + (asset.sharesOwned * (asset.nativeCurrency === 'USD' ? asset.realTimePrice : asset.realTimePrice / 16.5));
@@ -136,8 +184,12 @@ const Admin: React.FC = () => {
                   >
                     <Plus className="w-3.5 h-3.5 mr-1.5" /> Operar
                   </button>
-                  <button className="w-10 md:w-12 glass-button secondary p-0 flex items-center justify-center">
-                    <ArrowUpRight className="w-4 h-4 md:w-5 md:h-5" />
+                  <button 
+                    onClick={() => handleImpersonate(client.id)}
+                    title="Impersonar Cuenta (Ver Dashboard del Cliente)"
+                    className="w-10 md:w-12 glass-button secondary p-0 flex items-center justify-center hover:bg-primary/20 hover:text-primary transition-colors border-white/5"
+                  >
+                    <LogIn className="w-4 h-4 md:w-5 md:h-5" />
                   </button>
                 </div>
               </div>

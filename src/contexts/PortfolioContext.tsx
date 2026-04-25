@@ -35,11 +35,11 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
 
     const rawType = findKey(['Type', 'Tipo', 'Category', 'AssetType']);
     const typeMapping: Record<string, any> = {
-      'stocks': 'Stocks', 'acciones': 'Stocks', 'etfs': 'ETFs',
-      'Renta Fija': 'Renta Fija', 'renta fija': 'Renta Fija',
-      'cetes': 'Renta Fija', 'crypto': 'Crypto', 'cripto': 'Crypto',
-      'fibras': 'FIBRAs', 'fibra': 'FIBRAs', 'commodities': 'Commodities',
-      'forex': 'Forex', 'divisas': 'Forex'
+      'stocks': 'Renta Variable', 'acciones': 'Renta Variable', 'etfs': 'Renta Variable',
+      'fibras': 'Renta Variable', 'fibra': 'Renta Variable', 'commodities': 'Renta Variable',
+      'Renta Fija': 'Renta Fija', 'renta fija': 'Renta Fija', 'cetes': 'Renta Fija',
+      'crypto': 'Criptomonedas', 'cripto': 'Criptomonedas', 'criptomonedas': 'Criptomonedas',
+      'forex': 'Liquidez', 'divisas': 'Liquidez', 'cash': 'Liquidez', 'liquidez': 'Liquidez'
     };
 
     const safeParseFloat = (val: string) => {
@@ -51,7 +51,7 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
 
     return {
       ticker: findKey(['Ticker', 'Symbol', 'Activo']),
-      type: typeMapping[rawType.toLowerCase()] || 'Stocks',
+      type: typeMapping[rawType.toLowerCase()] || 'Renta Variable',
       sharesOwned: safeParseFloat(findKey(['Shares_Owned', 'Shares', 'Titulos', 'Cantidad'])),
       avgPurchasePriceMXN: safeParseFloat(findKey(['Avg_Price_MXN', 'Costo_MXN', 'Precio_Promedio_MXN'])),
       avgPurchasePriceUSD: safeParseFloat(findKey(['Avg_Price_USD', 'Costo_USD', 'Precio_Promedio_USD'])),
@@ -90,7 +90,7 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
 
       // Map Portfolios
       const portfolioByClient: Record<string, PortfolioAsset[]> = {};
-      combinedPortfolioRaw.forEach(row => {
+      combinedPortfolioRaw.forEach((row: any) => {
         const clientId = row.ClientID || row.clientid || row.ID || row.id;
         if (clientId) {
           if (!portfolioByClient[clientId]) portfolioByClient[clientId] = [];
@@ -102,7 +102,7 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
       });
 
       // Map Clients
-      const mappedClients: ClientWithPortfolio[] = clientsRaw.map(row => {
+      const mappedClients: ClientWithPortfolio[] = clientsRaw.map((row: any) => {
         const id = row.ID || row.id || '';
         return {
           id,
@@ -112,7 +112,7 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
           phone: row.Telefono || row.phone || '',
           portfolio: portfolioByClient[id] || []
         };
-      }).filter(c => c.id);
+      }).filter((c: any) => c.id);
 
       setAllClients(mappedClients);
 

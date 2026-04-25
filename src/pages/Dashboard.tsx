@@ -10,9 +10,7 @@ import {
   PieChart as PieChartIcon,
   List,
   Coins,
-  Building2,
   Landmark,
-  Gem,
   Activity,
   Layers,
   Plus,
@@ -121,7 +119,7 @@ const DeleteConfirmModal: React.FC<DeleteConfirmProps> = ({
 );
 
 // ─── Available categories ─────────────────────────────────────────────────────
-const CATEGORIES = ['All', 'Stocks', 'ETFs', 'Crypto', 'Renta Fija', 'FIBRAs', 'Commodities', 'Forex'];
+const CATEGORIES = ['All', 'Renta Variable', 'Criptomonedas', 'Renta Fija', 'Liquidez'];
 
 // ─── Asset Logo Helper ───────────────────────────────────────────────────────
 export const cleanTickerName = (ticker: string) => ticker.replace(/(STOCKS|ETFS|CRYPTO|FIBRAS|COMMODITIES|FOREX|EQUITY|INC)$/i, '').trim();
@@ -207,13 +205,11 @@ const Dashboard: React.FC = () => {
 
   const getAssetIcon = (type: string) => {
     switch (type) {
-      case 'Stocks':       return <Activity className="w-5 h-5" />;
-      case 'ETFs':         return <Layers className="w-5 h-5" />;
-      case 'Crypto':       return <Coins className="w-5 h-5" />;
-      case 'FIBRAs':       return <Building2 className="w-5 h-5" />;
-      case 'Renta Fija': return <Landmark className="w-5 h-5" />;
-      case 'Commodities':  return <Gem className="w-5 h-5" />;
-      default:             return <Activity className="w-5 h-5" />;
+      case 'Renta Variable': return <Activity className="w-5 h-5" />;
+      case 'Criptomonedas':  return <Coins className="w-5 h-5" />;
+      case 'Renta Fija':     return <Landmark className="w-5 h-5" />;
+      case 'Liquidez':       return <Layers className="w-5 h-5" />;
+      default:               return <Activity className="w-5 h-5" />;
     }
   };
 
@@ -309,9 +305,9 @@ const Dashboard: React.FC = () => {
           {CATEGORIES.map(category => {
             const isActive = selectedCategory === category;
             const labelMapping: Record<string, string> = {
-              'All': 'Todos los Activos', 'Stocks': 'Acciones', 'ETFs': 'ETFs',
-              'Crypto': 'Criptomonedas', 'Renta Fija': 'Renta Fija',
-              'FIBRAs': 'FIBRAs', 'Commodities': 'Materias Primas', 'Forex': 'Forex',
+              'All': 'Todos los Activos', 'Renta Variable': 'Renta Variable',
+              'Criptomonedas': 'Criptomonedas', 'Renta Fija': 'Renta Fija',
+              'Liquidez': 'Liquidez'
             };
             return (
               <button

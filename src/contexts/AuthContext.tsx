@@ -21,6 +21,7 @@ interface AuthContextType {
   login: (id: string, pass: string) => Promise<{ success: boolean; message?: string }>;
   logout: () => void;
   isLoading: boolean;
+  impersonateClient?: (client: ClientProfile) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -34,7 +35,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const loadAuthorizedClients = async () => {
       if (SHEET_URLS.CLIENTS_DATA) {
         const data = await fetchCsvData(SHEET_URLS.CLIENTS_DATA);
-        const mapped: ClientProfile[] = data.map(row => {
+        const mapped: ClientProfile[] = data.map((row: any) => {
           // Helper para encontrar campos sin importar mayúsculas/minúsculas
           const find = (keys: string[]) => {
             const found = Object.keys(row).find(k => keys.some(target => k.toLowerCase().trim() === target.toLowerCase()));
@@ -49,7 +50,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             email: find(['Email', 'EMAIL']),
             phone: find(['Telefono', 'TELEFONO'])
           };
-        }).filter(c => c.id);
+        }).filter((c: any) => c.id);
         setAuthorizedClients(mapped);
       }
       setIsLoading(false);
@@ -68,7 +69,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     let currentClients = authorizedClients;
     if (SHEET_URLS.CLIENTS_DATA) {
         const data = await fetchCsvData(SHEET_URLS.CLIENTS_DATA);
-        currentClients = data.map(row => {
+        currentClients = data.map((row: any) => {
             const find = (keys: string[]) => {
                 const found = Object.keys(row).find(k => keys.some(target => k.toLowerCase().trim() === target.toLowerCase()));
                 return found ? row[found] : '';
@@ -79,7 +80,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 role: 'client' as 'client',
                 password: find(['Password', 'PASSWORD']),
             } as ClientProfile;
-        }).filter(c => c.id);
+        }).filter((c: any) => c.id);
         setAuthorizedClients(currentClients);
     }
 
@@ -97,8 +98,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setUser(null);
   };
 
+  const impersonateClient = (client: ClientProfile) => {
+    setUser(client);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, login, logout, isLoading, impersonateClient }}>
       {children}
     </AuthContext.Provider>
   );

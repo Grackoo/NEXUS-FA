@@ -24,81 +24,32 @@ interface Props {
 }
 
 const SUGGESTIONS: Record<string, { ticker: string; name: string }[]> = {
-  'Stocks': [
+  'Renta Variable': [
     { ticker: 'AAPL', name: 'Apple Inc.' },
     { ticker: 'MSFT', name: 'Microsoft Corp.' },
-    { ticker: 'AMZN', name: 'Amazon.com Inc.' },
     { ticker: 'NVDA', name: 'Nvidia Corp.' },
-    { ticker: 'TSLA', name: 'Tesla Inc.' },
-    { ticker: 'META', name: 'Meta Platforms' },
-    { ticker: 'GOOGL', name: 'Alphabet Inc.' },
-    { ticker: 'WALMEX', name: 'Walmart de México' },
-    { ticker: 'BIMBOA', name: 'Grupo Bimbo' },
-    { ticker: 'FEMSAUBD', name: 'FEMSA' },
-    { ticker: 'GFNORTEO', name: 'Banorte' },
-    { ticker: 'AMX', name: 'América Móvil' },
-    { ticker: 'CEMEXCPO', name: 'Cemex' }
-  ],
-  'ETFs': [
-    { ticker: 'SPY', name: 'SPDR S&P 500 ETF Trust' },
     { ticker: 'IVV', name: 'iShares Core S&P 500 ETF' },
-    { ticker: 'VOO', name: 'Vanguard S&P 500 ETF' },
-    { ticker: 'QQQ', name: 'Invesco QQQ Trust (Nasdaq 100)' },
-    { ticker: 'NAFTRAC', name: 'iShares NAFTRAC (IPC Mexico)' },
-    { ticker: 'VTI', name: 'Vanguard Total Stock Market' }
+    { ticker: 'QQQ', name: 'Invesco QQQ Trust' },
+    { ticker: 'FUNO11', name: 'Fibra Uno' },
+    { ticker: 'GLD', name: 'Oro (SPDR Gold Shares)' }
   ],
-  'Crypto': [
+  'Criptomonedas': [
     { ticker: 'BTC', name: 'Bitcoin' },
     { ticker: 'ETH', name: 'Ethereum' },
     { ticker: 'SOL', name: 'Solana' },
     { ticker: 'BNB', name: 'Binance Coin' },
-    { ticker: 'XRP', name: 'Ripple' },
-    { ticker: 'ADA', name: 'Cardano' },
-    { ticker: 'DOGE', name: 'Dogecoin' }
+    { ticker: 'USDT', name: 'Tether' }
   ],
-  'Renta fija': [
+  'Renta Fija': [
     { ticker: 'CETES28', name: 'CETES 28 Días' },
-    { ticker: 'CETES91', name: 'CETES 91 Días' },
-    { ticker: 'CETES182', name: 'CETES 182 Días' },
-    { ticker: 'CETES364', name: 'CETES 364 Días' },
-    { ticker: 'BONOS', name: 'Bonos Gubernamentales (Bonos M)' },
+    { ticker: 'BONOS', name: 'Bonos Gubernamentales' },
     { ticker: 'UDIBONOS', name: 'Udibonos' },
-    { ticker: 'BPAG', name: 'Bonos de Protección al Ahorro' },
   ],
-  'FIBRAs': [
-    { ticker: 'FUNO11', name: 'Fibra Uno' },
-    { ticker: 'FMTY14', name: 'Fibra Monterrey' },
-    { ticker: 'FIBRAPL14', name: 'Fibra Prologis' },
-    { ticker: 'DANHOS13', name: 'Fibra Danhos' },
-    { ticker: 'TERRA13', name: 'Fibra Terrafina' },
-    { ticker: 'FIHO12', name: 'Fibra Hotel' },
-    { ticker: 'FCFE18', name: 'Fibra CFE' }
-  ],
-  'Commodities': [
-    { ticker: 'GLD', name: 'Oro (SPDR Gold Shares ETF)' },
-    { ticker: 'IAU', name: 'Oro (iShares Gold Trust)' },
-    { ticker: 'SLV', name: 'Plata (iShares Silver Trust)' },
-    { ticker: 'USO', name: 'Petróleo WTI (US Oil Fund)' },
-    { ticker: 'BNO', name: 'Petróleo Brent (US Brent Oil)' },
-    { ticker: 'UNG', name: 'Gas Natural (US Natural Gas)' },
-    { ticker: 'CORN', name: 'Maíz (Teucrium Corn Fund)' },
-    { ticker: 'WEAT', name: 'Trigo (Teucrium Wheat Fund)' },
-    { ticker: 'SOYB', name: 'Soya (Teucrium Soybean Fund)' },
-    { ticker: 'CPER', name: 'Cobre (US Copper Index Fund)' },
-    { ticker: 'PPLT', name: 'Platino (abrdn Physical Platinum)' },
-    { ticker: 'DBC', name: 'Índice de Commodities (Invesco DB)' },
-    { ticker: 'DBA', name: 'Índice de Agricultura (Invesco DB)' }
-  ],
-  'Forex': [
-    { ticker: 'USD', name: 'US Dollar (Dólar estadounidense)' },
-    { ticker: 'MXN', name: 'Mexican Peso (Peso mexicano)' },
-    { ticker: 'EUR', name: 'Euro' },
-    { ticker: 'GBP', name: 'British Pound (Libra esterlina)' },
-    { ticker: 'JPY', name: 'Japanese Yen (Yen japonés)' },
-    { ticker: 'CAD', name: 'Canadian Dollar' },
-    { ticker: 'CHF', name: 'Swiss Franc (Franco suizo)' },
-    { ticker: 'AUD', name: 'Australian Dollar' },
-    { ticker: 'CNY', name: 'Chinese Yuan (Yuan chino)' }
+  'Liquidez': [
+    { ticker: 'CASH', name: 'Efectivo en Cuenta' },
+    { ticker: 'USD', name: 'US Dollar' },
+    { ticker: 'MXN', name: 'Peso Mexicano' },
+    { ticker: 'EUR', name: 'Euro' }
   ]
 };
 
@@ -122,7 +73,7 @@ const SmartTransactionModal: React.FC<Props> = ({
   const [type, setType] = useState<'Buy' | 'Sell'>('Buy');
   const initialAssetType = isEditMode
     ? (editAsset!.type as any)
-    : (defaultAssetType && defaultAssetType !== 'All') ? defaultAssetType : 'Stocks';
+    : (defaultAssetType && defaultAssetType !== 'All') ? defaultAssetType : 'Renta Variable';
   const [assetType, setAssetType] = useState(initialAssetType);
   const initialCurrency = editAsset?.nativeCurrency ?? 'USD';
   const initialPrice = editAsset 
@@ -271,61 +222,79 @@ const SmartTransactionModal: React.FC<Props> = ({
 
           {/* ── Ticker + Asset Type ── */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2 relative" ref={suggestionsRef}>
-              <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase ml-1">
-                Instrumento (Ticker)
-              </label>
-              <input
-                value={ticker}
-                onChange={e => {
-                  setTicker(e.target.value.toUpperCase());
-                  setShowSuggestions(true);
-                }}
-                onFocus={() => setShowSuggestions(true)}
-                className="glass-input"
-                placeholder="Ej. AAPL"
-              />
-              {/* Autocomplete Dropdown */}
-              {showSuggestions && (ticker.length > 0 || availableSuggestions.length > 0) && (
-                <div className="absolute top-[100%] mt-1 left-0 right-0 max-h-48 overflow-y-auto bg-[#0a0a0a] border border-white/10 rounded-xl z-50 shadow-2xl scrollbar-hide py-1">
-                  {filteredSuggestions.length > 0 ? (
-                    filteredSuggestions.map((suggestion) => (
-                      <div 
-                        key={suggestion.ticker}
-                        onClick={() => {
-                          setTicker(suggestion.ticker);
-                          setShowSuggestions(false);
-                        }}
-                        className="px-4 py-2.5 hover:bg-white/5 cursor-pointer flex items-center justify-between transition-colors"
-                      >
-                        <span className="font-bold text-white text-sm">{suggestion.ticker}</span>
-                        <span className="text-xs text-gray-400 truncate ml-2 text-right">{suggestion.name}</span>
+            {assetType !== 'Liquidez' ? (
+              <div className="space-y-2 relative" ref={suggestionsRef}>
+                <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase ml-1">
+                  Instrumento (Ticker)
+                </label>
+                <input
+                  value={ticker}
+                  onChange={e => {
+                    setTicker(e.target.value.toUpperCase());
+                    setShowSuggestions(true);
+                  }}
+                  onFocus={() => setShowSuggestions(true)}
+                  className="glass-input"
+                  placeholder="Ej. AAPL"
+                />
+                {/* Autocomplete Dropdown */}
+                {showSuggestions && (ticker.length > 0 || availableSuggestions.length > 0) && (
+                  <div className="absolute top-[100%] mt-1 left-0 right-0 max-h-48 overflow-y-auto bg-[#0a0a0a] border border-white/10 rounded-xl z-50 shadow-2xl scrollbar-hide py-1">
+                    {filteredSuggestions.length > 0 ? (
+                      filteredSuggestions.map((suggestion) => (
+                        <div 
+                          key={suggestion.ticker}
+                          onClick={() => {
+                            setTicker(suggestion.ticker);
+                            setShowSuggestions(false);
+                          }}
+                          className="px-4 py-2.5 hover:bg-white/5 cursor-pointer flex items-center justify-between transition-colors"
+                        >
+                          <span className="font-bold text-white text-sm">{suggestion.ticker}</span>
+                          <span className="text-xs text-gray-400 truncate ml-2 text-right">{suggestion.name}</span>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="px-4 py-3 text-xs text-gray-500 text-center italic">
+                        Pulsa Enter para añadir "{ticker}" como nuevo
                       </div>
-                    ))
-                  ) : (
-                    <div className="px-4 py-3 text-xs text-gray-500 text-center italic">
-                      Pulsa Enter para añadir "{ticker}" como nuevo
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase ml-1">
+                  Instrumento
+                </label>
+                <input
+                  disabled
+                  value="CASH"
+                  className="glass-input opacity-50 cursor-not-allowed"
+                />
+              </div>
+            )}
             <div className="space-y-2">
               <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase ml-1">
                 Tipo de Activo
               </label>
               <select
                 value={assetType}
-                onChange={e => setAssetType(e.target.value as any)}
+                onChange={e => {
+                  const newType = e.target.value as any;
+                  setAssetType(newType);
+                  if (newType === 'Liquidez') {
+                    setTicker('CASH');
+                    setPrice(1);
+                    setCommission(0);
+                  }
+                }}
                 className="glass-input cursor-pointer"
               >
-                <option value="Stocks">Acciones (Stocks)</option>
-                <option value="ETFs">ETFs</option>
-                <option value="Crypto">Criptomonedas</option>
-                <option value="FIBRAs">FIBRAs / Real Estate</option>
-                <option value="Renta Fija">Renta Fija (CETES)</option>
-                <option value="Commodities">Commodities</option>
-                <option value="Forex">Forex</option>
+                <option value="Renta Variable">Renta Variable (Acciones/ETFs)</option>
+                <option value="Criptomonedas">Criptomonedas</option>
+                <option value="Renta Fija">Renta Fija (CETES/Bonos)</option>
+                <option value="Liquidez">Liquidez (Cash/Forex)</option>
               </select>
             </div>
           </div>
@@ -356,41 +325,46 @@ const SmartTransactionModal: React.FC<Props> = ({
               </div>
               <input
                 type="number"
+                step={assetType === 'Criptomonedas' ? '0.00000001' : '0.01'}
                 value={shares}
                 onChange={e => setShares(e.target.value === '' ? '' : Number(e.target.value))}
                 className="glass-input"
-                placeholder="0"
+                placeholder={assetType === 'Liquidez' ? 'Monto a depositar/retirar' : '0'}
               />
             </div>
           </div>
 
           {/* ── Price + Commission ── */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase ml-1">
-                Precio Unitario
-              </label>
-              <input
-                type="number"
-                value={price}
-                onChange={e => setPrice(e.target.value === '' ? '' : Number(e.target.value))}
-                className="glass-input"
-                placeholder="0.00"
-              />
+          {assetType !== 'Liquidez' && (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase ml-1">
+                  Precio Unitario
+                </label>
+                <input
+                  type="number"
+                  step={assetType === 'Criptomonedas' ? '0.00000001' : '0.01'}
+                  value={price}
+                  onChange={e => setPrice(e.target.value === '' ? '' : Number(e.target.value))}
+                  className="glass-input"
+                  placeholder="0.00"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase ml-1">
+                  Comisión (Total)
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={commission}
+                  onChange={e => setCommission(e.target.value === '' ? '' : Number(e.target.value))}
+                  className="glass-input"
+                  placeholder="0.00"
+                />
+              </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase ml-1">
-                Comisión (Total)
-              </label>
-              <input
-                type="number"
-                value={commission}
-                onChange={e => setCommission(e.target.value === '' ? '' : Number(e.target.value))}
-                className="glass-input"
-                placeholder="0.00"
-              />
-            </div>
-          </div>
+          )}
 
           {/* ── Date ── */}
           <div className="space-y-2">
