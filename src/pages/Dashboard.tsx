@@ -172,11 +172,11 @@ const AssetLogo: React.FC<{ ticker: string; logoUrl?: string; type?: string; cla
     };
 
     if (tickerToDomain[cleanTicker]) {
-      return `https://logo.clearbit.com/${tickerToDomain[cleanTicker]}`;
+      return `https://icon.horse/icon/${tickerToDomain[cleanTicker]}`;
     }
 
     // 4. Fallback for any other stock: assume ticker.com (Often works for big companies like ibm.com, ford.com)
-    return `https://logo.clearbit.com/${cleanTicker.toLowerCase()}.com`;
+    return `https://icon.horse/icon/${cleanTicker.toLowerCase()}.com`;
   };
 
   const finalLogoUrl = getLogoUrl();
