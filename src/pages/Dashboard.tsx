@@ -135,48 +135,56 @@ const AssetLogo: React.FC<{ ticker: string; logoUrl?: string; type?: string; cla
   const getLogoUrl = () => {
     if (logoUrl && logoUrl.trim() !== '') return logoUrl;
 
-    // 1. Crypto using Github Raw (Reliable, no hotlink block)
+    // 1. Hardcoded indestructible URLs (Wikipedia / GitHub Raw)
+    const customLogos: Record<string, string> = {
+      'VOO': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Vanguard_Group_logo.svg/512px-Vanguard_Group_logo.svg.png',
+      'CETES': 'https://images.crunchbase.com/image/upload/c_pad,h_170,w_170,f_auto,b_white,q_auto:eco,dpr_1/v1488540899/xxqomov3iuk93g5wxyr2.png',
+      'FUNO11': 'https://funo.mx/assets/img/funo-logo.svg',
+      'GLD': 'https://upload.wikimedia.org/wikipedia/en/thumb/f/f6/SPDR_Gold_Shares_logo.svg/512px-SPDR_Gold_Shares_logo.svg.png',
+      'AAPL': 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/512px-Apple_logo_black.svg.png',
+      'NVDA': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Nvidia_logo.svg/512px-Nvidia_logo.svg.png',
+      'MSFT': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/512px-Microsoft_logo.svg.png',
+      'TSLA': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Tesla_Motors.svg/512px-Tesla_Motors.svg.png',
+      'AMZN': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/512px-Amazon_logo.svg.png',
+      'META': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Meta_Platforms_Inc._logo.svg/512px-Meta_Platforms_Inc._logo.svg.png',
+      'GOOGL': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/512px-Google_2015_logo.svg.png',
+      'GOOG': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/512px-Google_2015_logo.svg.png',
+    };
+
+    if (customLogos[cleanTicker]) {
+      return customLogos[cleanTicker];
+    }
+
+    // 2. Crypto using Github Raw (Reliable, no hotlink block)
     if (type === 'Criptomonedas') {
       return `https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/${cleanTicker.toLowerCase()}.png`;
     }
 
-    // 2. Forex / Liquidez using SVG Flags
+    // 3. Forex / Liquidez using SVG Flags
     if (type === 'Liquidez') {
       if (cleanTicker === 'USD') return 'https://raw.githubusercontent.com/lipis/flag-icons/main/flags/4x3/us.svg';
       if (cleanTicker === 'MXN') return 'https://raw.githubusercontent.com/lipis/flag-icons/main/flags/4x3/mx.svg';
       if (cleanTicker === 'EUR') return 'https://raw.githubusercontent.com/lipis/flag-icons/main/flags/4x3/eu.svg';
     }
 
-    // 3. Known Mappings for Clearbit (Domain resolution)
+    // 4. Known Mappings for unavatar.io (Domain resolution)
     const tickerToDomain: Record<string, string> = {
-      'AAPL': 'apple.com',
-      'NVDA': 'nvidia.com',
-      'MSFT': 'microsoft.com',
-      'TSLA': 'tesla.com',
-      'AMZN': 'amazon.com',
-      'META': 'meta.com',
-      'GOOGL': 'google.com',
-      'GOOG': 'google.com',
-      'VOO': 'vanguard.com',
       'QQQ': 'invesco.com',
       'SPY': 'ssga.com',
       'IVV': 'ishares.com',
-      'CETES': 'cetesdirecto.com',
-      'FUNO11': 'funo.mx',
       'FIBRAPL14': 'fibraprologis.com',
       'FMTY14': 'fibramty.com',
       'DANHOS13': 'fibradanhos.com.mx',
-      'GLD': 'spdrgoldshares.com',
       'SLV': 'ishares.com',
       'BNO': 'uscofund.com'
     };
 
     if (tickerToDomain[cleanTicker]) {
-      return `https://icon.horse/icon/${tickerToDomain[cleanTicker]}`;
+      return `https://unavatar.io/${tickerToDomain[cleanTicker]}`;
     }
 
-    // 4. Fallback for any other stock: assume ticker.com (Often works for big companies like ibm.com, ford.com)
-    return `https://icon.horse/icon/${cleanTicker.toLowerCase()}.com`;
+    // 5. Fallback for any other stock: assume ticker.com
+    return `https://unavatar.io/${cleanTicker.toLowerCase()}.com`;
   };
 
   const finalLogoUrl = getLogoUrl();
