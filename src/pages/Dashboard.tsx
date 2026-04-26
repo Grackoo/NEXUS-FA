@@ -124,7 +124,7 @@ const CATEGORIES = ['All', 'Renta Variable', 'Criptomonedas', 'Renta Fija', 'Liq
 // ─── Asset Logo Helper ───────────────────────────────────────────────────────
 export const cleanTickerName = (ticker: string) => ticker.replace(/(STOCKS|ETFS|CRYPTO|FIBRAS|COMMODITIES|FOREX|EQUITY|INC)$/i, '').trim();
 
-const AssetLogo: React.FC<{ ticker: string; logoUrl?: string; className?: string }> = ({ ticker, logoUrl, className = '' }) => {
+const AssetLogo: React.FC<{ ticker: string; logoUrl?: string; type?: string; className?: string }> = ({ ticker, logoUrl, type, className = '' }) => {
   const [hasError, setHasError] = useState(false);
   const cleanTicker = cleanTickerName(ticker).toUpperCase();
   const firstLetter = cleanTicker.charAt(0);
@@ -132,21 +132,54 @@ const AssetLogo: React.FC<{ ticker: string; logoUrl?: string; className?: string
   const colors = ['#1A5CFF', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4'];
   const colorHex = colors[firstLetter.charCodeAt(0) % colors.length] || colors[0];
 
-  // Hardcoded mappings for common Mexican/Global tickers that APIs miss
-  const customLogos: Record<string, string> = {
-    'VOO': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Vanguard_Group_logo.svg/1024px-Vanguard_Group_logo.svg.png',
-    'CETES': 'https://www.cetesdirecto.com/sites/portal/o/cetesdirecto/assets/images/logo_cetesdirecto.png',
-    'FUNO11': 'https://funo.mx/assets/img/funo-logo.svg',
-    'GLD': 'https://upload.wikimedia.org/wikipedia/en/thumb/f/f6/SPDR_Gold_Shares_logo.svg/1200px-SPDR_Gold_Shares_logo.svg.png',
-    'USD': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Flag_of_the_United_States.svg/800px-Flag_of_the_United_States.svg.png',
-    'BTC': 'https://cryptologos.cc/logos/bitcoin-btc-logo.png',
-    'ETH': 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
-    'AAPL': 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg',
-    'NVDA': 'https://upload.wikimedia.org/wikipedia/commons/2/21/Nvidia_logo.svg'
+  const getLogoUrl = () => {
+    if (logoUrl && logoUrl.trim() !== '') return logoUrl;
+
+    // 1. Crypto using Github Raw (Reliable, no hotlink block)
+    if (type === 'Criptomonedas') {
+      return `https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/${cleanTicker.toLowerCase()}.png`;
+    }
+
+    // 2. Forex / Liquidez using SVG Flags
+    if (type === 'Liquidez') {
+      if (cleanTicker === 'USD') return 'https://raw.githubusercontent.com/lipis/flag-icons/main/flags/4x3/us.svg';
+      if (cleanTicker === 'MXN') return 'https://raw.githubusercontent.com/lipis/flag-icons/main/flags/4x3/mx.svg';
+      if (cleanTicker === 'EUR') return 'https://raw.githubusercontent.com/lipis/flag-icons/main/flags/4x3/eu.svg';
+    }
+
+    // 3. Known Mappings for Clearbit (Domain resolution)
+    const tickerToDomain: Record<string, string> = {
+      'AAPL': 'apple.com',
+      'NVDA': 'nvidia.com',
+      'MSFT': 'microsoft.com',
+      'TSLA': 'tesla.com',
+      'AMZN': 'amazon.com',
+      'META': 'meta.com',
+      'GOOGL': 'google.com',
+      'GOOG': 'google.com',
+      'VOO': 'vanguard.com',
+      'QQQ': 'invesco.com',
+      'SPY': 'ssga.com',
+      'IVV': 'ishares.com',
+      'CETES': 'cetesdirecto.com',
+      'FUNO11': 'funo.mx',
+      'FIBRAPL14': 'fibraprologis.com',
+      'FMTY14': 'fibramty.com',
+      'DANHOS13': 'fibradanhos.com.mx',
+      'GLD': 'spdrgoldshares.com',
+      'SLV': 'ishares.com',
+      'BNO': 'uscofund.com'
+    };
+
+    if (tickerToDomain[cleanTicker]) {
+      return `https://logo.clearbit.com/${tickerToDomain[cleanTicker]}`;
+    }
+
+    // 4. Fallback for any other stock: assume ticker.com (Often works for big companies like ibm.com, ford.com)
+    return `https://logo.clearbit.com/${cleanTicker.toLowerCase()}.com`;
   };
 
-  // Try custom mapping first, then try companiesmarketcap API, then fallback to clearbit
-  const finalLogoUrl = logoUrl || customLogos[cleanTicker] || `https://companiesmarketcap.com/img/company-logos/64/${cleanTicker}.webp`;
+  const finalLogoUrl = getLogoUrl();
 
   if (hasError || !finalLogoUrl) {
     return (
@@ -421,7 +454,7 @@ const Dashboard: React.FC = () => {
                           </div>
                           <div>
                             <div className="flex items-center gap-2 mb-1">
-                              <AssetLogo ticker={asset.ticker} logoUrl={asset.logoUrl} />
+                              <AssetLogo ticker={asset.ticker} logoUrl={asset.logoUrl} type={asset.type} />
                               <div className="flex items-center gap-2">
                                 <p className="font-semibold text-sm tracking-tight text-white">{cleanTickerName(asset.ticker)}</p>
                                 <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/5 text-white/50 font-medium uppercase tracking-wider">
