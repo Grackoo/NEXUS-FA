@@ -247,20 +247,25 @@ const Dashboard: React.FC = () => {
 
         {/* ── Header cards ── */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="md:col-span-2 glass-card flex flex-col justify-between overflow-hidden relative p-6 md:p-8">
-            <div className="relative z-10">
-              <p className="text-gray-400 font-medium text-[10px] md:text-xs mb-1 uppercase tracking-widest">Patrimonio Neto Total</p>
-              <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4 tabular-nums text-gradient">
+          <div className="md:col-span-2 glass-card flex flex-col justify-between overflow-hidden relative p-8 md:p-10 bg-slate-900/50 backdrop-blur-md border border-white/5 shadow-2xl rounded-3xl">
+            <div className="relative z-10 space-y-2">
+              <p className="text-xs uppercase tracking-wide font-medium text-white/60 mb-2">Balance Total</p>
+              <h1 className="text-4xl md:text-5xl font-semibold tracking-tight mb-4 tabular-nums text-white">
                 {formatValue(netWorth)}
               </h1>
-              <div className="flex flex-wrap items-center gap-3 md:gap-4">
-                <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] md:text-xs font-bold border ${isGlobalPositive ? 'bg-emerald/10 text-emerald border-emerald/20' : 'bg-crimson/10 text-crimson border-crimson/20'}`}>
-                  {isGlobalPositive ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />}
+              <div className="flex flex-wrap items-center gap-4 mt-6">
+                <div className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold border ${isGlobalPositive ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'}`}>
+                  {isGlobalPositive ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
                   {isGlobalPositive ? '+' : ''}{globalPLPercent.toFixed(2)}%
                 </div>
-                <p className="text-[10px] md:text-xs text-gray-400">
-                  Total G/P: <span className={isGlobalPositive ? 'text-emerald font-bold' : 'text-crimson font-bold'}>{isGlobalPositive ? '+' : ''}{formatValue(globalPL)}</span>
-                </p>
+                <div className="flex flex-col ml-2">
+                  <p className="text-[10px] uppercase tracking-wide font-medium text-white/50">
+                    Rendimiento Histórico
+                  </p>
+                  <p className={`text-sm font-semibold ${isGlobalPositive ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    {isGlobalPositive ? '+' : ''}{formatValue(globalPL)}
+                  </p>
+                </div>
               </div>
             </div>
             <div className="absolute right-0 bottom-0 top-0 w-1/3 bg-gradient-to-l from-primary/10 to-transparent flex items-center justify-end pr-4 md:pr-8">
@@ -268,16 +273,16 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="glass-card p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="font-bold text-[10px] md:text-sm tracking-widest flex items-center gap-2 uppercase text-gray-400">
-                <PieChartIcon className="w-4 h-4 text-primary" /> Distribución
+          <div className="glass-card p-6 md:p-8 bg-black/40 backdrop-blur-md border border-white/5 shadow-2xl rounded-3xl flex flex-col justify-between">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xs uppercase tracking-wide font-medium text-white/60 flex items-center gap-2">
+                <PieChartIcon className="w-4 h-4 text-primary" /> Asignación (Allocation)
               </h3>
             </div>
-            <div style={{ height: '200px', width: '100%', position: 'relative' }}>
+            <div style={{ height: '220px', width: '100%', position: 'relative' }}>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={allocation} innerRadius={60} outerRadius={85} paddingAngle={5} dataKey="value" stroke="none">
+                  <Pie data={allocation} innerRadius={65} outerRadius={90} paddingAngle={8} dataKey="value" stroke="none" cornerRadius={4}>
                     {allocation.map((_: any, i: number) => (
                       <Cell key={`cell-${i}`} fill={COLORS[i % COLORS.length]} />
                     ))}
@@ -292,9 +297,9 @@ const Dashboard: React.FC = () => {
                   />
                 </PieChart>
               </ResponsiveContainer>
-              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <p className="text-[9px] text-gray-500 uppercase tracking-widest">Activos</p>
-                <p className="text-base md:text-lg font-bold">{allocation.length}</p>
+              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mt-2">
+                <p className="text-[10px] text-white/50 uppercase tracking-widest">Activos</p>
+                <p className="text-2xl font-semibold text-white mt-1">{allocation.length}</p>
               </div>
             </div>
           </div>
@@ -329,15 +334,15 @@ const Dashboard: React.FC = () => {
         </section>
 
         {/* ── Positions Table ── */}
-        <section className="glass-card p-0 overflow-hidden">
-          <div className="px-6 md:px-8 py-5 md:py-6 border-b border-white/5 flex items-center justify-between bg-white/[0.01]">
-            <h3 className="font-bold text-base md:text-lg flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
+        <section className="glass-card p-0 overflow-hidden bg-slate-900/50 backdrop-blur-md border border-white/5 rounded-3xl shadow-2xl">
+          <div className="px-6 md:px-8 py-6 border-b border-white/5 flex items-center justify-between bg-white/[0.01]">
+            <h3 className="text-sm uppercase tracking-wide font-medium text-white/80 flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20">
                 <List className="w-4 h-4 md:w-5 md:h-5 text-primary" />
               </div>
               Posiciones Actuales {selectedCategory !== 'All' && <span>— {selectedCategory}</span>}
             </h3>
-            <div className="flex gap-2">
+            <div className="flex gap-4">
               <button
                 onClick={() => { setEditAsset(undefined); setIsTxModalOpen(true); }}
                 className="glass-button flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 text-[10px] md:text-xs"
@@ -354,14 +359,14 @@ const Dashboard: React.FC = () => {
           <div className="overflow-x-auto scrollbar-hide">
             <table className="w-full text-left border-collapse min-w-[780px] md:min-w-0">
               <thead>
-                <tr className="border-b border-white/5 text-gray-400 text-[9px] md:text-[10px] uppercase tracking-widest bg-white/[0.02]">
-                  <th className="px-6 md:px-8 py-4 md:py-5 font-semibold">Activo</th>
-                  <th className="px-4 py-4 md:py-5 font-semibold text-right">Cantidad</th>
-                  <th className="px-4 py-4 md:py-5 font-semibold text-right">Precio Prom.</th>
-                  <th className="px-4 py-4 md:py-5 font-semibold text-right">V. Mercado</th>
-                  <th className="px-4 py-4 md:py-5 font-semibold text-right">Ganancia</th>
-                  <th className="px-4 py-4 md:py-5 font-semibold text-right">Rend.</th>
-                  <th className="px-6 md:px-8 py-4 md:py-5 font-semibold text-center">Acciones</th>
+                <tr className="border-b border-white/5 text-white/50 text-[10px] md:text-[11px] uppercase tracking-widest bg-white/[0.01]">
+                  <th className="px-6 py-4 font-semibold">Activo</th>
+                  <th className="px-4 py-4 font-semibold text-right">Cantidad</th>
+                  <th className="px-4 py-4 font-semibold text-right">Precio Prom.</th>
+                  <th className="px-4 py-4 font-semibold text-right">V. Mercado</th>
+                  <th className="px-4 py-4 font-semibold text-right">Ganancia</th>
+                  <th className="px-4 py-4 font-semibold text-right">Rend.</th>
+                  <th className="px-6 py-4 font-semibold text-center">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
@@ -393,64 +398,64 @@ const Dashboard: React.FC = () => {
                   const isPositiveSub = plSub >= 0;
 
                   return (
-                    <tr key={asset.ticker} className="group hover:bg-white/[0.03] transition-colors">
+                    <tr key={asset.ticker} className="group hover:bg-white/[0.02] transition-colors border-b border-white/5 last:border-0">
                       {/* Asset info */}
-                      <td className="px-6 md:px-8 py-5 md:py-6">
-                        <div className="flex items-center gap-3 md:gap-4">
-                          <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-white/5 flex items-center justify-center text-primary border border-white/5 group-hover:border-primary/30 transition-all duration-300">
+                      <td className="px-6 py-3">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-primary border border-white/5 group-hover:border-primary/30 transition-all duration-300">
                             {getAssetIcon(asset.type)}
                           </div>
                           <div>
-                            <div className="flex items-center gap-2 md:gap-3 mb-0.5 md:mb-1">
+                            <div className="flex items-center gap-2 mb-1">
                               <AssetLogo ticker={asset.ticker} logoUrl={asset.logoUrl} />
-                              <div className="flex items-center gap-1.5 md:gap-2">
-                                <p className="font-bold text-xs md:text-sm tracking-tight">{cleanTickerName(asset.ticker)}</p>
-                                <span className="text-[8px] px-1.5 py-0.5 rounded bg-white/5 text-gray-400 font-medium uppercase tracking-wider">
+                              <div className="flex items-center gap-2">
+                                <p className="font-semibold text-sm tracking-tight text-white">{cleanTickerName(asset.ticker)}</p>
+                                <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/5 text-white/50 font-medium uppercase tracking-wider">
                                   {asset.type}
                                 </span>
                               </div>
                             </div>
-                            <p className="text-[9px] text-gray-500 font-medium uppercase tracking-widest">{asset.nativeCurrency}</p>
+                            <p className="text-[10px] text-white/40 font-medium uppercase tracking-widest">{asset.nativeCurrency}</p>
                           </div>
                         </div>
                       </td>
 
-                      <td className="px-4 py-5 md:py-6 text-right font-semibold tabular-nums text-xs md:text-sm">{asset.sharesOwned}</td>
+                      <td className="px-4 py-3 text-right font-semibold tabular-nums text-sm text-white">{asset.sharesOwned}</td>
                       
                       {/* Avg Price */}
-                      <td className="px-4 py-5 md:py-6 text-right tabular-nums text-gray-400 text-xs md:text-sm">
+                      <td className="px-4 py-3 text-right tabular-nums text-white/60 text-sm">
                         <div className="flex flex-col gap-1 items-end">
                           <span>{formatValue(avgMain)}</span>
-                          {avgSub > 0 && <span className="text-[10px] text-gray-600 font-medium">{formatValue(avgSub, oppositeCurrency)}</span>}
+                          {avgSub > 0 && <span className="text-[10px] text-white/40 font-medium">{formatValue(avgSub, oppositeCurrency)}</span>}
                         </div>
                       </td>
                       
                       {/* Market Value */}
-                      <td className="px-4 py-5 md:py-6 text-right font-bold tabular-nums text-xs md:text-sm">
+                      <td className="px-4 py-3 text-right font-semibold tabular-nums text-sm text-white">
                         <div className="flex flex-col gap-1 items-end">
                           <span>{formatValue(valueMain)}</span>
-                          <span className="text-[10px] text-gray-600 font-medium">{formatValue(valueSub, oppositeCurrency)}</span>
+                          <span className="text-[10px] text-white/40 font-medium">{formatValue(valueSub, oppositeCurrency)}</span>
                         </div>
                       </td>
 
                       {/* Profit/Loss */}
-                      <td className={`px-4 py-5 md:py-6 text-right font-bold tabular-nums text-xs md:text-sm`}>
+                      <td className={`px-4 py-3 text-right font-semibold tabular-nums text-sm`}>
                         <div className="flex flex-col gap-1 items-end">
-                          <span className={isPositiveMain ? 'text-emerald' : 'text-crimson'}>{isPositiveMain ? '+' : ''}{formatValue(plMain)}</span>
-                          <span className={`text-[10px] font-medium ${isPositiveSub ? 'text-emerald/50' : 'text-crimson/50'}`}>{isPositiveSub ? '+' : ''}{formatValue(plSub, oppositeCurrency)}</span>
+                          <span className={isPositiveMain ? 'text-emerald-400' : 'text-rose-400'}>{isPositiveMain ? '+' : ''}{formatValue(plMain)}</span>
+                          <span className={`text-[10px] font-medium ${isPositiveSub ? 'text-emerald-500/50' : 'text-rose-500/50'}`}>{isPositiveSub ? '+' : ''}{formatValue(plSub, oppositeCurrency)}</span>
                         </div>
                       </td>
 
                       {/* Return (PlPercentage) */}
-                      <td className="px-4 py-5 md:py-6 text-right">
+                      <td className="px-4 py-3 text-right">
                         <div className="flex flex-col gap-1.5 items-end">
-                          <div className={`inline-flex items-center gap-1.5 px-2 md:px-2.5 py-1 rounded-lg font-bold text-[10px] md:text-xs ${isPositiveMain ? 'bg-emerald/10 text-emerald border border-emerald/20' : 'bg-crimson/10 text-crimson border border-crimson/20'}`}>
-                            {isPositiveMain ? <TrendingUp className="w-3 md:w-3.5 h-3 md:h-3.5" /> : <TrendingDown className="w-3 md:w-3.5 h-3 md:h-3.5" />}
+                          <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-semibold text-xs ${isPositiveMain ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}`}>
+                            {isPositiveMain ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />}
                             {plPercentageMain.toFixed(1)}%
                           </div>
                           {avgSub > 0 && (
-                            <div className={`inline-flex items-center gap-1 text-[9px] font-bold ${isPositiveSub ? 'text-emerald/50' : 'text-crimson/50'}`}>
-                              {isPositiveSub ? <TrendingUp className="w-2.5 h-2.5" /> : <TrendingDown className="w-2.5 h-2.5" />}
+                            <div className={`inline-flex items-center gap-1 text-[10px] font-semibold ${isPositiveSub ? 'text-emerald-500/50' : 'text-rose-500/50'}`}>
+                              {isPositiveSub ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                               <span>{plPercentageSub.toFixed(1)}% {oppositeCurrency}</span>
                             </div>
                           )}
@@ -458,7 +463,7 @@ const Dashboard: React.FC = () => {
                       </td>
 
                       {/* Actions: Edit + Delete */}
-                      <td className="px-6 md:px-8 py-5 md:py-6 text-center">
+                      <td className="px-6 py-3 text-center">
                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
                           {/* Edit */}
                           <button

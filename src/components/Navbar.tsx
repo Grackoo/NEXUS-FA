@@ -8,19 +8,19 @@ const Navbar: React.FC = () => {
   const { currency, toggleCurrency } = useCurrency();
 
   return (
-    <nav className="sticky top-0 z-50 bg-black/60 backdrop-blur-xl border-b border-white/5">
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-3 md:py-5 flex items-center justify-between">
-        <div className="flex items-center gap-3 md:gap-4 group">
-          <div className="bg-primary w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center font-bold text-white shadow-[0_0_20px_rgba(26,92,255,0.4)] transition-all duration-300">
+    <nav className="sticky top-0 z-50 bg-black/40 backdrop-blur-md border-b border-white/5">
+      <div className="max-w-7xl mx-auto px-6 md:px-8 py-4 md:py-6 flex items-center justify-between">
+        <div className="flex items-center gap-4 group">
+          <div className="bg-primary w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white shadow-[0_0_20px_rgba(26,92,255,0.4)] transition-all duration-300">
             N
           </div>
           <div>
-            <h2 className="text-lg md:text-xl font-bold tracking-tighter text-gradient leading-none">NEXUS FA</h2>
-            <p className="hidden md:block text-[9px] text-gray-500 uppercase tracking-widest mt-1">Wealth Management</p>
+            <h2 className="text-xl font-bold tracking-tighter text-white leading-none">NEXUS FA</h2>
+            <p className="hidden md:block text-[10px] text-white/40 uppercase tracking-widest mt-1">Wealth Management</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 md:gap-8">
+        <div className="flex items-center gap-x-8">
           {/* Currency Switcher */}
           <button 
             onClick={toggleCurrency}
@@ -35,12 +35,12 @@ const Navbar: React.FC = () => {
             </div>
           </button>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
-              <p className="text-xs md:text-sm font-bold tracking-tight">{user?.name}</p>
+              <p className="text-sm font-semibold text-white tracking-tight">{user?.name}</p>
               <div className="flex items-center justify-end gap-1">
                  {user?.role === 'admin' && <ShieldCheck className="w-3 h-3 text-primary" />}
-                 <p className="text-[9px] md:text-[10px] text-gray-500 uppercase tracking-widest leading-none">{user?.role === 'admin' ? 'Admin' : 'Inversionista'}</p>
+                 <p className="text-[10px] text-white/50 uppercase tracking-widest font-medium leading-none">{user?.role === 'admin' ? 'Admin' : 'Inversionista'}</p>
               </div>
             </div>
             
