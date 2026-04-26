@@ -1,11 +1,21 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCurrency } from '../contexts/CurrencyContext';
-import { LogOut, RefreshCw, Settings, ShieldCheck } from 'lucide-react';
+import { LogOut, RefreshCw, Settings, ShieldCheck, TrendingUp, LayoutDashboard } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 
 const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
   const { currency, toggleCurrency } = useCurrency();
+  const location = useLocation();
+
+  const navLinks = [
+    { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
+    { name: 'Mercados', path: '/markets', icon: <TrendingUp className="w-4 h-4" /> },
+  ];
+  if (user?.role === 'admin') {
+    navLinks.unshift({ name: 'Panel Admin', path: '/admin', icon: <ShieldCheck className="w-4 h-4" /> });
+  }
 
   return (
     <nav className="sticky top-0 z-50 bg-black/40 backdrop-blur-md border-b border-white/5">
@@ -18,6 +28,26 @@ const Navbar: React.FC = () => {
             <h2 className="text-xl font-bold tracking-tighter text-white leading-none">NEXUS FA</h2>
             <p className="hidden md:block text-[10px] text-white/40 uppercase tracking-widest mt-1">Wealth Management</p>
           </div>
+        </div>
+
+        <div className="hidden lg:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
+          {navLinks.map(link => {
+            const isActive = location.pathname.includes(link.path);
+            return (
+              <Link 
+                key={link.path} 
+                to={link.path}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
+                  isActive 
+                    ? 'bg-white/10 text-white shadow-inner border border-white/5' 
+                    : 'text-white/50 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                {link.icon}
+                {link.name}
+              </Link>
+            );
+          })}
         </div>
 
         <div className="flex items-center gap-x-8">
@@ -60,6 +90,21 @@ const Navbar: React.FC = () => {
                 <div className="px-5 py-2 mb-1">
                   <p className="text-[9px] text-gray-500 uppercase tracking-widest font-bold">Cuenta</p>
                 </div>
+                
+                {/* Mobile Links */}
+                <div className="lg:hidden px-2 mb-2 space-y-1">
+                  {navLinks.map(link => (
+                    <Link 
+                      key={link.path}
+                      to={link.path}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs hover:bg-white/[0.05] text-white transition-colors"
+                    >
+                      {link.icon}
+                      {link.name}
+                    </Link>
+                  ))}
+                </div>
+
                 <button className="w-full flex items-center gap-3 px-5 py-2.5 text-xs md:text-sm hover:bg-white/[0.05] transition-colors group/item">
                   <Settings className="w-4 h-4 text-gray-500 group-hover/item:text-primary" />
                   Configuración

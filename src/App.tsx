@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './pages/Login.tsx';
 import Dashboard from './pages/Dashboard.tsx';
 import Admin from './pages/Admin.tsx';
+import Watchlist from './pages/Watchlist.tsx';
 import { useAuth } from './contexts/AuthContext';
 
 function App() {
@@ -20,6 +21,11 @@ function App() {
         <Route 
           path="/admin" 
           element={user && user.role === 'admin' ? <Admin /> : <Navigate to="/login" />} 
+        />
+        
+        <Route 
+          path="/markets" 
+          element={user ? <Watchlist /> : <Navigate to="/login" />} 
         />
 
         <Route path="*" element={<Navigate to="/login" />} />
