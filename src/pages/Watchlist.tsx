@@ -40,49 +40,55 @@ const Watchlist: React.FC = () => {
         </header>
 
         {/* Top Section: Watchlist + Main Chart */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
           {/* Sidebar Watchlist */}
-          <div className="glass-card p-0 flex flex-col bg-slate-900/50 backdrop-blur-md border border-white/5 rounded-3xl overflow-hidden h-[600px]">
-            <div className="p-6 border-b border-white/5 space-y-4">
-              <h2 className="text-sm font-semibold text-white tracking-wide">Mis Listas</h2>
+          <div className="md:col-span-5 lg:col-span-3 glass-card p-0 flex flex-col bg-gradient-to-b from-slate-900/80 to-black/60 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden h-[550px] shadow-2xl">
+            <div className="p-5 md:p-6 border-b border-white/5 space-y-4 bg-white/[0.02]">
+              <h2 className="text-sm font-bold text-white tracking-widest uppercase flex items-center gap-2">
+                <Star className="w-4 h-4 text-primary" /> Mis Listas
+              </h2>
               <div className="relative">
                 <input 
                   type="text" 
                   placeholder="Buscar símbolo..." 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-black/40 border border-white/10 rounded-xl py-2 pl-9 pr-4 text-xs text-white placeholder-white/30 focus:outline-none focus:border-primary/50 transition-colors"
+                  className="w-full bg-black/60 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-xs text-white placeholder-white/40 focus:outline-none focus:border-primary/50 transition-colors shadow-inner"
                 />
-                <Search className="w-3.5 h-3.5 text-white/40 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Search className="w-4 h-4 text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2" />
               </div>
             </div>
             
-            <div className="flex-1 overflow-y-auto scrollbar-hide p-2">
-              <div className="text-[10px] uppercase tracking-widest font-medium text-white/40 px-4 py-2 mb-1">
-                Posición
+            <div className="flex-1 overflow-y-auto scrollbar-hide p-3">
+              <div className="text-[9px] uppercase tracking-widest font-bold text-white/30 px-3 py-2 mb-2">
+                Activos Monitoreados
               </div>
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 {filteredItems.map((item) => (
                   <button
                     key={item.symbol}
                     onClick={() => setSelectedAsset(item)}
-                    className={`w-full text-left px-4 py-3 rounded-xl flex items-center justify-between transition-all duration-300 ${
+                    className={`w-full text-left px-4 py-3.5 rounded-2xl flex items-center justify-between transition-all duration-300 group ${
                       selectedAsset.symbol === item.symbol 
-                        ? 'bg-white/10 shadow-lg border border-white/10' 
-                        : 'hover:bg-white/[0.04] border border-transparent'
+                        ? 'bg-gradient-to-r from-primary/20 to-transparent border-l-2 border-primary shadow-lg' 
+                        : 'hover:bg-white/[0.04] border-l-2 border-transparent'
                     }`}
                   >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-[10px] ${
-                        selectedAsset.symbol === item.symbol ? 'bg-primary text-white' : 'bg-white/10 text-white/60'
+                    <div className="flex items-center gap-3.5">
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs transition-colors ${
+                        selectedAsset.symbol === item.symbol 
+                          ? 'bg-primary text-white shadow-[0_0_15px_rgba(26,92,255,0.4)]' 
+                          : 'bg-white/5 text-white/50 group-hover:bg-white/10 group-hover:text-white'
                       }`}>
                         {item.ticker[0]}
                       </div>
                       <div>
-                        <p className={`text-sm font-semibold ${selectedAsset.symbol === item.symbol ? 'text-white' : 'text-white/80'}`}>
+                        <p className={`text-sm font-semibold tracking-tight transition-colors ${
+                          selectedAsset.symbol === item.symbol ? 'text-white' : 'text-white/70 group-hover:text-white'
+                        }`}>
                           {item.name}
                         </p>
-                        <p className="text-[10px] text-white/40 tracking-wider uppercase">
+                        <p className="text-[10px] text-white/40 tracking-widest uppercase mt-0.5">
                           {item.ticker}
                         </p>
                       </div>
@@ -92,29 +98,32 @@ const Watchlist: React.FC = () => {
               </div>
             </div>
             
-            <div className="p-4 border-t border-white/5">
-              <button className="w-full py-2.5 rounded-xl border border-dashed border-white/20 text-white/60 text-xs font-semibold hover:border-white/40 hover:text-white transition-colors flex items-center justify-center gap-2">
-                <Plus className="w-4 h-4" /> Añadir seguridad
+            <div className="p-5 border-t border-white/5 bg-white/[0.01]">
+              <button className="w-full py-3 rounded-xl border border-dashed border-white/20 text-white/60 text-xs font-bold uppercase tracking-widest hover:border-primary/50 hover:text-primary hover:bg-primary/5 transition-all flex items-center justify-center gap-2">
+                <Plus className="w-4 h-4" /> Añadir Activo
               </button>
             </div>
           </div>
 
           {/* Main Chart Area */}
-          <div className="lg:col-span-3 glass-card p-6 md:p-8 bg-black/40 backdrop-blur-md border border-white/5 rounded-3xl h-[600px] flex flex-col">
-            <div className="flex items-start justify-between mb-6">
+          <div className="md:col-span-7 lg:col-span-9 glass-card p-6 md:p-8 bg-black/60 backdrop-blur-xl border border-white/10 rounded-3xl h-[550px] flex flex-col shadow-2xl relative overflow-hidden">
+            {/* Background glow for chart */}
+            <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 blur-[100px] rounded-full pointer-events-none -z-10"></div>
+            
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-8">
               <div>
-                <h2 className="text-3xl font-semibold text-white tracking-tight mb-1">{selectedAsset.name}</h2>
+                <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-2 drop-shadow-lg">{selectedAsset.name}</h2>
                 <div className="flex items-center gap-3">
-                  <span className="text-xs uppercase tracking-widest font-medium text-white/50">{selectedAsset.type}</span>
-                  <span className="text-xs uppercase tracking-widest font-medium text-white/50 border-l border-white/10 pl-3">Ticker: {selectedAsset.ticker}</span>
+                  <span className="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[10px] uppercase tracking-widest font-bold text-white/70">{selectedAsset.type}</span>
+                  <span className="text-[10px] uppercase tracking-widest font-bold text-white/50">Ticker: {selectedAsset.ticker}</span>
                 </div>
               </div>
-              <button className="px-4 py-2 rounded-xl bg-white text-black text-xs font-bold hover:bg-gray-200 transition-colors flex items-center gap-2">
-                <Plus className="w-4 h-4" /> Cartera de Inversiones
+              <button className="px-5 py-2.5 rounded-xl bg-white text-black text-xs font-bold hover:bg-gray-200 hover:scale-105 transition-all shadow-[0_0_20px_rgba(255,255,255,0.3)] flex items-center gap-2">
+                <Plus className="w-4 h-4" /> Operar Activo
               </button>
             </div>
             
-            <div className="flex-1 w-full rounded-2xl overflow-hidden border border-white/5">
+            <div className="flex-1 w-full rounded-2xl overflow-hidden border border-white/5 bg-black/40">
               <SymbolOverview 
                 colorTheme="dark" 
                 chartType="area" 
@@ -131,17 +140,17 @@ const Watchlist: React.FC = () => {
         </div>
 
         {/* Trending Section */}
-        <div className="space-y-6 pt-6">
+        <div className="space-y-6 pt-10">
           <div>
-            <h2 className="text-2xl font-semibold text-white tracking-tight mb-2">Tendencias</h2>
-            <p className="text-xs text-white/50">Identifique las últimas tendencias en acciones, ETF y criptomonedas directamente desde los mercados.</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight mb-2">Tendencias Globales</h2>
+            <p className="text-xs md:text-sm text-white/50 max-w-2xl">Monitor en tiempo real de los principales movimientos del mercado: descubre los activos con mayor crecimiento y volumen.</p>
           </div>
           
-          <div className="glass-card p-6 md:p-8 bg-slate-900/50 backdrop-blur-md border border-white/5 rounded-3xl overflow-hidden">
+          <div className="glass-card p-4 md:p-8 bg-gradient-to-tr from-slate-900/80 to-black/80 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
              <StockMarket 
                 colorTheme="dark" 
                 width="100%" 
-                height={500} 
+                height={550} 
                 locale="es"
                 isTransparent={true}
                 showChart={true}
