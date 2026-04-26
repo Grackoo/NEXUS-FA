@@ -126,13 +126,27 @@ export const cleanTickerName = (ticker: string) => ticker.replace(/(STOCKS|ETFS|
 
 const AssetLogo: React.FC<{ ticker: string; logoUrl?: string; className?: string }> = ({ ticker, logoUrl, className = '' }) => {
   const [hasError, setHasError] = useState(false);
-  const cleanTicker = cleanTickerName(ticker);
-  const firstLetter = cleanTicker.charAt(0).toUpperCase();
+  const cleanTicker = cleanTickerName(ticker).toUpperCase();
+  const firstLetter = cleanTicker.charAt(0);
 
   const colors = ['#1A5CFF', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4'];
-  const colorHex = colors[firstLetter.charCodeAt(0) % colors.length];
+  const colorHex = colors[firstLetter.charCodeAt(0) % colors.length] || colors[0];
 
-  const finalLogoUrl = logoUrl || `https://logo.clearbit.com/${cleanTicker.toLowerCase()}.com`;
+  // Hardcoded mappings for common Mexican/Global tickers that APIs miss
+  const customLogos: Record<string, string> = {
+    'VOO': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Vanguard_Group_logo.svg/1024px-Vanguard_Group_logo.svg.png',
+    'CETES': 'https://www.cetesdirecto.com/sites/portal/o/cetesdirecto/assets/images/logo_cetesdirecto.png',
+    'FUNO11': 'https://funo.mx/assets/img/funo-logo.svg',
+    'GLD': 'https://upload.wikimedia.org/wikipedia/en/thumb/f/f6/SPDR_Gold_Shares_logo.svg/1200px-SPDR_Gold_Shares_logo.svg.png',
+    'USD': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Flag_of_the_United_States.svg/800px-Flag_of_the_United_States.svg.png',
+    'BTC': 'https://cryptologos.cc/logos/bitcoin-btc-logo.png',
+    'ETH': 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
+    'AAPL': 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg',
+    'NVDA': 'https://upload.wikimedia.org/wikipedia/commons/2/21/Nvidia_logo.svg'
+  };
+
+  // Try custom mapping first, then try companiesmarketcap API, then fallback to clearbit
+  const finalLogoUrl = logoUrl || customLogos[cleanTicker] || `https://companiesmarketcap.com/img/company-logos/64/${cleanTicker}.webp`;
 
   if (hasError || !finalLogoUrl) {
     return (
