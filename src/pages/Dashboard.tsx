@@ -227,9 +227,18 @@ const Dashboard: React.FC = () => {
   let globalCurrentView = 0;
 
   displayedPortfolio.forEach(asset => {
-    const currentValueMXN = asset.sharesOwned * asset.realTimePrice;
+    // Determine the average cost in MXN (compute if missing)
+    let avgNativeMXN = asset.avgPurchasePriceMXN;
+    if (!avgNativeMXN && asset.avgPurchasePriceUSD) avgNativeMXN = asset.avgPurchasePriceUSD * exchangeRate;
+    if (!avgNativeMXN) avgNativeMXN = 0; // Fallback
+
+    // Determine current market price in MXN
+    const currentPriceMXN = asset.nativeCurrency === 'USD' ? asset.realTimePrice * exchangeRate : asset.realTimePrice;
+    const currentValueMXN = asset.sharesOwned * currentPriceMXN;
+    
+    // Convert to view
     const valueInView = convertToView(currentValueMXN, 'MXN');
-    const avgPriceInView = currency === 'USD' ? asset.avgPurchasePriceUSD : asset.avgPurchasePriceMXN;
+    const avgPriceInView = currency === 'USD' ? (avgNativeMXN / exchangeRate) : avgNativeMXN;
     const costBasisInView = asset.sharesOwned * avgPriceInView;
 
     globalCurrentView += valueInView;
@@ -243,7 +252,8 @@ const Dashboard: React.FC = () => {
 
   const allocation = displayedPortfolio.reduce((acc: any[], asset) => {
     const existing = acc.find(item => item.name === asset.type);
-    const val = convertToView(asset.sharesOwned * asset.realTimePrice, 'MXN');
+    const currentPriceMXN = asset.nativeCurrency === 'USD' ? asset.realTimePrice * exchangeRate : asset.realTimePrice;
+    const val = convertToView(asset.sharesOwned * currentPriceMXN, 'MXN');
     if (existing) existing.value += val;
     else acc.push({ name: asset.type, value: val });
     return acc;
@@ -421,27 +431,43 @@ const Dashboard: React.FC = () => {
                 {displayedPortfolio.map(asset => {
                   const oppositeCurrency = currency === 'USD' ? 'MXN' : 'USD';
                   
-                  // realTimePrice from Google Sheets is now ALWAYS in MXN
-                  const currentValueMXN = asset.sharesOwned * asset.realTimePrice;
-                  const valueInUSD = currentValueMXN / exchangeRate;
+                  // 1. Resolve missing avg prices dynamically based on exchange rate
+                  let avgNativeUSD = asset.avgPurchasePriceUSD;
+                  let avgNativeMXN = asset.avgPurchasePriceMXN;
+                  if (!avgNativeUSD && avgNativeMXN) avgNativeUSD = avgNativeMXN / exchangeRate;
+                  if (!avgNativeMXN && avgNativeUSD) avgNativeMXN = avgNativeUSD * exchangeRate;
                   
-                  const valueMain = currency === 'USD' ? valueInUSD : currentValueMXN;
-                  const valueSub = currency === 'USD' ? currentValueMXN : valueInUSD;
-                  
-                  // Use the explicit avg purchase prices from the backend
-                  const avgMain = currency === 'USD' ? asset.avgPurchasePriceUSD : asset.avgPurchasePriceMXN;
-                  const avgSub = currency === 'USD' ? asset.avgPurchasePriceMXN : asset.avgPurchasePriceUSD;
-                  
+                  // 2. Real Time Price is strictly in nativeCurrency
+                  let currentPriceUSD = 0;
+                  let currentPriceMXN = 0;
+                  if (asset.nativeCurrency === 'USD') {
+                    currentPriceUSD = asset.realTimePrice;
+                    currentPriceMXN = asset.realTimePrice * exchangeRate;
+                  } else {
+                    currentPriceMXN = asset.realTimePrice;
+                    currentPriceUSD = asset.realTimePrice / exchangeRate;
+                  }
+
+                  const currentValueUSD = asset.sharesOwned * currentPriceUSD;
+                  const currentValueMXN = asset.sharesOwned * currentPriceMXN;
+
+                  // 3. Assign Main and Sub based on Dashboard selected `currency`
+                  const valueMain = currency === 'USD' ? currentValueUSD : currentValueMXN;
+                  const valueSub = currency === 'USD' ? currentValueMXN : currentValueUSD;
+
+                  const avgMain = currency === 'USD' ? avgNativeUSD : avgNativeMXN;
+                  const avgSub = currency === 'USD' ? avgNativeMXN : avgNativeUSD;
+
                   const costBasisMain = asset.sharesOwned * avgMain;
                   const costBasisSub = asset.sharesOwned * avgSub;
 
                   const plMain = valueMain - costBasisMain;
                   const plSub = valueSub - costBasisSub;
                   
-                  // Avoid Division by 0 (Infinity%) if costBasis is 0 or missing
+                  // Avoid Division by 0
                   const plPercentageMain = costBasisMain > 0 ? (plMain / costBasisMain) * 100 : 0;
                   const plPercentageSub = costBasisSub > 0 ? (plSub / costBasisSub) * 100 : 0;
-                  
+
                   const isPositiveMain = plMain >= 0;
                   const isPositiveSub = plSub >= 0;
 

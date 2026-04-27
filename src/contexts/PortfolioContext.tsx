@@ -131,7 +131,10 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
   }, [user]);
 
   const totalNetWorthMXN = clientPortfolio.reduce((acc, asset) => {
-    return acc + (asset.sharesOwned * asset.realTimePrice); // realTimePrice is now explicitly MXN
+    const currentPriceMXN = asset.nativeCurrency === 'USD' 
+      ? asset.realTimePrice * exchangeRate 
+      : asset.realTimePrice;
+    return acc + (asset.sharesOwned * currentPriceMXN);
   }, 0);
 
   const totalNetWorthUSD = totalNetWorthMXN / exchangeRate;
