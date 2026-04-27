@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X, Calculator, RefreshCcw, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { usePortfolio } from '../contexts/PortfolioContext';
 import { useCurrency } from '../contexts/CurrencyContext';
-import { submitOperation } from '../services/sheetsService';
+import { submitOperation, deletePosition } from '../services/sheetsService';
 
 export interface EditAsset {
   ticker: string;
@@ -136,8 +136,12 @@ const SmartTransactionModal: React.FC<Props> = ({
     const totalTrans = (numShares * numPrice) + numCommission;
     const calculatedTotalMXN = currency === 'USD' ? totalTrans * exchangeRate : totalTrans;
 
-    // Preserve the Buy/Sell operation type even in edit mode so Sheets formulas don't break
-    const operationType = type;
+    // Si estamos editando, sobrescribimos toda la posición
+    if (isEditMode) {
+      await deletePosition(clientId, ticker, assetType);
+    }
+
+    const operationType = isEditMode ? 'Buy' : type;
 
     const success = await submitOperation({
       clientId,
@@ -199,28 +203,36 @@ const SmartTransactionModal: React.FC<Props> = ({
         <div className="p-8 space-y-6">
 
           {/* ── Buy / Sell ── */}
-          <div className="flex p-1 bg-white/5 rounded-xl border border-white/5">
-            <button
-              onClick={() => setType('Buy')}
-              className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-all border ${
-                type === 'Buy'
-                  ? 'bg-emerald/20 text-emerald border-emerald/50 shadow-[0_0_15px_rgba(16,185,129,0.3)]'
-                  : 'bg-transparent border-transparent text-gray-500 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              COMPRAR
-            </button>
-            <button
-              onClick={() => setType('Sell')}
-              className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-all border ${
-                type === 'Sell'
-                  ? 'bg-crimson/20 text-crimson border-crimson/50 shadow-[0_0_15px_rgba(239,68,68,0.3)]'
-                  : 'bg-transparent border-transparent text-gray-500 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              VENDER
-            </button>
-          </div>
+          {isEditMode ? (
+            <div className="flex p-1 bg-white/5 rounded-xl border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.15)]">
+              <div className="flex-1 py-2.5 rounded-lg text-sm font-bold text-center text-blue-400 bg-blue-500/10 tracking-widest">
+                SOBRESCRIBIR POSICIÓN
+              </div>
+            </div>
+          ) : (
+            <div className="flex p-1 bg-white/5 rounded-xl border border-white/5">
+              <button
+                onClick={() => setType('Buy')}
+                className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-all border ${
+                  type === 'Buy'
+                    ? 'bg-emerald/20 text-emerald border-emerald/50 shadow-[0_0_15px_rgba(16,185,129,0.3)]'
+                    : 'bg-transparent border-transparent text-gray-500 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                COMPRAR
+              </button>
+              <button
+                onClick={() => setType('Sell')}
+                className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-all border ${
+                  type === 'Sell'
+                    ? 'bg-crimson/20 text-crimson border-crimson/50 shadow-[0_0_15px_rgba(239,68,68,0.3)]'
+                    : 'bg-transparent border-transparent text-gray-500 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                VENDER
+              </button>
+            </div>
+          )}
 
           {/* ── Ticker + Asset Type ── */}
           <div className="grid grid-cols-2 gap-4">
