@@ -380,7 +380,7 @@ const Dashboard: React.FC = () => {
             const labelMapping: Record<string, string> = {
               'All': 'Todos los Activos', 'Renta Variable': 'Renta Variable',
               'Criptomonedas': 'Criptomonedas', 'Renta Fija': 'Renta Fija',
-              'Liquidez': 'Liquidez'
+              'Divisas': 'Divisas'
             };
             return (
               <button
