@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
 import SmartTransactionModal, { type EditAsset } from '../components/SmartTransactionModal';
+import EditSingleOperationModal from '../components/EditSingleOperationModal';
 
 // ─── Delete Confirmation Modal ────────────────────────────────────────────────
 interface DeleteConfirmProps {
@@ -223,6 +224,9 @@ const Dashboard: React.FC = () => {
 
   // Expanded row state
   const [expandedTicker, setExpandedTicker] = useState<string | null>(null);
+  
+  // Single Operation Edit State
+  const [editSingleOpTarget, setEditSingleOpTarget] = useState<{ op: any; index: number } | null>(null);
 
   const displayedPortfolio =
     selectedCategory === 'All'
@@ -602,13 +606,22 @@ const Dashboard: React.FC = () => {
                                               <p className="text-[10px] text-gray-400">{new Date(op.date).toLocaleDateString()}</p>
                                             </div>
                                           </div>
-                                          <div className="text-right">
-                                            <p className="font-semibold text-sm text-white">
-                                              {isBuy ? '+' : isSell ? '-' : ''}{op.shares} Acciones
-                                            </p>
-                                            <p className="text-[10px] text-gray-400">
-                                              Precio: {formatValue(op.price, op.currency as 'USD' | 'MXN')}
-                                            </p>
+                                          <div className="flex items-center gap-4 text-right">
+                                            <div>
+                                              <p className="font-semibold text-sm text-white">
+                                                {isBuy ? '+' : isSell ? '-' : ''}{op.shares} Acciones
+                                              </p>
+                                              <p className="text-[10px] text-gray-400">
+                                                Precio: {formatValue(op.price, op.currency as 'USD' | 'MXN')}
+                                              </p>
+                                            </div>
+                                            <button 
+                                              onClick={() => setEditSingleOpTarget({ op, index: idx })}
+                                              className="p-1.5 rounded-md hover:bg-white/10 text-gray-400 hover:text-white transition-colors border border-transparent hover:border-white/10"
+                                              title="Editar Operación"
+                                            >
+                                              <Pencil className="w-3.5 h-3.5" />
+                                            </button>
                                           </div>
                                         </div>
                                       );
@@ -640,7 +653,13 @@ const Dashboard: React.FC = () => {
         />
       )}
 
-      {/* ── Operations History Modal (Removed) ── */}
+      {/* ── Edit Single Operation Modal ── */}
+      <EditSingleOperationModal
+        isOpen={!!editSingleOpTarget}
+        onClose={() => setEditSingleOpTarget(null)}
+        operationToEdit={editSingleOpTarget?.op || null}
+        operationIndex={editSingleOpTarget?.index ?? -1}
+      />
 
       {/* ── Delete Confirmation Modal ── */}
       {deleteTarget && (
