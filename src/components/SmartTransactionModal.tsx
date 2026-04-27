@@ -136,8 +136,8 @@ const SmartTransactionModal: React.FC<Props> = ({
     const totalTrans = (numShares * numPrice) + numCommission;
     const calculatedTotalMXN = currency === 'USD' ? totalTrans * exchangeRate : totalTrans;
 
-    // Edit mode sends as Edit, new operation keeps Buy/Sell
-    const operationType = isEditMode ? 'Edit' : type;
+    // Preserve the Buy/Sell operation type even in edit mode so Sheets formulas don't break
+    const operationType = type;
 
     const success = await submitOperation({
       clientId,
