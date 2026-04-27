@@ -4,15 +4,30 @@ import { useCurrency } from './CurrencyContext';
 import { fetchCsvData, SHEET_URLS } from '../services/sheetsService';
 import { type PortfolioAsset } from '../data/MockData';
 
+export interface Operation {
+  date: string;
+  clientId: string;
+  type: string;
+  ticker: string;
+  assetType: string;
+  shares: number;
+  price: number;
+  commission: number;
+  currency: string;
+  totalMXN: number;
+}
+
 export interface ClientWithPortfolio extends ClientProfile {
   portfolio: PortfolioAsset[];
 }
 
 interface PortfolioContextType {
   clientPortfolio: PortfolioAsset[];
+  clientOperations: Operation[];
   totalNetWorthUSD: number;
   totalNetWorthMXN: number;
-  allClients: ClientWithPortfolio[]; // Enriched with portfolio data
+  allClients: ClientWithPortfolio[];
+  allOperations: Operation[];
   isLoading: boolean;
   refreshPortfolio: () => Promise<void>;
 }
@@ -23,7 +38,9 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
   const { user } = useAuth();
   const { exchangeRate } = useCurrency();
   const [clientPortfolio, setClientPortfolio] = useState<PortfolioAsset[]>([]);
+  const [clientOperations, setClientOperations] = useState<Operation[]>([]);
   const [allClients, setAllClients] = useState<ClientWithPortfolio[]>([]);
+  const [allOperations, setAllOperations] = useState<Operation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Helper to map CSV row to PortfolioAsset
@@ -81,12 +98,29 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
         SHEET_URLS.SUMMARY_FOREX
       ].filter(url => url && url.trim() !== '');
 
-      const [clientsRaw, ...portfolioRaws] = await Promise.all([
+      const [clientsRaw, opsRaw, ...portfolioRaws] = await Promise.all([
         fetchCsvData(SHEET_URLS.CLIENTS_DATA),
+        fetchCsvData(SHEET_URLS.OPERACIONES),
         ...portfolioSources.map(url => fetchCsvData(url))
       ]);
 
       const combinedPortfolioRaw = portfolioRaws.flat();
+
+      // Map Operations
+      const mappedOperations: Operation[] = (opsRaw || []).map((row: any) => ({
+        date: row.Fecha || row.Date || '',
+        clientId: row.Cliente_ID || row.ClientID || '',
+        type: row.Tipo_Operación || row.Type || '',
+        ticker: row.Ticker || row.Symbol || '',
+        assetType: row.Tipo_Activo || row.AssetType || '',
+        shares: parseFloat(row.Cantidad || row.Shares || 0),
+        price: parseFloat(row.Precio || row.Price || 0),
+        commission: parseFloat(row.Comisión || row.Comision || 0),
+        currency: row.Moneda || row.Currency || 'USD',
+        totalMXN: parseFloat((row.Total_MXN || '0').toString().replace(/[^0-9.-]+/g, ''))
+      }));
+
+      setAllOperations(mappedOperations);
 
       // Map Portfolios
       const portfolioByClient: Record<string, PortfolioAsset[]> = {};
@@ -119,6 +153,7 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
       // Update current user's specific portfolio
       if (user) {
         setClientPortfolio(portfolioByClient[user.id] || []);
+        setClientOperations(mappedOperations.filter(op => op.clientId === user.id));
       }
     } catch (error) {
       console.error('Error syncing portfolios:', error);
@@ -140,7 +175,16 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
   const totalNetWorthUSD = totalNetWorthMXN / exchangeRate;
 
   return (
-    <PortfolioContext.Provider value={{ clientPortfolio, totalNetWorthUSD, totalNetWorthMXN, allClients, isLoading, refreshPortfolio }}>
+    <PortfolioContext.Provider value={{ 
+      clientPortfolio, 
+      clientOperations,
+      totalNetWorthUSD, 
+      totalNetWorthMXN, 
+      allClients, 
+      allOperations,
+      isLoading, 
+      refreshPortfolio 
+    }}>
       {children}
     </PortfolioContext.Provider>
   );

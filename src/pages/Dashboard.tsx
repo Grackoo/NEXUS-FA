@@ -18,9 +18,11 @@ import {
   Trash2,
   AlertTriangle,
   RefreshCcw,
+  History,
 } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
 import SmartTransactionModal, { type EditAsset } from '../components/SmartTransactionModal';
+import OperationsHistoryModal from '../components/OperationsHistoryModal';
 
 // ─── Delete Confirmation Modal ────────────────────────────────────────────────
 interface DeleteConfirmProps {
@@ -217,6 +219,9 @@ const Dashboard: React.FC = () => {
   // Delete confirm state
   const [deleteTarget, setDeleteTarget] = useState<{ ticker: string; assetType: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // History modal state
+  const [historyTarget, setHistoryTarget] = useState<{ ticker: string } | null>(null);
 
   const displayedPortfolio =
     selectedCategory === 'All'
@@ -539,11 +544,20 @@ const Dashboard: React.FC = () => {
                       {/* Actions: Edit + Delete */}
                       <td className="px-6 py-3 text-center">
                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                          {/* History */}
+                          <button
+                            onClick={() => setHistoryTarget({ ticker: asset.ticker })}
+                            className="action-btn text-blue-400 border-blue-400/20 hover:bg-blue-500/10 hover:border-blue-500/40"
+                            title={`Ver historial de ${asset.ticker}`}
+                          >
+                            <History className="w-3.5 h-3.5" />
+                          </button>
+
                           {/* Edit */}
                           <button
                             onClick={() => handleOpenEdit(asset)}
                             className="action-btn edit"
-                            title={`Editar posición de ${asset.ticker}`}
+                            title={`Nueva transacción para ${asset.ticker}`}
                           >
                             <Pencil className="w-3.5 h-3.5" />
                           </button>
@@ -592,6 +606,14 @@ const Dashboard: React.FC = () => {
           editAsset={editAsset}
         />
       )}
+
+      {/* ── Operations History Modal ── */}
+      <OperationsHistoryModal
+        isOpen={!!historyTarget}
+        onClose={() => setHistoryTarget(null)}
+        ticker={historyTarget?.ticker || ''}
+        clientId={user?.id || ''}
+      />
 
       {/* ── Delete Confirmation Modal ── */}
       {deleteTarget && (
