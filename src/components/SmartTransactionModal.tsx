@@ -142,11 +142,12 @@ const SmartTransactionModal: React.FC<Props> = ({
     }
 
     const operationType = isEditMode ? 'Buy' : type;
+    const finalAssetType = assetType === 'Divisas' ? 'Forex' : assetType;
 
     const success = await submitOperation({
       clientId,
       type: operationType,
-      assetType,
+      assetType: finalAssetType,
       ticker,
       shares: numShares,
       price: numPrice,
@@ -155,7 +156,7 @@ const SmartTransactionModal: React.FC<Props> = ({
       Cliente_ID: clientId,
       Tipo_Operacion: operationType,
       Ticker: ticker,
-      Tipo_Activo: assetType,
+      Tipo_Activo: finalAssetType,
       Cantidad: numShares,
       Precio: numPrice,
       Comision: numCommission,

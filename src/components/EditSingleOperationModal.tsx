@@ -67,13 +67,14 @@ const EditSingleOperationModal: React.FC<Props> = ({ isOpen, onClose, operationT
       // 3. Re-submit all operations, substituting the edited one
       for (let i = 0; i < allOpsForTicker.length; i++) {
         const op = allOpsForTicker[i];
-        
         if (i === operationIndex) {
+          const finalAssetType = op.assetType === 'Divisas' ? 'Forex' : op.assetType;
+          
           // Submit the EDITED operation
           await submitOperation({
             clientId: op.clientId,
             type: type,
-            assetType: op.assetType,
+            assetType: finalAssetType,
             ticker: op.ticker,
             shares: numShares,
             price: numPrice,
@@ -82,7 +83,7 @@ const EditSingleOperationModal: React.FC<Props> = ({ isOpen, onClose, operationT
             Cliente_ID: op.clientId,
             Tipo_Operacion: type,
             Ticker: op.ticker,
-            Tipo_Activo: op.assetType,
+            Tipo_Activo: finalAssetType,
             Cantidad: numShares,
             Precio: numPrice,
             Comision: numCommission,
@@ -95,11 +96,12 @@ const EditSingleOperationModal: React.FC<Props> = ({ isOpen, onClose, operationT
           // Submit the ORIGINAL operation
           const originalTotalTrans = (op.shares * op.price) + op.commission;
           const originalTotalMXN = op.currency === 'USD' ? originalTotalTrans * exchangeRate : originalTotalTrans;
+          const originalFinalAssetType = op.assetType === 'Divisas' ? 'Forex' : op.assetType;
           
           await submitOperation({
             clientId: op.clientId,
             type: op.type,
-            assetType: op.assetType,
+            assetType: originalFinalAssetType,
             ticker: op.ticker,
             shares: op.shares,
             price: op.price,
@@ -108,7 +110,7 @@ const EditSingleOperationModal: React.FC<Props> = ({ isOpen, onClose, operationT
             Cliente_ID: op.clientId,
             Tipo_Operacion: op.type,
             Ticker: op.ticker,
-            Tipo_Activo: op.assetType,
+            Tipo_Activo: originalFinalAssetType,
             Cantidad: op.shares,
             Precio: op.price,
             Comision: op.commission,
