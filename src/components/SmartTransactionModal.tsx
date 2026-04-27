@@ -163,12 +163,14 @@ const SmartTransactionModal: React.FC<Props> = ({
 
     setIsSubmitting(false);
     if (success) {
-      await refreshPortfolio();
       setIsSuccess(true);
-      setTimeout(() => {
+      
+      // Delay fetching the CSV by 2.5 seconds to give Google Sheets time to update its published CSV endpoint
+      setTimeout(async () => {
+        await refreshPortfolio();
         setIsSuccess(false);
         onClose();
-      }, 2000);
+      }, 2500);
     }
   };
 
