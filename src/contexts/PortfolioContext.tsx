@@ -56,7 +56,7 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
       'fibras': 'Renta Variable', 'fibra': 'Renta Variable', 'commodities': 'Renta Variable',
       'Renta Fija': 'Renta Fija', 'renta fija': 'Renta Fija', 'cetes': 'Renta Fija',
       'crypto': 'Criptomonedas', 'cripto': 'Criptomonedas', 'criptomonedas': 'Criptomonedas',
-      'forex': 'Liquidez', 'divisas': 'Liquidez', 'cash': 'Liquidez', 'liquidez': 'Liquidez'
+      'forex': 'Divisas', 'divisas': 'Divisas', 'cash': 'Divisas', 'liquidez': 'Divisas'
     };
 
     const safeParseFloat = (val: string) => {

@@ -123,7 +123,7 @@ const DeleteConfirmModal: React.FC<DeleteConfirmProps> = ({
 );
 
 // ─── Available categories ─────────────────────────────────────────────────────
-const CATEGORIES = ['All', 'Renta Variable', 'Criptomonedas', 'Renta Fija', 'Liquidez'];
+const CATEGORIES = ['All', 'Renta Variable', 'Criptomonedas', 'Renta Fija', 'Divisas'];
 
 // ─── Asset Logo Helper ───────────────────────────────────────────────────────
 export const cleanTickerName = (ticker: string) => ticker.replace(/(STOCKS|ETFS|CRYPTO|FIBRAS|COMMODITIES|FOREX|EQUITY|INC)$/i, '').trim();

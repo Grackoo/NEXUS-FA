@@ -45,11 +45,11 @@ const SUGGESTIONS: Record<string, { ticker: string; name: string }[]> = {
     { ticker: 'BONOS', name: 'Bonos Gubernamentales' },
     { ticker: 'UDIBONOS', name: 'Udibonos' },
   ],
-  'Liquidez': [
-    { ticker: 'CASH', name: 'Efectivo en Cuenta' },
+  'Divisas': [
     { ticker: 'USD', name: 'US Dollar' },
-    { ticker: 'MXN', name: 'Peso Mexicano' },
-    { ticker: 'EUR', name: 'Euro' }
+    { ticker: 'EUR', name: 'Euro' },
+    { ticker: 'JPY', name: 'Japanese Yen' },
+    { ticker: 'GBP', name: 'British Pound' }
   ]
 };
 
@@ -236,58 +236,45 @@ const SmartTransactionModal: React.FC<Props> = ({
 
           {/* ── Ticker + Asset Type ── */}
           <div className="grid grid-cols-2 gap-4">
-            {assetType !== 'Liquidez' ? (
-              <div className="space-y-2 relative" ref={suggestionsRef}>
-                <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase ml-1">
-                  Instrumento (Ticker)
-                </label>
-                <input
-                  value={ticker}
-                  onChange={e => {
-                    setTicker(e.target.value.toUpperCase());
-                    setShowSuggestions(true);
-                  }}
-                  onFocus={() => setShowSuggestions(true)}
-                  className="glass-input"
-                  placeholder="Ej. AAPL"
-                />
-                {/* Autocomplete Dropdown */}
-                {showSuggestions && (ticker.length > 0 || availableSuggestions.length > 0) && (
-                  <div className="absolute top-[100%] mt-1 left-0 right-0 max-h-48 overflow-y-auto bg-[#0a0a0a] border border-white/10 rounded-xl z-50 shadow-2xl scrollbar-hide py-1">
-                    {filteredSuggestions.length > 0 ? (
-                      filteredSuggestions.map((suggestion) => (
-                        <div 
-                          key={suggestion.ticker}
-                          onClick={() => {
-                            setTicker(suggestion.ticker);
-                            setShowSuggestions(false);
-                          }}
-                          className="px-4 py-2.5 hover:bg-white/5 cursor-pointer flex items-center justify-between transition-colors"
-                        >
-                          <span className="font-bold text-white text-sm">{suggestion.ticker}</span>
-                          <span className="text-xs text-gray-400 truncate ml-2 text-right">{suggestion.name}</span>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="px-4 py-3 text-xs text-gray-500 text-center italic">
-                        Pulsa Enter para añadir "{ticker}" como nuevo
+            <div className="space-y-2 relative" ref={suggestionsRef}>
+              <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase ml-1">
+                Instrumento (Ticker)
+              </label>
+              <input
+                value={ticker}
+                onChange={e => {
+                  setTicker(e.target.value.toUpperCase());
+                  setShowSuggestions(true);
+                }}
+                onFocus={() => setShowSuggestions(true)}
+                className="glass-input"
+                placeholder="Ej. AAPL"
+              />
+              {/* Autocomplete Dropdown */}
+              {showSuggestions && (ticker.length > 0 || availableSuggestions.length > 0) && (
+                <div className="absolute top-[100%] mt-1 left-0 right-0 max-h-48 overflow-y-auto bg-[#0a0a0a] border border-white/10 rounded-xl z-50 shadow-2xl scrollbar-hide py-1">
+                  {filteredSuggestions.length > 0 ? (
+                    filteredSuggestions.map((suggestion) => (
+                      <div 
+                        key={suggestion.ticker}
+                        onClick={() => {
+                          setTicker(suggestion.ticker);
+                          setShowSuggestions(false);
+                        }}
+                        className="px-4 py-2.5 hover:bg-white/5 cursor-pointer flex items-center justify-between transition-colors"
+                      >
+                        <span className="font-bold text-white text-sm">{suggestion.ticker}</span>
+                        <span className="text-xs text-gray-400 truncate ml-2 text-right">{suggestion.name}</span>
                       </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase ml-1">
-                  Instrumento
-                </label>
-                <input
-                  disabled
-                  value="CASH"
-                  className="glass-input opacity-50 cursor-not-allowed"
-                />
-              </div>
-            )}
+                    ))
+                  ) : (
+                    <div className="px-4 py-3 text-xs text-gray-500 text-center italic">
+                      Pulsa Enter para añadir "{ticker}" como nuevo
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
             <div className="space-y-2">
               <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase ml-1">
                 Tipo de Activo
@@ -297,18 +284,13 @@ const SmartTransactionModal: React.FC<Props> = ({
                 onChange={e => {
                   const newType = e.target.value as any;
                   setAssetType(newType);
-                  if (newType === 'Liquidez') {
-                    setTicker('CASH');
-                    setPrice(1);
-                    setCommission(0);
-                  }
                 }}
                 className="glass-input cursor-pointer"
               >
                 <option value="Renta Variable">Renta Variable (Acciones/ETFs)</option>
                 <option value="Criptomonedas">Criptomonedas</option>
                 <option value="Renta Fija">Renta Fija (CETES/Bonos)</option>
-                <option value="Liquidez">Liquidez (Cash/Forex)</option>
+                <option value="Divisas">Divisas (Cash/Forex)</option>
               </select>
             </div>
           </div>
@@ -343,42 +325,40 @@ const SmartTransactionModal: React.FC<Props> = ({
                 value={shares}
                 onChange={e => setShares(e.target.value === '' ? '' : Number(e.target.value))}
                 className="glass-input"
-                placeholder={assetType === 'Liquidez' ? 'Monto a depositar/retirar' : '0'}
+                placeholder="0"
               />
             </div>
           </div>
 
           {/* ── Price + Commission ── */}
-          {assetType !== 'Liquidez' && (
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase ml-1">
-                  Precio Unitario
-                </label>
-                <input
-                  type="number"
-                  step={assetType === 'Criptomonedas' ? '0.00000001' : '0.01'}
-                  value={price}
-                  onChange={e => setPrice(e.target.value === '' ? '' : Number(e.target.value))}
-                  className="glass-input"
-                  placeholder="0.00"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase ml-1">
-                  Comisión (Total)
-                </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={commission}
-                  onChange={e => setCommission(e.target.value === '' ? '' : Number(e.target.value))}
-                  className="glass-input"
-                  placeholder="0.00"
-                />
-              </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase ml-1">
+                Precio Unitario
+              </label>
+              <input
+                type="number"
+                step={assetType === 'Criptomonedas' ? '0.00000001' : '0.01'}
+                value={price}
+                onChange={e => setPrice(e.target.value === '' ? '' : Number(e.target.value))}
+                className="glass-input"
+                placeholder="0.00"
+              />
             </div>
-          )}
+            <div className="space-y-2">
+              <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase ml-1">
+                Comisión (Total)
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                value={commission}
+                onChange={e => setCommission(e.target.value === '' ? '' : Number(e.target.value))}
+                className="glass-input"
+                placeholder="0.00"
+              />
+            </div>
+          </div>
 
           {/* ── Date ── */}
           <div className="space-y-2">
