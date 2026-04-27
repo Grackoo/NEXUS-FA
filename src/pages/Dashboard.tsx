@@ -16,13 +16,14 @@ import {
   Plus,
   Pencil,
   Trash2,
-  AlertTriangle,
   RefreshCcw,
   History,
+  ChevronDown,
+  ChevronUp,
+  AlertTriangle,
 } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
 import SmartTransactionModal, { type EditAsset } from '../components/SmartTransactionModal';
-import OperationsHistoryModal from '../components/OperationsHistoryModal';
 
 // ─── Delete Confirmation Modal ────────────────────────────────────────────────
 interface DeleteConfirmProps {
@@ -208,7 +209,7 @@ const AssetLogo: React.FC<{ ticker: string; logoUrl?: string; type?: string; cla
 
 // ─── Dashboard ────────────────────────────────────────────────────────────────
 const Dashboard: React.FC = () => {
-  const { clientPortfolio, refreshPortfolio } = usePortfolio();
+  const { clientPortfolio, clientOperations, refreshPortfolio } = usePortfolio();
   const { currency, exchangeRate, formatValue, convertToView } = useCurrency();
   const { user } = useAuth();
 
@@ -220,8 +221,8 @@ const Dashboard: React.FC = () => {
   const [deleteTarget, setDeleteTarget] = useState<{ ticker: string; assetType: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // History modal state
-  const [historyTarget, setHistoryTarget] = useState<{ ticker: string } | null>(null);
+  // Expanded row state
+  const [expandedTicker, setExpandedTicker] = useState<string | null>(null);
 
   const displayedPortfolio =
     selectedCategory === 'All'
@@ -477,116 +478,148 @@ const Dashboard: React.FC = () => {
                   const isPositiveSub = plSub >= 0;
 
                   return (
-                    <tr key={asset.ticker} className="group hover:bg-white/[0.02] transition-colors border-b border-white/5 last:border-0">
-                      {/* Asset info */}
-                      <td className="px-6 py-3">
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-primary border border-white/5 group-hover:border-primary/30 transition-all duration-300">
-                            {getAssetIcon(asset.type)}
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2 mb-1">
-                              <AssetLogo ticker={asset.ticker} logoUrl={asset.logoUrl} type={asset.type} />
-                              <div className="flex items-center gap-2">
-                                <p className="font-semibold text-sm tracking-tight text-white">{cleanTickerName(asset.ticker)}</p>
-                                <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/5 text-white/50 font-medium uppercase tracking-wider">
-                                  {asset.type}
-                                </span>
+                    <React.Fragment key={asset.ticker}>
+                      <tr className="group hover:bg-white/[0.02] transition-colors border-b border-white/5 last:border-0">
+                        {/* Asset info */}
+                        <td className="px-6 py-3 cursor-pointer" onClick={() => setExpandedTicker(expandedTicker === asset.ticker ? null : asset.ticker)}>
+                          <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-primary border border-white/5 group-hover:border-primary/30 transition-all duration-300">
+                              {getAssetIcon(asset.type)}
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2 mb-1">
+                                <AssetLogo ticker={asset.ticker} logoUrl={asset.logoUrl} type={asset.type} />
+                                <div className="flex items-center gap-2">
+                                  <p className="font-semibold text-sm tracking-tight text-white">{cleanTickerName(asset.ticker)}</p>
+                                  <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/5 text-white/50 font-medium uppercase tracking-wider">
+                                    {asset.type}
+                                  </span>
+                                </div>
                               </div>
+                              <p className="text-[10px] text-white/40 font-medium uppercase tracking-widest">{asset.nativeCurrency}</p>
                             </div>
-                            <p className="text-[10px] text-white/40 font-medium uppercase tracking-widest">{asset.nativeCurrency}</p>
                           </div>
-                        </div>
-                      </td>
+                        </td>
 
-                      <td className="px-4 py-3 text-right font-semibold tabular-nums text-sm text-white">{asset.sharesOwned}</td>
-                      
-                      {/* Avg Price */}
-                      <td className="px-4 py-3 text-right tabular-nums text-white/60 text-sm">
-                        <div className="flex flex-col gap-1 items-end">
-                          <span>{formatValue(avgMain)}</span>
-                          {avgSub > 0 && <span className="text-[10px] text-white/40 font-medium">{formatValue(avgSub, oppositeCurrency)}</span>}
-                        </div>
-                      </td>
-                      
-                      {/* Market Value */}
-                      <td className="px-4 py-3 text-right font-semibold tabular-nums text-sm text-white">
-                        <div className="flex flex-col gap-1 items-end">
-                          <span>{formatValue(valueMain)}</span>
-                          <span className="text-[10px] text-white/40 font-medium">{formatValue(valueSub, oppositeCurrency)}</span>
-                        </div>
-                      </td>
-
-                      {/* Profit/Loss */}
-                      <td className={`px-4 py-3 text-right font-semibold tabular-nums text-sm`}>
-                        <div className="flex flex-col gap-1 items-end">
-                          <span className={isPositiveMain ? 'text-emerald-400' : 'text-rose-400'}>{isPositiveMain ? '+' : ''}{formatValue(plMain)}</span>
-                          <span className={`text-[10px] font-medium ${isPositiveSub ? 'text-emerald-500/50' : 'text-rose-500/50'}`}>{isPositiveSub ? '+' : ''}{formatValue(plSub, oppositeCurrency)}</span>
-                        </div>
-                      </td>
-
-                      {/* Return (PlPercentage) */}
-                      <td className="px-4 py-3 text-right">
-                        <div className="flex flex-col gap-1.5 items-end">
-                          <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-semibold text-xs ${isPositiveMain ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}`}>
-                            {isPositiveMain ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />}
-                            {plPercentageMain.toFixed(1)}%
+                        <td className="px-4 py-3 text-right font-semibold tabular-nums text-sm text-white">{asset.sharesOwned}</td>
+                        
+                        {/* Avg Price */}
+                        <td className="px-4 py-3 text-right tabular-nums text-white/60 text-sm">
+                          <div className="flex flex-col gap-1 items-end">
+                            <span>{formatValue(avgMain)}</span>
+                            {avgSub > 0 && <span className="text-[10px] text-white/40 font-medium">{formatValue(avgSub, oppositeCurrency)}</span>}
                           </div>
-                          {avgSub > 0 && (
-                            <div className={`inline-flex items-center gap-1 text-[10px] font-semibold ${isPositiveSub ? 'text-emerald-500/50' : 'text-rose-500/50'}`}>
-                              {isPositiveSub ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                              <span>{plPercentageSub.toFixed(1)}% {oppositeCurrency}</span>
+                        </td>
+                        
+                        {/* Market Value */}
+                        <td className="px-4 py-3 text-right font-semibold tabular-nums text-sm text-white">
+                          <div className="flex flex-col gap-1 items-end">
+                            <span>{formatValue(valueMain)}</span>
+                            <span className="text-[10px] text-white/40 font-medium">{formatValue(valueSub, oppositeCurrency)}</span>
+                          </div>
+                        </td>
+
+                        {/* Profit/Loss */}
+                        <td className={`px-4 py-3 text-right font-semibold tabular-nums text-sm`}>
+                          <div className="flex flex-col gap-1 items-end">
+                            <span className={isPositiveMain ? 'text-emerald-400' : 'text-rose-400'}>{isPositiveMain ? '+' : ''}{formatValue(plMain)}</span>
+                            <span className={`text-[10px] font-medium ${isPositiveSub ? 'text-emerald-500/50' : 'text-rose-500/50'}`}>{isPositiveSub ? '+' : ''}{formatValue(plSub, oppositeCurrency)}</span>
+                          </div>
+                        </td>
+
+                        {/* Return (PlPercentage) */}
+                        <td className="px-4 py-3 text-right">
+                          <div className="flex flex-col gap-1.5 items-end">
+                            <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-semibold text-xs ${isPositiveMain ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}`}>
+                              {isPositiveMain ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />}
+                              {plPercentageMain.toFixed(1)}%
                             </div>
-                          )}
-                        </div>
-                      </td>
+                            {avgSub > 0 && (
+                              <div className={`inline-flex items-center gap-1 text-[10px] font-semibold ${isPositiveSub ? 'text-emerald-500/50' : 'text-rose-500/50'}`}>
+                                {isPositiveSub ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                                <span>{plPercentageSub.toFixed(1)}% {oppositeCurrency}</span>
+                              </div>
+                            )}
+                          </div>
+                        </td>
 
-                      {/* Actions: Edit + Delete */}
-                      <td className="px-6 py-3 text-center">
-                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-                          {/* History */}
-                          <button
-                            onClick={() => setHistoryTarget({ ticker: asset.ticker })}
-                            className="action-btn text-blue-400 border-blue-400/20 hover:bg-blue-500/10 hover:border-blue-500/40"
-                            title={`Ver historial de ${asset.ticker}`}
-                          >
-                            <History className="w-3.5 h-3.5" />
-                          </button>
+                        {/* Actions */}
+                        <td className="px-6 py-3 text-center">
+                          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <button
+                              onClick={() => setExpandedTicker(expandedTicker === asset.ticker ? null : asset.ticker)}
+                              className="action-btn text-gray-400 border-white/5 hover:bg-white/5"
+                              title="Ver historial de operaciones"
+                            >
+                              {expandedTicker === asset.ticker ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                            </button>
 
-                          {/* Edit */}
-                          <button
-                            onClick={() => handleOpenEdit(asset)}
-                            className="action-btn edit"
-                            title={`Nueva transacción para ${asset.ticker}`}
-                          >
-                            <Pencil className="w-3.5 h-3.5" />
-                          </button>
+                            <button
+                              onClick={() => handleOpenEdit(asset)}
+                              className="action-btn edit"
+                              title={`Ajustar posición de ${asset.ticker}`}
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                            </button>
 
-                          {/* Delete */}
-                          <button
-                            onClick={() => setDeleteTarget({ ticker: asset.ticker, assetType: asset.type })}
-                            className="action-btn"
-                            title={`Eliminar posición de ${asset.ticker}`}
-                            style={{
-                              color: 'rgba(239,68,68,0.7)',
-                              borderColor: 'rgba(239,68,68,0.2)',
-                            }}
-                            onMouseEnter={e => {
-                              (e.currentTarget as HTMLButtonElement).style.color = 'var(--crimson)';
-                              (e.currentTarget as HTMLButtonElement).style.background = 'rgba(239,68,68,0.12)';
-                              (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(239,68,68,0.35)';
-                            }}
-                            onMouseLeave={e => {
-                              (e.currentTarget as HTMLButtonElement).style.color = 'rgba(239,68,68,0.7)';
-                              (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.04)';
-                              (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(239,68,68,0.2)';
-                            }}
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
+                            <button
+                              onClick={() => setDeleteTarget({ ticker: asset.ticker, assetType: asset.type })}
+                              className="action-btn text-rose-500/70 border-rose-500/20 hover:text-rose-500 hover:bg-rose-500/10 hover:border-rose-500/30"
+                              title={`Eliminar posición de ${asset.ticker}`}
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+
+                      {/* Expanded Operations Row */}
+                      {expandedTicker === asset.ticker && (
+                        <tr className="bg-black/20 border-b border-white/5">
+                          <td colSpan={7} className="p-0">
+                            <div className="p-6">
+                              <h4 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+                                <History className="w-4 h-4 text-blue-400" /> Historial de Operaciones
+                              </h4>
+                              {clientOperations.filter(op => op.ticker === asset.ticker).length === 0 ? (
+                                <p className="text-sm text-gray-500">No hay operaciones registradas individualmente.</p>
+                              ) : (
+                                <div className="space-y-2">
+                                  {clientOperations
+                                    .filter(op => op.ticker === asset.ticker)
+                                    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                                    .map((op, idx) => {
+                                      const isBuy = op.type === 'Buy' || op.type === 'Compra';
+                                      const isSell = op.type === 'Sell' || op.type === 'Venta';
+                                      return (
+                                        <div key={idx} className="flex items-center justify-between p-3 rounded-lg bg-white/[0.02] border border-white/5 hover:bg-white/[0.04]">
+                                          <div className="flex items-center gap-3">
+                                            <div className={`p-2 rounded-full ${isBuy ? 'bg-emerald-500/10 text-emerald-400' : isSell ? 'bg-rose-500/10 text-rose-400' : 'bg-blue-500/10 text-blue-400'}`}>
+                                              {isBuy ? <TrendingUp className="w-4 h-4" /> : isSell ? <TrendingDown className="w-4 h-4" /> : <RefreshCcw className="w-4 h-4" />}
+                                            </div>
+                                            <div>
+                                              <p className="font-semibold text-sm text-white">{op.type}</p>
+                                              <p className="text-[10px] text-gray-400">{new Date(op.date).toLocaleDateString()}</p>
+                                            </div>
+                                          </div>
+                                          <div className="text-right">
+                                            <p className="font-semibold text-sm text-white">
+                                              {isBuy ? '+' : isSell ? '-' : ''}{op.shares} Acciones
+                                            </p>
+                                            <p className="text-[10px] text-gray-400">
+                                              Precio: {formatValue(op.price, op.currency as 'USD' | 'MXN')}
+                                            </p>
+                                          </div>
+                                        </div>
+                                      );
+                                  })}
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
                   );
                 })}
               </tbody>
@@ -607,13 +640,7 @@ const Dashboard: React.FC = () => {
         />
       )}
 
-      {/* ── Operations History Modal ── */}
-      <OperationsHistoryModal
-        isOpen={!!historyTarget}
-        onClose={() => setHistoryTarget(null)}
-        ticker={historyTarget?.ticker || ''}
-        clientId={user?.id || ''}
-      />
+      {/* ── Operations History Modal (Removed) ── */}
 
       {/* ── Delete Confirmation Modal ── */}
       {deleteTarget && (
