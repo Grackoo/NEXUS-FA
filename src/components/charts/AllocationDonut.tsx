@@ -1,13 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, Legend } from 'recharts';
-
-const mockData = [
-  { name: 'Renta Variable', value: 450000 },
-  { name: 'Criptomonedas', value: 120000 },
-  { name: 'Renta Fija', value: 300000 },
-  { name: 'Bienes Raíces', value: 80000 },
-  { name: 'Divisas', value: 50000 }
-];
+import { usePortfolio } from '../../contexts/PortfolioContext';
+import { useCurrency } from '../../contexts/CurrencyContext';
 
 const COLORS = ['#06B6D4', '#8B5CF6', '#10B981', '#EC4899', '#F59E0B'];
 
@@ -27,6 +21,26 @@ const CustomTooltip = ({ active, payload }: any) => {
 };
 
 export const AllocationDonut: React.FC = () => {
+  const { clientPortfolio } = usePortfolio();
+  const { currency, exchangeRate, convertToView, formatValue } = useCurrency();
+
+  const { data, total } = useMemo(() => {
+    let totalValue = 0;
+    const allocation = clientPortfolio.reduce((acc: any[], asset) => {
+      const existing = acc.find(item => item.name === asset.type);
+      const currentPriceMXN = asset.nativeCurrency === 'USD' ? asset.realTimePrice * exchangeRate : asset.realTimePrice;
+      const val = convertToView(asset.sharesOwned * currentPriceMXN, 'MXN');
+      
+      if (val > 0) {
+        if (existing) existing.value += val;
+        else acc.push({ name: asset.type, value: val });
+        totalValue += val;
+      }
+      return acc;
+    }, []);
+    return { data: allocation, total: totalValue };
+  }, [clientPortfolio, exchangeRate, currency, convertToView]);
+
   return (
     <div className="relative w-full h-[350px] glass-card p-6 bg-slate-900/50 backdrop-blur-xl border border-white/5 rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] overflow-hidden">
       {/* Glow background effect */}
@@ -40,7 +54,7 @@ export const AllocationDonut: React.FC = () => {
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
-              data={mockData}
+              data={data}
               cx="50%"
               cy="50%"
               innerRadius={70}
@@ -50,7 +64,7 @@ export const AllocationDonut: React.FC = () => {
               stroke="none"
               cornerRadius={8}
             >
-              {mockData.map((entry, index) => (
+              {data.map((entry, index) => (
                 <Cell 
                   key={`cell-${index}`} 
                   fill={COLORS[index % COLORS.length]} 
@@ -73,7 +87,7 @@ export const AllocationDonut: React.FC = () => {
       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mt-2">
         <span className="text-white/40 text-[10px] uppercase tracking-widest font-semibold">Total</span>
         <span className="text-white font-bold text-xl drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
-          $1.0M
+          {formatValue(total)}
         </span>
       </div>
     </div>
