@@ -25,6 +25,7 @@ import {
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
 import SmartTransactionModal, { type EditAsset } from '../components/SmartTransactionModal';
 import EditSingleOperationModal from '../components/EditSingleOperationModal';
+import { PortfolioHealthDashboard } from '../components/charts/PortfolioHealthDashboard';
 
 // ─── Delete Confirmation Modal ────────────────────────────────────────────────
 interface DeleteConfirmProps {
@@ -371,6 +372,11 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
           </div>
+        </section>
+
+        {/* ── Portfolio Health Dashboard ── */}
+        <section className="w-full">
+          <PortfolioHealthDashboard />
         </section>
 
         {/* ── Category Tabs ── */}
