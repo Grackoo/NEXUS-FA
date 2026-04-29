@@ -175,7 +175,8 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Components */
 .glass-card {
-  background: var(--bg-card);
+  background-color: rgba(255, 255, 255, 0.03); /* Explicit fallback for minifiers */
+  background-color: var(--bg-card);
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
   border: 1px solid var(--border-light);
@@ -350,7 +351,7 @@ select.glass-input option {
   align-items: center;
   justify-content: center;
   padding: 1.5rem;
-  background: rgba(0, 0, 0, 0.85);
+  background-color: rgba(0, 0, 0, 0.85); /* Explicit background-color */
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }

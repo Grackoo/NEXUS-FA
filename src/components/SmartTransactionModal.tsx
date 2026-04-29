@@ -182,8 +182,8 @@ const SmartTransactionModal: React.FC<Props> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay animate-fade-in">
-      <div className="glass-card w-full max-w-lg p-0 overflow-hidden">
+    <div className="modal-overlay bg-black/85 animate-fade-in">
+      <div className="glass-card bg-white/[0.03] w-full max-w-lg p-0 overflow-hidden">
 
         {/* ── Header ── */}
         <div className="px-8 py-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
