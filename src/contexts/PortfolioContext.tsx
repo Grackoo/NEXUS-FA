@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { useAuth, type ClientProfile } from './AuthContext';
-import { useCurrency } from './CurrencyContext';
 import { fetchCsvData, fetchPortfolioData, SHEET_URLS } from '../services/sheetsService';
 import { type PortfolioAsset } from '../data/MockData';
 
@@ -36,7 +35,6 @@ const PortfolioContext = createContext<PortfolioContextType | undefined>(undefin
 
 export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { user } = useAuth();
-  const { exchangeRate } = useCurrency();
   const [clientPortfolio, setClientPortfolio] = useState<PortfolioAsset[]>([]);
   const [clientOperations, setClientOperations] = useState<Operation[]>([]);
   const [allClients, setAllClients] = useState<ClientWithPortfolio[]>([]);
