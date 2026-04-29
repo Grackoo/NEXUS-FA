@@ -3,23 +3,12 @@
  * and Google Apps Script (Write).
  */
 
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwOwelcOqLZsPLWPgmx72h6LUe5nylvnlkboEfY1qm5aUSsxMeJ96tUB0zPXrMu-aBRtQ/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwRqbjaQj_qfvlF6Whe8wtxC6g83hWU75lMNDudCU1_Vl3Hcs22GWevoTreKY64K2S4sA/exec';
 
 // These are the real CSV URLs constructed from the user's published sheet
 export const SHEET_URLS = {
-  PORTFOLIO_SUMMARY: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMbHAoAnLIzHBO7iGu9ETipHcbSXmvBuc-bsR4vBsaciYzmipRlmk36kLz83miN692Dkgt7MyuLnLK/pub?gid=96904810&single=true&output=csv',
-  CURRENCY_TRACKER: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMbHAoAnLIzHBO7iGu9ETipHcbSXmvBuc-bsR4vBsaciYzmipRlmk36kLz83miN692Dkgt7MyuLnLK/pub?gid=1688734912&single=true&output=csv',
-  OPERACIONES: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMbHAoAnLIzHBO7iGu9ETipHcbSXmvBuc-bsR4vBsaciYzmipRlmk36kLz83miN692Dkgt7MyuLnLK/pub?gid=418925467&single=true&output=csv',
-  // URL corregida con el GID 1509214802 detectado en tu captura
+  // Solo conservamos CLIENTS_DATA para la lista de usuarios. El portafolio y operaciones ahora vienen del servidor.
   CLIENTS_DATA: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMbHAoAnLIzHBO7iGu9ETipHcbSXmvBuc-bsR4vBsaciYzmipRlmk36kLz83miN692Dkgt7MyuLnLK/pub?gid=1509214802&single=true&output=csv',
-  // Nuevas URLs de categorías
-  SUMMARY_STOCKS: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMbHAoAnLIzHBO7iGu9ETipHcbSXmvBuc-bsR4vBsaciYzmipRlmk36kLz83miN692Dkgt7MyuLnLK/pub?gid=1142203439&single=true&output=csv',
-  SUMMARY_ETFS: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMbHAoAnLIzHBO7iGu9ETipHcbSXmvBuc-bsR4vBsaciYzmipRlmk36kLz83miN692Dkgt7MyuLnLK/pub?gid=643930586&single=true&output=csv',
-  SUMMARY_CRYPTO: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMbHAoAnLIzHBO7iGu9ETipHcbSXmvBuc-bsR4vBsaciYzmipRlmk36kLz83miN692Dkgt7MyuLnLK/pub?gid=230075770&single=true&output=csv',
-  SUMMARY_FIXED_INCOME: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMbHAoAnLIzHBO7iGu9ETipHcbSXmvBuc-bsR4vBsaciYzmipRlmk36kLz83miN692Dkgt7MyuLnLK/pub?gid=810681393&single=true&output=csv',
-  SUMMARY_FIBRAS: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMbHAoAnLIzHBO7iGu9ETipHcbSXmvBuc-bsR4vBsaciYzmipRlmk36kLz83miN692Dkgt7MyuLnLK/pub?gid=831142110&single=true&output=csv',
-  SUMMARY_COMMODITIES: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMbHAoAnLIzHBO7iGu9ETipHcbSXmvBuc-bsR4vBsaciYzmipRlmk36kLz83miN692Dkgt7MyuLnLK/pub?gid=456974640&single=true&output=csv',
-  SUMMARY_FOREX: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMbHAoAnLIzHBO7iGu9ETipHcbSXmvBuc-bsR4vBsaciYzmipRlmk36kLz83miN692Dkgt7MyuLnLK/pub?gid=1831667518&single=true&output=csv'
 };
 
 const cache = new Map<string, { data: any, timestamp: number }>();
@@ -72,6 +61,30 @@ export async function fetchCsvData(url: string) {
   } catch (error) {
     console.error('Error fetching CSV:', error);
     return [];
+  }
+}
+
+export async function fetchPortfolioData(clientId: string) {
+  try {
+    const url = `${SCRIPT_URL}?action=getPortfolio&clientId=${encodeURIComponent(clientId)}`;
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+    
+    // En Apps Script, a veces hay redirects, fetch los sigue automáticamente
+    const text = await response.text();
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      console.error('La respuesta de Apps Script no es JSON válido:', text);
+      return null;
+    }
+  } catch (error) {
+    console.error('Error fetching portfolio data from GAS:', error);
+    return null;
   }
 }
 

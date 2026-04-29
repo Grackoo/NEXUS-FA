@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { useAuth, type ClientProfile } from './AuthContext';
 import { useCurrency } from './CurrencyContext';
-import { fetchCsvData, SHEET_URLS } from '../services/sheetsService';
+import { fetchCsvData, fetchPortfolioData, SHEET_URLS } from '../services/sheetsService';
 import { type PortfolioAsset } from '../data/MockData';
 
 export interface Operation {
@@ -43,117 +43,50 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [allOperations, setAllOperations] = useState<Operation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Helper to map CSV row to PortfolioAsset
-  const mapRowToAsset = (row: any): PortfolioAsset => {
-    const findKey = (keys: string[]) => {
-      const found = Object.keys(row).find(k => keys.some(target => k.toLowerCase().trim() === target.toLowerCase()));
-      return found ? row[found] : '';
-    };
-
-    const rawType = findKey(['Type', 'Tipo', 'Category', 'AssetType']);
-    const typeMapping: Record<string, any> = {
-      'stocks': 'Renta Variable', 'acciones': 'Renta Variable', 'etfs': 'Renta Variable',
-      'fibras': 'Renta Variable', 'fibra': 'Renta Variable', 'commodities': 'Renta Variable',
-      'Renta Fija': 'Renta Fija', 'renta fija': 'Renta Fija', 'cetes': 'Renta Fija',
-      'crypto': 'Criptomonedas', 'cripto': 'Criptomonedas', 'criptomonedas': 'Criptomonedas',
-      'forex': 'Divisas', 'divisas': 'Divisas', 'cash': 'Divisas', 'liquidez': 'Divisas'
-    };
-
-    const safeParseFloat = (val: string) => {
-      // Remove everything except digits, minus signs, and decimal points (e.g., strips '$', ',', '€', '#N/A')
-      const cleaned = (val || '0').toString().replace(/[^0-9.-]+/g, '');
-      const parsed = parseFloat(cleaned);
-      return isNaN(parsed) ? 0 : parsed;
-    };
-
-    return {
-      ticker: findKey(['Ticker', 'Symbol', 'Activo']),
-      type: typeMapping[rawType.toLowerCase()] || 'Renta Variable',
-      sharesOwned: safeParseFloat(findKey(['Shares_Owned', 'Shares', 'Titulos', 'Cantidad'])),
-      avgPurchasePriceMXN: safeParseFloat(findKey(['Avg_Price_MXN', 'Costo_MXN', 'Precio_Promedio_MXN'])),
-      avgPurchasePriceUSD: safeParseFloat(findKey(['Avg_Price_USD', 'Costo_USD', 'Precio_Promedio_USD'])),
-      realTimePrice: safeParseFloat(findKey(['Live_Price', 'Real_Time_Price', 'Precio_Mercado', 'Price'])),
-      nativeCurrency: (findKey(['Currency', 'Moneda', 'Divisa']) as any) || 'USD',
-      logoUrl: findKey(['LogoURL', 'Logo_URL', 'Logo']) || undefined
-    };
-  };
+  const [totalNetWorthMXN, setTotalNetWorthMXN] = useState(0);
+  const [totalNetWorthUSD, setTotalNetWorthUSD] = useState(0);
 
   // 1. Sync All Clients & Portfolios
   const refreshPortfolio = async () => {
     setIsLoading(true);
     try {
-      if (!SHEET_URLS.CLIENTS_DATA) {
-        setIsLoading(false);
-        return;
-      }
-
-      const portfolioSources = [
-        SHEET_URLS.PORTFOLIO_SUMMARY,
-        SHEET_URLS.SUMMARY_STOCKS,
-        SHEET_URLS.SUMMARY_ETFS,
-        SHEET_URLS.SUMMARY_CRYPTO,
-        SHEET_URLS.SUMMARY_FIXED_INCOME,
-        SHEET_URLS.SUMMARY_FIBRAS,
-        SHEET_URLS.SUMMARY_COMMODITIES,
-        SHEET_URLS.SUMMARY_FOREX
-      ].filter(url => url && url.trim() !== '');
-
-      const [clientsRaw, opsRaw, ...portfolioRaws] = await Promise.all([
-        fetchCsvData(SHEET_URLS.CLIENTS_DATA),
-        fetchCsvData(SHEET_URLS.OPERACIONES),
-        ...portfolioSources.map(url => fetchCsvData(url))
-      ]);
-
-      const combinedPortfolioRaw = portfolioRaws.flat();
-
-      // Map Operations
-      const mappedOperations: Operation[] = (opsRaw || []).map((row: any) => ({
-        date: row.Fecha || row.Date || '',
-        clientId: row.Cliente_ID || row.ClientID || '',
-        type: row.Tipo_Operación || row.Type || '',
-        ticker: row.Ticker || row.Symbol || '',
-        assetType: row.Tipo_Activo || row.AssetType || '',
-        shares: parseFloat(row.Cantidad || row.Shares || 0),
-        price: parseFloat(row.Precio || row.Price || 0),
-        commission: parseFloat(row.Comisión || row.Comision || 0),
-        currency: row.Moneda || row.Currency || 'USD',
-        totalMXN: parseFloat((row.Total_MXN || '0').toString().replace(/[^0-9.-]+/g, ''))
-      }));
-
-      setAllOperations(mappedOperations);
-
-      // Map Portfolios
-      const portfolioByClient: Record<string, PortfolioAsset[]> = {};
-      combinedPortfolioRaw.forEach((row: any) => {
-        const clientId = row.ClientID || row.clientid || row.ID || row.id;
-        if (clientId) {
-          if (!portfolioByClient[clientId]) portfolioByClient[clientId] = [];
-          const asset = mapRowToAsset(row);
-          if (asset.ticker && asset.sharesOwned > 0) {
-            portfolioByClient[clientId].push(asset);
-          }
-        }
-      });
-
-      // Map Clients
-      const mappedClients: ClientWithPortfolio[] = clientsRaw.map((row: any) => {
-        const id = row.ID || row.id || '';
-        return {
-          id,
+      let mappedClients: ClientWithPortfolio[] = [];
+      
+      // Mantenemos la carga de la lista de clientes para usos administrativos
+      if (SHEET_URLS.CLIENTS_DATA) {
+        const clientsRaw = await fetchCsvData(SHEET_URLS.CLIENTS_DATA);
+        mappedClients = clientsRaw.map((row: any) => ({
+          id: row.ID || row.id || '',
           name: row.Nombre || row.name || '',
           role: (row.Role || row.role || 'client') as 'admin' | 'client',
           email: row.Email || row.email || '',
           phone: row.Telefono || row.phone || '',
-          portfolio: portfolioByClient[id] || []
-        };
-      }).filter((c: any) => c.id);
+          portfolio: [] // El portfolio se cargará desde el servidor
+        })).filter((c: any) => c.id);
+        
+        setAllClients(mappedClients);
+      }
 
-      setAllClients(mappedClients);
-
-      // Update current user's specific portfolio
+      // Si hay un usuario activo, obtenemos su portafolio calculado en el servidor
       if (user) {
-        setClientPortfolio(portfolioByClient[user.id] || []);
-        setClientOperations(mappedOperations.filter(op => op.clientId === user.id));
+        const serverData = await fetchPortfolioData(user.id);
+        
+        if (serverData) {
+          setClientPortfolio(serverData.portfolio || []);
+          setClientOperations(serverData.operations || []);
+          
+          if (serverData.totals) {
+            setTotalNetWorthMXN(serverData.totals.netWorthMXN || 0);
+            setTotalNetWorthUSD(serverData.totals.netWorthUSD || 0);
+          }
+
+          // Opcional: Actualizar el portafolio del cliente activo en allClients
+          const updatedClients = mappedClients.map(c => 
+            c.id === user.id ? { ...c, portfolio: serverData.portfolio || [] } : c
+          );
+          setAllClients(updatedClients);
+          setAllOperations(serverData.operations || []);
+        }
       }
     } catch (error) {
       console.error('Error syncing portfolios:', error);
@@ -164,15 +97,6 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
   useEffect(() => {
     refreshPortfolio();
   }, [user]);
-
-  const totalNetWorthMXN = clientPortfolio.reduce((acc, asset) => {
-    const currentPriceMXN = asset.nativeCurrency === 'USD' 
-      ? asset.realTimePrice * exchangeRate 
-      : asset.realTimePrice;
-    return acc + (asset.sharesOwned * currentPriceMXN);
-  }, 0);
-
-  const totalNetWorthUSD = totalNetWorthMXN / exchangeRate;
 
   return (
     <PortfolioContext.Provider value={{ 
