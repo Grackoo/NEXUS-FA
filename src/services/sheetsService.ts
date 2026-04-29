@@ -7,8 +7,9 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwRqbjaQj_qfvlF6Whe8
 
 // These are the real CSV URLs constructed from the user's published sheet
 export const SHEET_URLS = {
-  // Solo conservamos CLIENTS_DATA para la lista de usuarios. El portafolio y operaciones ahora vienen del servidor.
+  // Solo conservamos CLIENTS_DATA y CURRENCY_TRACKER. El portafolio y operaciones ahora vienen del servidor.
   CLIENTS_DATA: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMbHAoAnLIzHBO7iGu9ETipHcbSXmvBuc-bsR4vBsaciYzmipRlmk36kLz83miN692Dkgt7MyuLnLK/pub?gid=1509214802&single=true&output=csv',
+  CURRENCY_TRACKER: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMbHAoAnLIzHBO7iGu9ETipHcbSXmvBuc-bsR4vBsaciYzmipRlmk36kLz83miN692Dkgt7MyuLnLK/pub?gid=1688734912&single=true&output=csv',
 };
 
 const cache = new Map<string, { data: any, timestamp: number }>();

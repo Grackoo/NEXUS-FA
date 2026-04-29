@@ -28,7 +28,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export const PerformanceArea: React.FC = () => {
-  const { clientOperations, clientPortfolio } = usePortfolio();
+  const { clientPortfolio } = usePortfolio();
   const { currency, exchangeRate } = useCurrency();
 
   const data = useMemo(() => {

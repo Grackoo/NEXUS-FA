@@ -64,7 +64,7 @@ export const AllocationDonut: React.FC = () => {
               stroke="none"
               cornerRadius={8}
             >
-              {data.map((entry, index) => (
+              {data.map((_, index) => (
                 <Cell 
                   key={`cell-${index}`} 
                   fill={COLORS[index % COLORS.length]} 
