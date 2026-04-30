@@ -22,8 +22,8 @@ const OperationsHistoryModal: React.FC<Props> = ({ isOpen, onClose, ticker, clie
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   return (
-    <div className="modal-overlay animate-fade-in">
-      <div className="glass-card w-full max-w-2xl p-0 overflow-hidden">
+    <div className="modal-overlay animate-fade-in" style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}>
+      <div className="glass-card w-full max-w-5xl p-0 overflow-hidden flex flex-col h-[85vh]" style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)' }}>
         {/* Header */}
         <div className="px-8 py-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
           <div>

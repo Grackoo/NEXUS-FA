@@ -137,8 +137,8 @@ const EditSingleOperationModal: React.FC<Props> = ({ isOpen, onClose, operationT
   };
 
   return (
-    <div className="modal-overlay animate-fade-in z-[100]">
-      <div className="glass-card w-full max-w-md p-0 overflow-hidden relative">
+    <div className="modal-overlay animate-fade-in z-[100]" style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}>
+      <div className="glass-card w-full max-w-lg p-0 overflow-hidden relative" style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)' }}>
         {isSubmitting && (
           <div className="absolute inset-0 bg-black/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center">
             <RefreshCcw className="w-10 h-10 text-primary animate-spin mb-4" />
