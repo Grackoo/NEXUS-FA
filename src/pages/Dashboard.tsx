@@ -26,6 +26,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } 
 import SmartTransactionModal, { type EditAsset } from '../components/SmartTransactionModal';
 import EditSingleOperationModal from '../components/EditSingleOperationModal';
 import { PortfolioHealthDashboard } from '../components/charts/PortfolioHealthDashboard';
+import NexusLoadingScreen from '../components/NexusLoadingScreen';
 
 // ─── Delete Confirmation Modal ────────────────────────────────────────────────
 interface DeleteConfirmProps {
@@ -229,6 +230,10 @@ const Dashboard: React.FC = () => {
   // Single Operation Edit State
   const [editSingleOpTarget, setEditSingleOpTarget] = useState<{ op: any; index: number } | null>(null);
 
+  const [showLoadingScreen, setShowLoadingScreen] = useState(() => {
+    return !sessionStorage.getItem('hasSeenNexusLoading');
+  });
+
   const displayedPortfolio =
     selectedCategory === 'All'
       ? clientPortfolio
@@ -307,6 +312,17 @@ const Dashboard: React.FC = () => {
     setIsDeleting(false);
     setDeleteTarget(null);
   };
+
+  if (showLoadingScreen) {
+    return (
+      <NexusLoadingScreen 
+        onComplete={() => {
+          sessionStorage.setItem('hasSeenNexusLoading', 'true');
+          setShowLoadingScreen(false);
+        }} 
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen pb-12">

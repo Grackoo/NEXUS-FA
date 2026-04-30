@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { Users, Search, Plus, BarChart3, AlertCircle, Shield, Eye, Pencil, Check, X, PlusCircle, Info, LogIn } from 'lucide-react';
 import SmartTransactionModal from '../components/SmartTransactionModal.tsx';
 import { submitOperation } from '../services/sheetsService';
+import NexusLoadingScreen from '../components/NexusLoadingScreen';
 
 const Admin: React.FC = () => {
   const { allClients, isLoading } = usePortfolio();
@@ -18,6 +19,10 @@ const Admin: React.FC = () => {
   const [isAssetsModalOpen, setIsAssetsModalOpen] = useState(false);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [showAddClientInfo, setShowAddClientInfo] = useState(false);
+
+  const [showLoadingScreen, setShowLoadingScreen] = useState(() => {
+    return !sessionStorage.getItem('hasSeenAdminLoading');
+  });
 
   if (isLoading) {
     return (
@@ -62,6 +67,17 @@ const Admin: React.FC = () => {
   }, 0);
 
   const globalAUMDisplay = currency === 'USD' ? globalAUM : globalAUM * 16.5;
+
+  if (showLoadingScreen) {
+    return (
+      <NexusLoadingScreen 
+        onComplete={() => {
+          sessionStorage.setItem('hasSeenAdminLoading', 'true');
+          setShowLoadingScreen(false);
+        }} 
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen pb-12">
