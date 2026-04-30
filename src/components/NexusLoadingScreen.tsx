@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Activity, ShieldCheck, TrendingUp, DollarSign } from 'lucide-react';
 
 export default function NexusLoadingScreen({ onComplete }: { onComplete?: () => void }) {
