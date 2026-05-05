@@ -7,7 +7,6 @@ import { deletePosition } from '../services/sheetsService';
 import {
   TrendingUp,
   TrendingDown,
-  PieChart as PieChartIcon,
   List,
   Coins,
   Landmark,
@@ -22,7 +21,6 @@ import {
   ChevronUp,
   AlertTriangle,
 } from 'lucide-react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
 import SmartTransactionModal, { type EditAsset } from '../components/SmartTransactionModal';
 import EditSingleOperationModal from '../components/EditSingleOperationModal';
 import { PerformanceArea } from '../components/charts/PerformanceArea';
@@ -267,17 +265,6 @@ const Dashboard: React.FC = () => {
   const globalPL = globalCurrentView - globalCostBasisView;
   const globalPLPercent = globalCostBasisView > 0 ? (globalPL / globalCostBasisView) * 100 : 0;
   const isGlobalPositive = globalPL >= 0;
-
-  const allocation = displayedPortfolio.reduce((acc: any[], asset) => {
-    const existing = acc.find(item => item.name === asset.type);
-    const currentPriceMXN = asset.nativeCurrency === 'USD' ? asset.realTimePrice * exchangeRate : asset.realTimePrice;
-    const val = convertToView(asset.sharesOwned * currentPriceMXN, 'MXN');
-    if (existing) existing.value += val;
-    else acc.push({ name: asset.type, value: val });
-    return acc;
-  }, []);
-
-  const COLORS = ['#1A5CFF', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4'];
 
   const getAssetIcon = (type: string) => {
     switch (type) {
