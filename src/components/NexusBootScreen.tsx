@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Cpu, Server, Shield, Database } from 'lucide-react';
 
 interface NexusBootScreenProps {
