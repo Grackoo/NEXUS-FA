@@ -65,9 +65,9 @@ export const useRiskMetrics = () => {
     // A simple heuristic: Max Drawdown ≈ Volatility * 1.5 in a normal year
     let maxDrawdown = portfolioVolatility * 1.5;
 
-    // Cap values for display sanity
-    if (sharpeRatio > 5) sharpeRatio = 5;
-    if (sharpeRatio < -5) sharpeRatio = -5;
+    // Limit the values to avoid extreme UI breaks, but allow high numbers
+    if (sharpeRatio > 999) sharpeRatio = 999;
+    if (sharpeRatio < -999) sharpeRatio = -999;
     if (maxDrawdown > 1) maxDrawdown = 0.99;
 
     return {

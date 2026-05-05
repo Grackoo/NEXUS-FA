@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Shield, Lock, ChevronRight, Globe, TrendingUp, AlertCircle, UserPlus, X, Briefcase, HelpCircle, Eye, EyeOff, Loader2 } from 'lucide-react';
+import NexusBootScreen from '../components/NexusBootScreen';
 
 const Login: React.FC = () => {
   const [userId, setUserId] = useState('');
@@ -9,6 +10,7 @@ const Login: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [isBooting, setIsBooting] = useState(true);
   const { login, isLoading: isAuthLoading } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -28,15 +30,8 @@ const Login: React.FC = () => {
     }
   };
 
-  if (isAuthLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#020202]">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-10 h-10 text-primary animate-spin" />
-          <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Iniciando Sistemas...</p>
-        </div>
-      </div>
-    );
+  if (isBooting || isAuthLoading) {
+    return <NexusBootScreen onComplete={() => setIsBooting(false)} />;
   }
 
   return (
