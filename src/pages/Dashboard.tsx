@@ -25,7 +25,7 @@ import SmartTransactionModal, { type EditAsset } from '../components/SmartTransa
 import EditSingleOperationModal from '../components/EditSingleOperationModal';
 import { PerformanceArea } from '../components/charts/PerformanceArea';
 import { AllocationDonut } from '../components/charts/AllocationDonut';
-import { PnLBarChart } from '../components/charts/PnLBarChart';
+import { PortfolioHealthDashboard } from '../components/charts/PortfolioHealthDashboard';
 import NexusLoadingScreen from '../components/NexusLoadingScreen';
 
 // ─── Delete Confirmation Modal ────────────────────────────────────────────────
@@ -353,9 +353,9 @@ const Dashboard: React.FC = () => {
           </div>
         </section>
 
-        {/* ── Top & Bottom Performers ── */}
+        {/* ── Portfolio Health Dashboard ── */}
         <section className="w-full">
-          <PnLBarChart />
+          <PortfolioHealthDashboard />
         </section>
 
         {/* ── Category Tabs ── */}

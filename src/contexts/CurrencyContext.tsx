@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { CURRENCY_TRACKER } from '../data/MockData';
 import { fetchCsvData, SHEET_URLS } from '../services/sheetsService';
+import { useAuth } from './AuthContext';
 
 type Currency = 'USD' | 'MXN';
 
@@ -17,6 +18,7 @@ const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined
 export const CurrencyProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [currency, setCurrency] = useState<Currency>('USD');
   const [exchangeRate, setExchangeRate] = useState(CURRENCY_TRACKER.USD_MXN_RATE);
+  const { isPrivacyMode } = useAuth();
 
   useEffect(() => {
     const loadRate = async () => {
@@ -44,10 +46,12 @@ export const CurrencyProvider: React.FC<{ children: ReactNode }> = ({ children }
   };
 
   const formatValue = (value: number, assetCurrency?: Currency) => {
-    // If an asset is locked to a specific currency (like CETES to MXN), we might show it in that currency
-    // but the dashboard usually converts everything to the preferred view.
     const displayCurrency = assetCurrency || currency;
     
+    if (isPrivacyMode) {
+      return displayCurrency === 'USD' ? 'USD ••••••' : 'MXN ••••••';
+    }
+
     return new Intl.NumberFormat('es-MX', {
       style: 'currency',
       currency: displayCurrency,

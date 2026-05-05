@@ -3,7 +3,9 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Toolti
 import { usePortfolio } from '../../contexts/PortfolioContext';
 import { useCurrency } from '../../contexts/CurrencyContext';
 
-const CustomTooltip = ({ active, payload }: any) => {
+import { useAuth } from '../../contexts/AuthContext';
+
+const CustomTooltip = ({ active, payload, formatValue }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     const isPositive = data.pnl >= 0;
@@ -13,7 +15,7 @@ const CustomTooltip = ({ active, payload }: any) => {
         <div>
           <p className="text-white/60 text-[10px] uppercase tracking-widest font-semibold mb-1">{data.name}</p>
           <p className={`font-bold text-lg tabular-nums ${isPositive ? 'text-emerald-400' : 'text-rose-500'}`}>
-            {isPositive ? '+' : ''}{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(data.pnl)}
+            {isPositive ? '+' : ''}{formatValue(data.pnl)}
           </p>
         </div>
       </div>
@@ -24,7 +26,8 @@ const CustomTooltip = ({ active, payload }: any) => {
 
 export const PnLBarChart: React.FC = () => {
   const { clientPortfolio } = usePortfolio();
-  const { currency, exchangeRate } = useCurrency();
+  const { currency, exchangeRate, formatValue } = useCurrency();
+  const { isPrivacyMode } = useAuth();
 
   const data = useMemo(() => {
     const pnlList = clientPortfolio.map(asset => {
@@ -72,7 +75,7 @@ export const PnLBarChart: React.FC = () => {
     <div className="w-full h-[350px] glass-card p-6 bg-slate-900/50 backdrop-blur-xl border border-white/5 rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
       <div className="mb-6">
         <h3 className="text-white/80 font-semibold text-sm uppercase tracking-widest">Top & Bottom Performers</h3>
-        <p className="text-white/40 text-[11px] mt-1">Ganancia y pérdida absoluta (USD)</p>
+        <p className="text-white/40 text-[11px] mt-1">Ganancia y pérdida absoluta ({currency})</p>
       </div>
 
       <div className="w-full h-[250px]">
@@ -84,7 +87,7 @@ export const PnLBarChart: React.FC = () => {
               axisLine={false} 
               tickLine={false} 
               tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 11 }}
-              tickFormatter={(val) => `$${val >= 0 ? '+' : ''}${val/1000}k`}
+              tickFormatter={(val) => isPrivacyMode ? '••••' : `$${val >= 0 ? '+' : ''}${val/1000}k`}
             />
             <YAxis 
               dataKey="name" 
@@ -94,7 +97,7 @@ export const PnLBarChart: React.FC = () => {
               tick={{ fill: 'rgba(255,255,255,0.8)', fontSize: 11, fontWeight: 'bold' }}
               width={50}
             />
-            <RechartsTooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.02)' }} />
+            <RechartsTooltip content={<CustomTooltip formatValue={formatValue} />} cursor={{ fill: 'rgba(255,255,255,0.02)' }} />
             <Bar dataKey="pnl" radius={[0, 4, 4, 0]} barSize={16}>
               {data.map((entry, index) => (
                 <Cell 

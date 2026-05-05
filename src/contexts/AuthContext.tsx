@@ -22,6 +22,8 @@ interface AuthContextType {
   logout: () => void;
   isLoading: boolean;
   impersonateClient?: (client: ClientProfile) => void;
+  isPrivacyMode: boolean;
+  togglePrivacyMode: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -30,6 +32,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [user, setUser] = useState<ClientProfile | null>(null);
   const [authorizedClients, setAuthorizedClients] = useState<ClientProfile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPrivacyMode, setIsPrivacyMode] = useState(false);
+
+  const togglePrivacyMode = () => setIsPrivacyMode(prev => !prev);
 
   useEffect(() => {
     const loadAuthorizedClients = async () => {
@@ -103,7 +108,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading, impersonateClient }}>
+    <AuthContext.Provider value={{ user, login, logout, isLoading, impersonateClient, isPrivacyMode, togglePrivacyMode }}>
       {children}
     </AuthContext.Provider>
   );

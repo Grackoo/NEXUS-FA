@@ -1,11 +1,11 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCurrency } from '../contexts/CurrencyContext';
-import { LogOut, RefreshCw, Settings, ShieldCheck, TrendingUp, LayoutDashboard } from 'lucide-react';
+import { LogOut, RefreshCw, Settings, ShieldCheck, TrendingUp, LayoutDashboard, Eye, EyeOff } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 const Navbar: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, isPrivacyMode, togglePrivacyMode } = useAuth();
   const { currency, toggleCurrency } = useCurrency();
   const location = useLocation();
 
@@ -63,6 +63,15 @@ const Navbar: React.FC = () => {
             <div className={`px-2 md:px-3 py-0.5 md:py-1 rounded-full text-[9px] md:text-[10px] font-bold transition-all ${currency === 'MXN' ? 'bg-primary text-white' : 'text-gray-500'}`}>
               MXN
             </div>
+          </button>
+          
+          {/* Privacy Toggle */}
+          <button 
+            onClick={togglePrivacyMode}
+            className="flex items-center justify-center w-8 h-8 md:w-9 md:h-9 rounded-full bg-white/[0.05] border border-white/[0.1] hover:bg-white/[0.1] transition-all text-gray-400 hover:text-white"
+            title={isPrivacyMode ? "Desactivar Modo Privacidad" : "Activar Modo Privacidad"}
+          >
+            {isPrivacyMode ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
 
           <div className="flex items-center gap-4">

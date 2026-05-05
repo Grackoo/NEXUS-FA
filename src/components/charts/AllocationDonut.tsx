@@ -5,14 +5,14 @@ import { useCurrency } from '../../contexts/CurrencyContext';
 
 const COLORS = ['#06B6D4', '#8B5CF6', '#10B981', '#EC4899', '#F59E0B'];
 
-const CustomTooltip = ({ active, payload }: any) => {
+const CustomTooltip = ({ active, payload, formatValue }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0];
     return (
       <div className="bg-[#0f172a]/90 backdrop-blur-md border border-white/10 p-3 rounded-2xl shadow-[0_0_20px_rgba(0,0,0,0.5)]">
         <p className="text-white/60 text-[10px] uppercase tracking-widest font-semibold mb-1">{data.name}</p>
         <p className="text-white font-bold text-lg tabular-nums">
-          {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(data.value)}
+          {formatValue(data.value)}
         </p>
       </div>
     );
@@ -72,7 +72,7 @@ export const AllocationDonut: React.FC = () => {
                 />
               ))}
             </Pie>
-            <RechartsTooltip content={<CustomTooltip />} cursor={{ fill: 'transparent' }} />
+            <RechartsTooltip content={<CustomTooltip formatValue={formatValue} />} cursor={{ fill: 'transparent' }} />
             <Legend 
               verticalAlign="bottom" 
               height={36} 
