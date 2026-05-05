@@ -42,7 +42,7 @@ export const AllocationDonut: React.FC = () => {
   }, [clientPortfolio, exchangeRate, currency, convertToView]);
 
   return (
-    <div className="relative w-full h-[350px] glass-card p-6 bg-slate-900/50 backdrop-blur-xl border border-white/5 rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] overflow-hidden">
+    <div className="relative w-full h-full min-h-[350px] glass-card p-6 bg-slate-900/50 backdrop-blur-xl border border-white/5 rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] overflow-hidden">
       {/* Glow background effect */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-cyan-500/20 rounded-full blur-[80px] pointer-events-none" />
       

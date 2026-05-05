@@ -25,7 +25,9 @@ import {
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
 import SmartTransactionModal, { type EditAsset } from '../components/SmartTransactionModal';
 import EditSingleOperationModal from '../components/EditSingleOperationModal';
-import { PortfolioHealthDashboard } from '../components/charts/PortfolioHealthDashboard';
+import { PerformanceArea } from '../components/charts/PerformanceArea';
+import { AllocationDonut } from '../components/charts/AllocationDonut';
+import { PnLBarChart } from '../components/charts/PnLBarChart';
 import NexusLoadingScreen from '../components/NexusLoadingScreen';
 
 // ─── Delete Confirmation Modal ────────────────────────────────────────────────
@@ -331,19 +333,19 @@ const Dashboard: React.FC = () => {
       <main className="max-w-7xl mx-auto px-4 md:px-8 mt-6 md:mt-10 space-y-6 md:space-y-8 animate-fade-in">
 
         {/* ── Header cards ── */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="md:col-span-2 glass-card flex flex-col justify-between overflow-hidden relative p-8 md:p-10 bg-slate-900/50 backdrop-blur-md border border-white/5 shadow-2xl rounded-3xl">
+        <section className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <div className="lg:col-span-1 glass-card flex flex-col justify-between overflow-hidden relative p-8 bg-slate-900/50 backdrop-blur-md border border-white/5 shadow-2xl rounded-3xl">
             <div className="relative z-10 space-y-2">
               <p className="text-xs uppercase tracking-wide font-medium text-white/60 mb-2">Balance Total</p>
-              <h1 className="text-4xl md:text-5xl font-semibold tracking-tight mb-4 tabular-nums text-white">
+              <h1 className="text-3xl lg:text-4xl font-semibold tracking-tight mb-4 tabular-nums text-white break-words">
                 {formatValue(netWorth)}
               </h1>
-              <div className="flex flex-wrap items-center gap-4 mt-6">
-                <div className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold border ${isGlobalPositive ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'}`}>
+              <div className="flex flex-col gap-4 mt-6">
+                <div className={`inline-flex self-start items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border ${isGlobalPositive ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'}`}>
                   {isGlobalPositive ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
                   {isGlobalPositive ? '+' : ''}{globalPLPercent.toFixed(2)}%
                 </div>
-                <div className="flex flex-col ml-2">
+                <div className="flex flex-col">
                   <p className="text-[10px] uppercase tracking-wide font-medium text-white/50">
                     Rendimiento Histórico
                   </p>
@@ -353,46 +355,20 @@ const Dashboard: React.FC = () => {
                 </div>
               </div>
             </div>
-            <div className="absolute right-0 bottom-0 top-0 w-1/3 bg-gradient-to-l from-primary/10 to-transparent flex items-center justify-end pr-4 md:pr-8">
-              <TrendingUp className="w-20 h-20 md:w-32 md:h-32 text-primary/10 rotate-12" />
-            </div>
           </div>
 
-          <div className="glass-card p-6 md:p-8 bg-black/40 backdrop-blur-md border border-white/5 shadow-2xl rounded-3xl flex flex-col justify-between">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xs uppercase tracking-wide font-medium text-white/60 flex items-center gap-2">
-                <PieChartIcon className="w-4 h-4 text-primary" /> Asignación (Allocation)
-              </h3>
-            </div>
-            <div style={{ height: '220px', width: '100%', position: 'relative' }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie data={allocation} innerRadius={65} outerRadius={90} paddingAngle={8} dataKey="value" stroke="none" cornerRadius={4}>
-                    {allocation.map((_: any, i: number) => (
-                      <Cell key={`cell-${i}`} fill={COLORS[i % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <RechartsTooltip
-                    contentStyle={{
-                      background: 'rgba(5,5,5,0.9)', backdropFilter: 'blur(8px)',
-                      border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px',
-                      boxShadow: '0 10px 15px rgba(0,0,0,0.5)', padding: '8px',
-                    }}
-                    itemStyle={{ color: '#fff', fontSize: '11px', textTransform: 'uppercase' }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mt-2">
-                <p className="text-[10px] text-white/50 uppercase tracking-widest">Activos</p>
-                <p className="text-2xl font-semibold text-white mt-1">{allocation.length}</p>
-              </div>
-            </div>
+          <div className="lg:col-span-2">
+            <PerformanceArea />
+          </div>
+
+          <div className="lg:col-span-1">
+            <AllocationDonut />
           </div>
         </section>
 
-        {/* ── Portfolio Health Dashboard ── */}
+        {/* ── Top & Bottom Performers ── */}
         <section className="w-full">
-          <PortfolioHealthDashboard />
+          <PnLBarChart />
         </section>
 
         {/* ── Category Tabs ── */}
