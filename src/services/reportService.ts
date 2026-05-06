@@ -85,8 +85,8 @@ export const prepareReportData = (
       ticker: op.ticker,
       type: op.type === 'Buy' ? 'Compra' : 'Venta',
       shares: op.shares,
-      price: formatCurrency(op.price, op.currency),
-      total: formatCurrency(op.totalMXN, 'MXN'),
+      price: formatCurrency(op.price, op.currency || 'USD'),
+      total: formatCurrency(op.totalMXN || 0, 'MXN'),
       thesis: op.thesis || 'Sin tesis registrada.'
     }));
 

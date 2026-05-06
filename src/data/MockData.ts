@@ -1,4 +1,4 @@
-import { AssetCategory, PortfolioAsset, Operation } from '../types';
+import type { PortfolioAsset, Operation } from '../types';
 
 export interface Client {
   id: string;
