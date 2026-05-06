@@ -416,6 +416,7 @@ const Dashboard: React.FC = () => {
                   <th className="px-6 py-4 font-semibold">Activo</th>
                   <th className="px-4 py-4 font-semibold text-right">Cantidad</th>
                   <th className="px-4 py-4 font-semibold text-right">Precio Prom.</th>
+                  <th className="px-4 py-4 font-semibold text-right">Target</th>
                   <th className="px-4 py-4 font-semibold text-right">V. Mercado</th>
                   <th className="px-4 py-4 font-semibold text-right">Ganancia</th>
                   <th className="px-4 py-4 font-semibold text-right">Rend.</th>
@@ -500,6 +501,24 @@ const Dashboard: React.FC = () => {
                           </div>
                         </td>
                         
+                        {/* Target Price */}
+                        {(() => {
+                          const targetPrice = asset.target;
+                          const currentPrice = asset.nativeCurrency === 'USD' ? currentPriceUSD : currentPriceMXN;
+                          const isNearTarget = targetPrice ? Math.abs(currentPrice - targetPrice) / targetPrice <= 0.05 : false;
+                          return (
+                            <td className={`px-4 py-3 text-right tabular-nums text-sm transition-all duration-300 ${isNearTarget ? 'animate-pulse bg-primary/10 shadow-[inset_0_0_15px_rgba(26,92,255,0.4)] border-x border-primary/30' : ''}`}>
+                              {targetPrice ? (
+                                <span className={isNearTarget ? 'text-primary-glow font-bold' : 'text-white/80 font-semibold'}>
+                                  {formatValue(targetPrice, asset.nativeCurrency)}
+                                </span>
+                              ) : (
+                                <span className="text-white/40">-</span>
+                              )}
+                            </td>
+                          );
+                        })()}
+                        
                         {/* Market Value */}
                         <td className="px-4 py-3 text-right font-semibold tabular-nums text-sm text-white">
                           <div className="flex flex-col gap-1 items-end">
@@ -565,7 +584,7 @@ const Dashboard: React.FC = () => {
                       {/* Expanded Operations Row */}
                       {expandedTicker === asset.ticker && (
                         <tr className="bg-black/20 border-b border-white/5">
-                          <td colSpan={7} className="p-0">
+                          <td colSpan={8} className="p-0">
                             <div className="p-6">
                               <h4 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
                                 <History className="w-4 h-4 text-blue-400" /> Historial de Operaciones

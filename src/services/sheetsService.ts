@@ -12,20 +12,13 @@ export const SHEET_URLS = {
   CURRENCY_TRACKER: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMbHAoAnLIzHBO7iGu9ETipHcbSXmvBuc-bsR4vBsaciYzmipRlmk36kLz83miN692Dkgt7MyuLnLK/pub?gid=1688734912&single=true&output=csv',
 };
 
-const cache = new Map<string, { data: any, timestamp: number }>();
-const CACHE_TTL_MS = 1000 * 60 * 5; // 5 minutes cache
-
 export function invalidateCache() {
-  cache.clear();
+  // Caché manejado ahora por useCachedData
 }
 
 export async function fetchCsvData(url: string) {
   if (!url) return [];
   
-  const cached = cache.get(url);
-  if (cached && (Date.now() - cached.timestamp < CACHE_TTL_MS)) {
-    return cached.data;
-  }
   try {
     const uniqueUrl = url.includes('?') ? `${url}&_t=${Date.now()}` : `${url}?_t=${Date.now()}`;
     const response = await fetch(uniqueUrl, {
@@ -57,7 +50,6 @@ export async function fetchCsvData(url: string) {
       return obj;
     });
 
-    cache.set(url, { data: parsedData, timestamp: Date.now() });
     return parsedData;
   } catch (error) {
     console.error('Error fetching CSV:', error);

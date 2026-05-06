@@ -10,6 +10,7 @@ import SmartTransactionModal from '../components/SmartTransactionModal.tsx';
 import { submitOperation } from '../services/sheetsService';
 import { prepareReportData } from '../services/reportService';
 import NexusLoadingScreen from '../components/NexusLoadingScreen';
+import toast from 'react-hot-toast';
 
 const Admin: React.FC = () => {
   const { allClients, isLoading } = usePortfolio();
@@ -310,6 +311,11 @@ const AssetBreakdownModal: React.FC<{
   };
 
   const saveEdit = async (asset: any) => {
+    if (editData.shares < 0) {
+      toast.error('Inventario inválido: El balance del activo no puede quedar en negativo.');
+      return;
+    }
+
     setIsSubmitting(true);
     const success = await submitOperation({
       clientId,

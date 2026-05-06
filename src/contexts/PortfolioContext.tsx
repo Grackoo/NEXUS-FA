@@ -1,21 +1,10 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { useAuth, type ClientProfile } from './AuthContext';
-import { fetchCsvData, fetchPortfolioData, SHEET_URLS } from '../services/sheetsService';
-import { type PortfolioAsset } from '../data/MockData';
+import { SHEET_URLS } from '../services/sheetsService';
+import { useCachedData } from '../hooks/useCachedData';
+import { type PortfolioAsset, type Operation } from '../types';
 
-export interface Operation {
-  date: string;
-  clientId: string;
-  type: string;
-  ticker: string;
-  assetType: string;
-  shares: number;
-  price: number;
-  commission: number;
-  currency: string;
-  totalMXN: number;
-  thesis?: string;
-}
+export type { Operation };
 
 export interface ClientWithPortfolio extends ClientProfile {
   portfolio: PortfolioAsset[];
@@ -37,6 +26,7 @@ const PortfolioContext = createContext<PortfolioContextType | undefined>(undefin
 
 export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { user } = useAuth();
+  const { fetchCsvCached, fetchPortfolioCached } = useCachedData();
   const [clientPortfolio, setClientPortfolio] = useState<PortfolioAsset[]>([]);
   const [clientOperations, setClientOperations] = useState<Operation[]>([]);
   const [allClients, setAllClients] = useState<ClientWithPortfolio[]>([]);
@@ -54,7 +44,7 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
       
       // Mantenemos la carga de la lista de clientes para usos administrativos
       if (SHEET_URLS.CLIENTS_DATA) {
-        const clientsRaw = await fetchCsvData(SHEET_URLS.CLIENTS_DATA);
+        const clientsRaw = await fetchCsvCached(SHEET_URLS.CLIENTS_DATA);
         mappedClients = clientsRaw.map((row: any) => ({
           id: row.ID || row.id || '',
           name: row.Nombre || row.name || '',
@@ -75,7 +65,7 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
           const clientIds = mappedClients.filter(c => c.role === 'client').map(c => c.id);
           const allPortfolios = await Promise.all(
             clientIds.map(async (id) => {
-              const data = await fetchPortfolioData(id);
+              const data = await fetchPortfolioCached(id);
               return { id, data };
             })
           );
@@ -95,7 +85,7 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
           setAllClients(updatedClients);
           
           // También cargamos el portafolio del propio admin si tuviera (opcional, suele ser 0)
-          const adminData = await fetchPortfolioData(user.id);
+          const adminData = await fetchPortfolioCached(user.id);
           if (adminData) {
             setClientPortfolio(adminData.portfolio || []);
             setClientOperations(adminData.operations || []);
@@ -106,7 +96,7 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
           }
         } else {
           // Si es cliente, cargamos solo su portafolio
-          const serverData = await fetchPortfolioData(user.id);
+          const serverData = await fetchPortfolioCached(user.id);
           
           if (serverData) {
             setClientPortfolio(serverData.portfolio || []);

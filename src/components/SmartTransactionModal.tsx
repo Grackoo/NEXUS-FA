@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Calculator, RefreshCcw, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { usePortfolio } from '../contexts/PortfolioContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { submitOperation, deletePosition } from '../services/sheetsService';
@@ -137,6 +138,13 @@ const SmartTransactionModal: React.FC<Props> = ({
 
   const handleConfirm = async () => {
     if (isSimulationMode) return;
+    
+    // Validación de Inventario antes de procesar una venta
+    if (type === 'Sell' && numShares > sharesOwned) {
+      toast.error(`Inventario insuficiente: No puedes vender ${numShares} títulos de ${ticker} (Balance actual: ${sharesOwned}).`);
+      return;
+    }
+
     setIsSubmitting(true);
     const totalTrans = (numShares * numPrice) + numCommission;
     const calculatedTotalMXN = currency === 'USD' ? totalTrans * exchangeRate : totalTrans;

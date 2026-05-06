@@ -4,13 +4,16 @@ import Dashboard from './pages/Dashboard.tsx';
 import Admin from './pages/Admin.tsx';
 import Watchlist from './pages/Watchlist.tsx';
 import { useAuth } from './contexts/AuthContext';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   const { user } = useAuth();
 
   return (
-    <Router>
-      <Routes>
+    <>
+      <Toaster position="top-right" />
+      <Router>
+        <Routes>
         <Route path="/login" element={!user ? <Login /> : <Navigate to={user.role === 'admin' ? '/admin' : '/dashboard'} />} />
         
         <Route 
@@ -31,6 +34,7 @@ function App() {
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </Router>
+    </>
   );
 }
 

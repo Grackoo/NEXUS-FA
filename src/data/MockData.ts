@@ -1,15 +1,4 @@
-export type AssetCategory = 'Renta Variable' | 'Criptomonedas' | 'Renta Fija' | 'Liquidez';
-
-export interface PortfolioAsset {
-  ticker: string;
-  type: AssetCategory;
-  sharesOwned: number;
-  avgPurchasePriceMXN: number;
-  avgPurchasePriceUSD: number;
-  realTimePrice: number; // Stored in its native currency
-  nativeCurrency: 'USD' | 'MXN';
-  logoUrl?: string;
-}
+import { AssetCategory, PortfolioAsset, Operation } from '../types';
 
 export interface Client {
   id: string;
@@ -52,19 +41,7 @@ export const MOCK_CLIENTS: Client[] = [
   }
 ];
 
-export interface Operation {
-  id: string;
-  clientId: string;
-  type: 'Buy' | 'Sell';
-  assetType: AssetCategory;
-  ticker: string;
-  shares: number;
-  price: number;
-  commission: number;
-  originalCurrency: 'USD' | 'MXN';
-  date: string;
-}
-
+// Operations are now defined in src/types/index.ts
 export const MOCK_OPERACIONES: Operation[] = [
   { id: 'op1', clientId: 'client-1', type: 'Buy', assetType: 'Renta Variable', ticker: 'AAPL', shares: 10, price: 145, commission: 2, originalCurrency: 'USD', date: '2024-01-10' },
   { id: 'op2', clientId: 'client-1', type: 'Buy', assetType: 'Renta Variable', ticker: 'IVV', shares: 5, price: 450, commission: 5, originalCurrency: 'USD', date: '2024-02-15' },
