@@ -117,131 +117,44 @@ export default function NexusLoadingScreen({ onComplete }: { onComplete?: () => 
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#0b0e14] text-white relative overflow-hidden font-sans">
-      
-      {/* Luces de fondo (Glow) */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px] pointer-events-none"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-[120px] pointer-events-none"></div>
-
-      <div className="z-10 flex flex-col items-center w-full max-w-lg px-6">
-        
-        {/* Logo de NEXUS FA */}
-        <div className="flex items-center mb-10 animate-pulse">
-          <div className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold mr-3 shadow-[0_0_15px_rgba(37,99,235,0.5)]">
-            N
-          </div>
-          <div className="flex flex-col">
-            <h1 className="text-xl font-extrabold tracking-widest text-white leading-tight">
-              NEXUS FA
-            </h1>
-            <span className="text-[0.60rem] text-gray-400 tracking-[0.3em] font-medium uppercase">
-              Wealth Management
-            </span>
-          </div>
+    <div className="min-h-screen bg-[#0b0e14] pt-8 px-4 md:px-8 max-w-7xl mx-auto flex flex-col gap-6 md:gap-8">
+      {/* Header Skeleton */}
+      <div className="flex justify-between items-center mb-4 mt-6 animate-pulse">
+        <div className="w-32 h-8 bg-gray-800/80 rounded-lg"></div>
+        <div className="flex gap-4">
+           <div className="w-10 h-10 bg-gray-800/80 rounded-full"></div>
+           <div className="w-10 h-10 bg-gray-800/80 rounded-full"></div>
         </div>
-
-        {/* --- CONTENEDOR DE LA GRÁFICA --- */}
-        <div className="w-full bg-[#131722]/80 border border-gray-800/80 rounded-2xl p-6 mb-8 shadow-2xl backdrop-blur-sm">
-          
-          {/* Cabecera del panel de gráfica */}
-          <div className="flex justify-between items-end mb-6">
-            <div>
-              <span className="text-xs text-gray-400 tracking-wider uppercase font-semibold block mb-1">
-                Cargando Portafolio
-              </span>
-              <div className="text-3xl font-bold text-white flex items-end leading-none">
-                {progress.toFixed(1)}<span className="text-lg text-emerald-400 ml-1 mb-0.5">%</span>
-              </div>
-            </div>
-            <div className="text-right">
-              <span className="text-xs text-emerald-400 font-medium flex items-center justify-end bg-emerald-400/10 px-2 py-1 rounded">
-                <TrendingUp className="w-3 h-3 mr-1" /> ALTA VELOCIDAD
-              </span>
-            </div>
-          </div>
-
-          {/* Área SVG de la Gráfica */}
-          <div className="relative w-full h-32">
-            <svg 
-              className="w-full h-full overflow-visible" 
-              viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`} 
-              preserveAspectRatio="none"
-            >
-              <defs>
-                {/* Máscara de recorte que crece con el progreso */}
-                <clipPath id="progressClip">
-                  <rect x="0" y="0" width={currentX} height={viewBoxHeight + 20} />
-                </clipPath>
-
-                {/* Gradiente para el área bajo la línea */}
-                <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#34d399" stopOpacity="0.4" />
-                  <stop offset="100%" stopColor="#34d399" stopOpacity="0.0" />
-                </linearGradient>
-
-                {/* Gradiente para la línea */}
-                <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stopColor="#3b82f6" /> {/* Azul */}
-                  <stop offset="100%" stopColor="#34d399" /> {/* Esmeralda */}
-                </linearGradient>
-              </defs>
-
-              {/* Líneas de cuadrícula (Grid) de fondo */}
-              <line x1="0" y1="30" x2={viewBoxWidth} y2="30" stroke="#1f2937" strokeWidth="1" strokeDasharray="4 4" />
-              <line x1="0" y1="60" x2={viewBoxWidth} y2="60" stroke="#1f2937" strokeWidth="1" strokeDasharray="4 4" />
-              <line x1="0" y1="90" x2={viewBoxWidth} y2="90" stroke="#1f2937" strokeWidth="1" strokeDasharray="4 4" />
-
-              {/* GRÁFICA ACTIVA (Recortada por la máscara) */}
-              <g clipPath="url(#progressClip)">
-                {/* Área con gradiente */}
-                <path d={fillPath} fill="url(#areaGradient)" />
-                
-                {/* Línea de tendencia */}
-                <path 
-                  d={linePath} 
-                  fill="none" 
-                  stroke="url(#lineGradient)" 
-                  strokeWidth="3" 
-                  strokeLinejoin="round"
-                  strokeLinecap="round"
-                  className="drop-shadow-[0_0_8px_rgba(52,211,153,0.8)]"
-                />
-              </g>
-
-              {/* Punto Brillante (Glow Dot) siguiendo la punta de la línea */}
-              {progress > 0 && progress < 100 && (
-                <g transform={`translate(${currentX}, ${dotY})`}>
-                  <circle r="6" fill="#34d399" fillOpacity="0.3" className="animate-ping" />
-                  <circle r="3.5" fill="#ffffff" className="drop-shadow-[0_0_6px_rgba(255,255,255,1)]" />
-                </g>
-              )}
-            </svg>
-          </div>
-        </div>
-
-        {/* Mensajes Dinámicos Inferiores */}
-        <div className="h-6 flex items-center justify-center transition-all duration-300 w-full">
-          <div className="flex items-center space-x-3">
-            <div className="animate-pulse">
-              {loadingMessages[messageIndex].icon}
-            </div>
-            <span className="text-sm font-medium text-gray-300">
-              {loadingMessages[messageIndex].text}
-            </span>
-          </div>
-        </div>
-
       </div>
 
-      <style>{`
-        @keyframes fade-in-up {
-          0% { opacity: 0; transform: translateY(20px); }
-          100% { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in-up {
-          animation: fade-in-up 0.5s ease-out forwards;
-        }
-      `}</style>
+      {/* Cards Skeleton */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-pulse">
+        {/* Balance Card */}
+        <div className="lg:col-span-1 h-64 bg-gray-800/60 rounded-3xl border border-white/5 flex flex-col justify-center p-8">
+          <div className="w-24 h-4 bg-gray-700 rounded mb-4"></div>
+          <div className="w-48 h-10 bg-gray-600 rounded mb-6"></div>
+          <div className="w-16 h-6 bg-gray-700 rounded"></div>
+        </div>
+        
+        {/* Chart Card */}
+        <div className="lg:col-span-2 h-64 bg-gray-800/40 rounded-3xl border border-white/5 p-6 flex flex-col">
+           <div className="w-32 h-4 bg-gray-700 rounded mb-auto"></div>
+           <div className="w-full h-32 bg-gray-700/50 rounded-xl mt-4"></div>
+        </div>
+
+        {/* Donut Card */}
+        <div className="lg:col-span-1 h-64 bg-gray-800/60 rounded-3xl border border-white/5 p-6 flex items-center justify-center">
+           <div className="w-32 h-32 bg-gray-700/50 rounded-full border-8 border-gray-600/50"></div>
+        </div>
+      </div>
+
+      {/* Table Skeleton */}
+      <div className="w-full flex-1 bg-gray-800/40 rounded-3xl border border-white/5 animate-pulse p-6 mt-4 flex flex-col gap-4">
+         <div className="w-48 h-6 bg-gray-700 rounded mb-4"></div>
+         {[1, 2, 3, 4, 5].map(i => (
+           <div key={i} className="w-full h-12 bg-gray-700/30 rounded-xl"></div>
+         ))}
+      </div>
     </div>
   );
 }

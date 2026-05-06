@@ -19,6 +19,11 @@ export interface PortfolioAsset {
   logoUrl?: string;
   /** Precio objetivo opcional para alerta de salida */
   target?: number; 
+  /** Alertas visuales TP/SL */
+  takeProfit?: number;
+  stopLoss?: number;
+  /** Rendimiento por dividendo estimado (ej: 0.05 = 5%) */
+  dividendYield?: number;
 }
 
 /**

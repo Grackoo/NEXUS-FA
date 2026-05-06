@@ -6,7 +6,7 @@ import { useCurrency } from '../../contexts/CurrencyContext';
 const CustomTooltip = ({ active, payload, label, formatValue }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-[#0f172a]/90 backdrop-blur-md border border-white/10 p-4 rounded-2xl shadow-[0_0_30px_rgba(6,182,212,0.15)]">
+      <div className="bg-[#0f172a]/70 backdrop-blur-xl border border-cyan-400/50 p-4 rounded-2xl shadow-[0_0_20px_rgba(34,211,238,0.3)]">
         <p className="text-white/50 text-[11px] uppercase tracking-widest font-bold mb-3 border-b border-white/10 pb-2">{label} 2026</p>
         <div className="space-y-2">
           {payload.map((entry: any, index: number) => (
@@ -155,7 +155,10 @@ export const PerformanceArea: React.FC = () => {
               tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 11 }}
               tickFormatter={(value) => `$${value / 1000}k`}
             />
-            <RechartsTooltip content={<CustomTooltip formatValue={formatValue} />} />
+            <RechartsTooltip 
+              content={<CustomTooltip formatValue={formatValue} />} 
+              cursor={{ stroke: 'rgba(34,211,238,0.5)', strokeWidth: 1, strokeDasharray: '4 4' }}
+            />
             <Area 
               type="monotone" 
               dataKey="capital" 

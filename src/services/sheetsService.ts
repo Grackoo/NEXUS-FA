@@ -3,7 +3,31 @@
  * and Google Apps Script (Write).
  */
 
+import CryptoJS from 'crypto-js';
+
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwRqbjaQj_qfvlF6Whe8wtxC6g83hWU75lMNDudCU1_Vl3Hcs22GWevoTreKY64K2S4sA/exec';
+
+const ENCRYPTION_KEY = import.meta.env.VITE_ENCRYPTION_KEY || 'default_nexus_key_2026';
+
+export const encryptData = (text: string) => {
+  if (!text) return text;
+  try {
+    return CryptoJS.AES.encrypt(text, ENCRYPTION_KEY).toString();
+  } catch (e) {
+    return text;
+  }
+};
+
+export const decryptData = (ciphertext: string) => {
+  if (!ciphertext) return ciphertext;
+  try {
+    const bytes = CryptoJS.AES.decrypt(ciphertext, ENCRYPTION_KEY);
+    const originalText = bytes.toString(CryptoJS.enc.Utf8);
+    return originalText || ciphertext;
+  } catch (e) {
+    return ciphertext;
+  }
+};
 
 // These are the real CSV URLs constructed from the user's published sheet
 export const SHEET_URLS = {
@@ -45,7 +69,12 @@ export async function fetchCsvData(url: string) {
     const parsedData = rows.slice(1).map(row => {
       const obj: any = {};
       headers.forEach((header, i) => {
-        obj[header.trim()] = row[i]?.trim();
+        let val = row[i]?.trim();
+        // Intentar desencriptar el nombre si aplica
+        if (header.trim().toLowerCase() === 'nombre' || header.trim().toLowerCase() === 'name') {
+           val = decryptData(val);
+        }
+        obj[header.trim()] = val;
       });
       return obj;
     });
@@ -70,7 +99,14 @@ export async function fetchPortfolioData(clientId: string) {
     // En Apps Script, a veces hay redirects, fetch los sigue automáticamente
     const text = await response.text();
     try {
-      return JSON.parse(text);
+      const parsed = JSON.parse(text);
+      if (parsed && parsed.operations) {
+        parsed.operations = parsed.operations.map((op: any) => ({
+          ...op,
+          thesis: decryptData(op.thesis)
+        }));
+      }
+      return parsed;
     } catch (e) {
       console.error('La respuesta de Apps Script no es JSON válido:', text);
       return null;
@@ -91,6 +127,9 @@ export async function submitOperation(data: any) {
       },
       body: JSON.stringify({
         ...data,
+        Nombre: encryptData(data.Nombre), // En caso de que se cree un cliente
+        Tesis_Inversion: encryptData(data.Tesis_Inversion),
+        thesis: encryptData(data.thesis),
         date: data.date || new Date().toISOString().split('T')[0]
       }),
     });

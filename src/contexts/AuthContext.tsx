@@ -14,6 +14,7 @@ export interface ClientProfile {
   password?: string;
   email?: string;
   phone?: string;
+  riskProfile?: 'Conservador' | 'Moderado' | 'Agresivo';
 }
 
 interface AuthContextType {
@@ -53,7 +54,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             role: 'client' as 'client',
             password: find(['Password', 'PASSWORD']),
             email: find(['Email', 'EMAIL']),
-            phone: find(['Telefono', 'TELEFONO'])
+            phone: find(['Telefono', 'TELEFONO']),
+            riskProfile: (find(['Perfil_Riesgo', 'PERFIL_RIESGO', 'RiskProfile']) as any) || 'Moderado'
           };
         }).filter((c: any) => c.id);
         setAuthorizedClients(mapped);
@@ -84,6 +86,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 name: find(['Nombre', 'NOMBRE']),
                 role: 'client' as 'client',
                 password: find(['Password', 'PASSWORD']),
+                riskProfile: (find(['Perfil_Riesgo', 'PERFIL_RIESGO', 'RiskProfile']) as any) || 'Moderado'
             } as ClientProfile;
         }).filter((c: any) => c.id);
         setAuthorizedClients(currentClients);

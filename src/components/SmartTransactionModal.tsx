@@ -223,8 +223,8 @@ const SmartTransactionModal: React.FC<Props> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay animate-fade-in flex items-center justify-center p-4 overflow-y-auto" style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)', zIndex: 100 }}>
-      <div className={`glass-card w-full ${isSimulationMode ? 'max-w-4xl' : 'max-w-lg'} p-0 overflow-hidden transition-all duration-500`} style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)' }}>
+    <div className="modal-overlay animate-fade-in flex items-center justify-center p-4 overflow-y-auto bg-black/60 backdrop-blur-sm" style={{ zIndex: 100 }}>
+      <div className={`w-full ${isSimulationMode ? 'max-w-4xl' : 'max-w-lg'} p-0 overflow-hidden transition-all duration-500 bg-slate-900/50 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)] rounded-2xl`}>
 
         {/* ── Header ── */}
         <div className="px-8 py-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">

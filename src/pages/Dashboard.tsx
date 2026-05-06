@@ -417,6 +417,8 @@ const Dashboard: React.FC = () => {
                   <th className="px-4 py-4 font-semibold text-right">Cantidad</th>
                   <th className="px-4 py-4 font-semibold text-right">Precio Prom.</th>
                   <th className="px-4 py-4 font-semibold text-right">Target</th>
+                  <th className="px-4 py-4 font-semibold text-right">Take Profit</th>
+                  <th className="px-4 py-4 font-semibold text-right">Stop Loss</th>
                   <th className="px-4 py-4 font-semibold text-right">V. Mercado</th>
                   <th className="px-4 py-4 font-semibold text-right">Ganancia</th>
                   <th className="px-4 py-4 font-semibold text-right">Rend.</th>
@@ -518,6 +520,42 @@ const Dashboard: React.FC = () => {
                             </td>
                           );
                         })()}
+
+                        {/* Take Profit */}
+                        {(() => {
+                          const tpPrice = asset.takeProfit;
+                          const currentPrice = asset.nativeCurrency === 'USD' ? currentPriceUSD : currentPriceMXN;
+                          const isNearTP = tpPrice ? Math.abs(currentPrice - tpPrice) / tpPrice <= 0.05 : false;
+                          return (
+                            <td className={`px-4 py-3 text-right tabular-nums text-sm transition-all duration-300 ${isNearTP ? 'animate-pulse bg-emerald-500/10 shadow-[inset_0_0_15px_rgba(16,185,129,0.4)] border-x border-emerald-500/30' : ''}`}>
+                              {tpPrice ? (
+                                <span className={isNearTP ? 'text-emerald-400 font-bold drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]' : 'text-white/80 font-semibold'}>
+                                  {formatValue(tpPrice, asset.nativeCurrency)}
+                                </span>
+                              ) : (
+                                <span className="text-white/40">-</span>
+                              )}
+                            </td>
+                          );
+                        })()}
+
+                        {/* Stop Loss */}
+                        {(() => {
+                          const slPrice = asset.stopLoss;
+                          const currentPrice = asset.nativeCurrency === 'USD' ? currentPriceUSD : currentPriceMXN;
+                          const isNearSL = slPrice ? Math.abs(currentPrice - slPrice) / slPrice <= 0.05 : false;
+                          return (
+                            <td className={`px-4 py-3 text-right tabular-nums text-sm transition-all duration-300 ${isNearSL ? 'animate-pulse bg-rose-500/10 shadow-[inset_0_0_15px_rgba(244,63,94,0.4)] border-x border-rose-500/30' : ''}`}>
+                              {slPrice ? (
+                                <span className={isNearSL ? 'text-rose-400 font-bold drop-shadow-[0_0_8px_rgba(244,63,94,0.8)]' : 'text-white/80 font-semibold'}>
+                                  {formatValue(slPrice, asset.nativeCurrency)}
+                                </span>
+                              ) : (
+                                <span className="text-white/40">-</span>
+                              )}
+                            </td>
+                          );
+                        })()}
                         
                         {/* Market Value */}
                         <td className="px-4 py-3 text-right font-semibold tabular-nums text-sm text-white">
@@ -584,7 +622,7 @@ const Dashboard: React.FC = () => {
                       {/* Expanded Operations Row */}
                       {expandedTicker === asset.ticker && (
                         <tr className="bg-black/20 border-b border-white/5">
-                          <td colSpan={8} className="p-0">
+                          <td colSpan={10} className="p-0">
                             <div className="p-6">
                               <h4 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
                                 <History className="w-4 h-4 text-blue-400" /> Historial de Operaciones

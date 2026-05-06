@@ -16,6 +16,7 @@ interface PortfolioContextType {
   clientOperations: Operation[];
   totalNetWorthUSD: number;
   totalNetWorthMXN: number;
+  estimatedAnnualDividendsUSD: number;
   allClients: ClientWithPortfolio[];
   allOperations: Operation[];
   isLoading: boolean;
@@ -35,6 +36,31 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   const [totalNetWorthMXN, setTotalNetWorthMXN] = useState(0);
   const [totalNetWorthUSD, setTotalNetWorthUSD] = useState(0);
+
+  // Diccionario de yields estimados (rendimiento anual)
+  const DIVIDEND_YIELDS: Record<string, number> = {
+    'AAPL': 0.005,
+    'OXY': 0.015,
+    'KO': 0.03,
+    'JNJ': 0.03,
+    'T': 0.065,
+    'XOM': 0.033,
+    'IVV': 0.013,
+    'SPY': 0.013,
+    'FIBRAPL14': 0.06,
+    'FUNO11': 0.08,
+  };
+
+  const estimatedAnnualDividendsUSD = clientPortfolio.reduce((acc, asset) => {
+    const yieldRate = asset.dividendYield || DIVIDEND_YIELDS[asset.ticker] || 0;
+    if (yieldRate > 0) {
+      const valueUSD = asset.nativeCurrency === 'USD' 
+        ? asset.sharesOwned * asset.realTimePrice 
+        : (asset.sharesOwned * asset.realTimePrice) / 16.5; 
+      return acc + (valueUSD * yieldRate);
+    }
+    return acc;
+  }, 0);
 
   // 1. Sync All Clients & Portfolios
   const refreshPortfolio = async () => {
@@ -135,6 +161,7 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
       clientOperations,
       totalNetWorthUSD, 
       totalNetWorthMXN, 
+      estimatedAnnualDividendsUSD,
       allClients, 
       allOperations,
       isLoading, 
