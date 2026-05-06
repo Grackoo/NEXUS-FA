@@ -508,7 +508,7 @@ const ClientReportModal: React.FC<{
                         <Cell key={`cell-${index}`} fill={['#10B981', '#1A5CFF', '#F59E0B', '#EF4444', '#8B5CF6', '#14B8A6'][index % 6]} />
                       ))}
                     </Pie>
-                    <RechartsTooltip formatter={(value: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'MXN' }).format(value)} />
+                    <RechartsTooltip formatter={(value: any) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'MXN' }).format(Number(value))} />
                     <Legend />
                   </PieChart>
                 </ResponsiveContainer>
