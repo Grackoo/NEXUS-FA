@@ -19,6 +19,7 @@ export interface Operation {
 
 export interface ClientWithPortfolio extends ClientProfile {
   portfolio: PortfolioAsset[];
+  operations: Operation[];
 }
 
 interface PortfolioContextType {
@@ -60,7 +61,8 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
           role: (row.Role || row.role || 'client') as 'admin' | 'client',
           email: row.Email || row.email || '',
           phone: row.Telefono || row.phone || '',
-          portfolio: [] // El portfolio se cargará desde el servidor
+          portfolio: [], // El portfolio se cargará desde el servidor
+          operations: []
         })).filter((c: any) => c.id);
         
         setAllClients(mappedClients);
@@ -68,23 +70,63 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
 
       // Si hay un usuario activo, obtenemos su portafolio calculado en el servidor
       if (user) {
-        const serverData = await fetchPortfolioData(user.id);
-        
-        if (serverData) {
-          setClientPortfolio(serverData.portfolio || []);
-          setClientOperations(serverData.operations || []);
-          
-          if (serverData.totals) {
-            setTotalNetWorthMXN(serverData.totals.netWorthMXN || 0);
-            setTotalNetWorthUSD(serverData.totals.netWorthUSD || 0);
-          }
-
-          // Opcional: Actualizar el portafolio del cliente activo en allClients
-          const updatedClients = mappedClients.map(c => 
-            c.id === user.id ? { ...c, portfolio: serverData.portfolio || [] } : c
+        if (user.role === 'admin') {
+          // Si es admin, cargamos los portafolios de todos los clientes
+          const clientIds = mappedClients.filter(c => c.role === 'client').map(c => c.id);
+          const allPortfolios = await Promise.all(
+            clientIds.map(async (id) => {
+              const data = await fetchPortfolioData(id);
+              return { id, data };
+            })
           );
+          
+          const updatedClients = mappedClients.map(c => {
+            const fetched = allPortfolios.find(p => p.id === c.id);
+            if (fetched && fetched.data) {
+              return { 
+                ...c, 
+                portfolio: fetched.data.portfolio || [],
+                operations: fetched.data.operations || []
+              };
+            }
+            return c;
+          });
+          
           setAllClients(updatedClients);
-          setAllOperations(serverData.operations || []);
+          
+          // También cargamos el portafolio del propio admin si tuviera (opcional, suele ser 0)
+          const adminData = await fetchPortfolioData(user.id);
+          if (adminData) {
+            setClientPortfolio(adminData.portfolio || []);
+            setClientOperations(adminData.operations || []);
+            if (adminData.totals) {
+              setTotalNetWorthMXN(adminData.totals.netWorthMXN || 0);
+              setTotalNetWorthUSD(adminData.totals.netWorthUSD || 0);
+            }
+          }
+        } else {
+          // Si es cliente, cargamos solo su portafolio
+          const serverData = await fetchPortfolioData(user.id);
+          
+          if (serverData) {
+            setClientPortfolio(serverData.portfolio || []);
+            setClientOperations(serverData.operations || []);
+            
+            if (serverData.totals) {
+              setTotalNetWorthMXN(serverData.totals.netWorthMXN || 0);
+              setTotalNetWorthUSD(serverData.totals.netWorthUSD || 0);
+            }
+
+            const updatedClients = mappedClients.map(c => 
+              c.id === user.id ? { 
+                ...c, 
+                portfolio: serverData.portfolio || [],
+                operations: serverData.operations || []
+              } : c
+            );
+            setAllClients(updatedClients);
+            setAllOperations(serverData.operations || []);
+          }
         }
       }
     } catch (error) {

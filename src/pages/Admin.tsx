@@ -4,9 +4,10 @@ import { usePortfolio } from '../contexts/PortfolioContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Users, Search, Plus, BarChart3, AlertCircle, Shield, Eye, Pencil, Check, X, PlusCircle, Info, LogIn } from 'lucide-react';
+import { Users, Search, Plus, BarChart3, AlertCircle, Shield, Eye, Pencil, Check, X, PlusCircle, Info, LogIn, FileText } from 'lucide-react';
 import SmartTransactionModal from '../components/SmartTransactionModal.tsx';
 import { submitOperation } from '../services/sheetsService';
+import { prepareReportData } from '../services/reportService';
 import NexusLoadingScreen from '../components/NexusLoadingScreen';
 
 const Admin: React.FC = () => {
@@ -56,6 +57,12 @@ const Admin: React.FC = () => {
       impersonateClient(client);
       navigate('/');
     }
+  };
+
+  const handleExportPDF = (client: any, totalUSD: number, totalMXN: number) => {
+    const reportData = prepareReportData(client, client.operations || [], totalUSD, totalMXN, 16.5);
+    console.log("PDF Report Data Ready:", reportData);
+    alert(`Los datos de ${client.name} han sido procesados.\nRevisa la consola para ver la estructura lista para inyectar en el generador PDF.`);
   };
 
   const globalAUM = allClients.reduce((acc, client) => {
@@ -199,6 +206,13 @@ const Admin: React.FC = () => {
                     className="flex-1 glass-button text-[10px] md:text-xs py-2.5 md:py-3 font-bold uppercase tracking-widest"
                   >
                     <Plus className="w-3.5 h-3.5 mr-1.5" /> Operar
+                  </button>
+                  <button 
+                    onClick={() => handleExportPDF(client, totalUSD, totalMXN)}
+                    title="Generar Reporte PDF"
+                    className="w-10 md:w-12 glass-button secondary p-0 flex items-center justify-center hover:bg-emerald/20 hover:text-emerald transition-colors border-white/5"
+                  >
+                    <FileText className="w-4 h-4 md:w-5 md:h-5" />
                   </button>
                   <button 
                     onClick={() => handleImpersonate(client.id)}
