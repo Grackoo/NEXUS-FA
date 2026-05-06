@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import { SymbolOverview, StockMarket } from 'react-ts-tradingview-widgets';
-import { Plus, Search, Star, Target, ArrowDownToLine, ArrowUpToLine, BellRing } from 'lucide-react';
+import { Plus, Search, Star, ArrowDownToLine, ArrowUpToLine, BellRing } from 'lucide-react';
 
 interface WatchlistItem {
   symbol: string;

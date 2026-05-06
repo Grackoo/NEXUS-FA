@@ -1,4 +1,4 @@
-import { ClientWithPortfolio, Operation } from '../contexts/PortfolioContext';
+import type { ClientWithPortfolio, Operation } from '../contexts/PortfolioContext';
 
 export interface ReportData {
   clientName: string;
