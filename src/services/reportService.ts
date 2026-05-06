@@ -11,6 +11,7 @@ export interface ReportData {
   allocation: {
     assetType: string;
     valueMXN: string;
+    value: number;
     percentage: string;
   }[];
   recentOperations: {
@@ -70,6 +71,7 @@ export const prepareReportData = (
     .map(([type, val]) => ({
       assetType: type,
       valueMXN: formatCurrency(val, 'MXN'),
+      value: val,
       percentage: totalMXN > 0 ? ((val / totalMXN) * 100).toFixed(1) + '%' : '0%'
     }))
     .sort((a, b) => parseFloat(b.percentage) - parseFloat(a.percentage));

@@ -5,6 +5,7 @@ import { useCurrency } from '../contexts/CurrencyContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Users, Search, Plus, BarChart3, AlertCircle, Shield, Eye, Pencil, Check, X, PlusCircle, Info, LogIn, FileText, Printer } from 'lucide-react';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip as RechartsTooltip } from 'recharts';
 import SmartTransactionModal from '../components/SmartTransactionModal.tsx';
 import { submitOperation } from '../services/sheetsService';
 import { prepareReportData } from '../services/reportService';
@@ -466,24 +467,53 @@ const ClientReportModal: React.FC<{
           {/* Allocation */}
           <div>
             <h3 className="text-lg font-bold text-gray-900 mb-4 border-b border-gray-200 pb-2">Distribución de Activos</h3>
-            <table className="w-full text-left text-sm">
-              <thead>
-                <tr className="text-gray-500 border-b border-gray-200">
-                  <th className="py-2 font-bold uppercase tracking-wider text-xs">Clase de Activo</th>
-                  <th className="py-2 text-right font-bold uppercase tracking-wider text-xs">Valor (MXN)</th>
-                  <th className="py-2 text-right font-bold uppercase tracking-wider text-xs">% Portafolio</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {reportData.allocation.map((item: any, idx: number) => (
-                  <tr key={idx}>
-                    <td className="py-3 font-semibold text-gray-900">{item.assetType}</td>
-                    <td className="py-3 text-right tabular-nums text-gray-700">{item.valueMXN}</td>
-                    <td className="py-3 text-right font-bold tabular-nums text-gray-900">{item.percentage}</td>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+              <table className="w-full text-left text-sm">
+                <thead>
+                  <tr className="text-gray-500 border-b border-gray-200">
+                    <th className="py-2 font-bold uppercase tracking-wider text-xs">Clase de Activo</th>
+                    <th className="py-2 text-right font-bold uppercase tracking-wider text-xs">Valor (MXN)</th>
+                    <th className="py-2 text-right font-bold uppercase tracking-wider text-xs">% Portafolio</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {reportData.allocation.map((item: any, idx: number) => (
+                    <tr key={idx}>
+                      <td className="py-3 font-semibold text-gray-900 flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: ['#10B981', '#1A5CFF', '#F59E0B', '#EF4444', '#8B5CF6', '#14B8A6'][idx % 6] }} />
+                        {item.assetType}
+                      </td>
+                      <td className="py-3 text-right tabular-nums text-gray-700">{item.valueMXN}</td>
+                      <td className="py-3 text-right font-bold tabular-nums text-gray-900">{item.percentage}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              <div className="h-64 w-full flex items-center justify-center">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={reportData.allocation}
+                      dataKey="value"
+                      nameKey="assetType"
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={90}
+                      paddingAngle={2}
+                      isAnimationActive={false}
+                    >
+                      {reportData.allocation.map((_: any, index: number) => (
+                        <Cell key={`cell-${index}`} fill={['#10B981', '#1A5CFF', '#F59E0B', '#EF4444', '#8B5CF6', '#14B8A6'][index % 6]} />
+                      ))}
+                    </Pie>
+                    <RechartsTooltip formatter={(value: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'MXN' }).format(value)} />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
           </div>
 
           {/* Operations */}
