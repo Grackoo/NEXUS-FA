@@ -14,6 +14,7 @@ export interface Operation {
   commission: number;
   currency: string;
   totalMXN: number;
+  thesis?: string;
 }
 
 export interface ClientWithPortfolio extends ClientProfile {

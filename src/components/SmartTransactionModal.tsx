@@ -3,6 +3,8 @@ import { X, Calculator, RefreshCcw, AlertTriangle, CheckCircle2 } from 'lucide-r
 import { usePortfolio } from '../contexts/PortfolioContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { submitOperation, deletePosition } from '../services/sheetsService';
+import { AllocationDonut } from './charts/AllocationDonut';
+import { Settings2 } from 'lucide-react';
 
 export interface EditAsset {
   ticker: string;
@@ -87,6 +89,7 @@ const SmartTransactionModal: React.FC<Props> = ({
   const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isSimulationMode, setIsSimulationMode] = useState(false);
 
   // Autocomplete state
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -132,6 +135,7 @@ const SmartTransactionModal: React.FC<Props> = ({
   const newAvgUSD = calculateNewAvg();
 
   const handleConfirm = async () => {
+    if (isSimulationMode) return;
     setIsSubmitting(true);
     const totalTrans = (numShares * numPrice) + numCommission;
     const calculatedTotalMXN = currency === 'USD' ? totalTrans * exchangeRate : totalTrans;
@@ -179,11 +183,37 @@ const SmartTransactionModal: React.FC<Props> = ({
     }
   };
 
+  const getSimulatedPortfolio = () => {
+    if (!client) return [];
+    const newPortfolio = JSON.parse(JSON.stringify(client.portfolio));
+    const assetIndex = newPortfolio.findIndex((a: any) => a.ticker === ticker);
+    const finalAssetType = assetType === 'Divisas' ? 'Forex' : assetType;
+    
+    if (assetIndex >= 0) {
+      if (type === 'Buy') {
+        newPortfolio[assetIndex].sharesOwned += numShares;
+      } else {
+        newPortfolio[assetIndex].sharesOwned = Math.max(0, newPortfolio[assetIndex].sharesOwned - numShares);
+      }
+    } else if (type === 'Buy' && numShares > 0) {
+      newPortfolio.push({
+        ticker,
+        type: finalAssetType,
+        sharesOwned: numShares,
+        realTimePrice: numPrice,
+        nativeCurrency: currency,
+        avgPurchasePriceUSD: newAvgUSD,
+        avgPurchasePriceMXN: newAvgUSD * exchangeRate
+      });
+    }
+    return newPortfolio;
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay animate-fade-in" style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}>
-      <div className="glass-card w-full max-w-lg p-0 overflow-hidden" style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)' }}>
+    <div className="modal-overlay animate-fade-in flex items-center justify-center p-4 overflow-y-auto" style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)', zIndex: 100 }}>
+      <div className={`glass-card w-full ${isSimulationMode ? 'max-w-4xl' : 'max-w-lg'} p-0 overflow-hidden transition-all duration-500`} style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)' }}>
 
         {/* ── Header ── */}
         <div className="px-8 py-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
@@ -201,7 +231,23 @@ const SmartTransactionModal: React.FC<Props> = ({
           </button>
         </div>
 
-        <div className="p-8 space-y-6">
+        {/* ── Toggle Simulación ── */}
+        {!isEditMode && (
+          <div className="px-8 py-3 bg-white/[0.01] border-b border-white/5 flex items-center justify-between">
+            <span className="text-xs text-gray-400 font-semibold uppercase tracking-widest flex items-center gap-2">
+              <Settings2 className="w-4 h-4 text-primary" /> Modo Simulación
+            </span>
+            <button 
+              onClick={() => setIsSimulationMode(!isSimulationMode)}
+              className={`relative inline-flex h-5 w-10 items-center rounded-full transition-colors ${isSimulationMode ? 'bg-primary' : 'bg-gray-700'}`}
+            >
+              <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${isSimulationMode ? 'translate-x-5' : 'translate-x-1'}`} />
+            </button>
+          </div>
+        )}
+
+        <div className={`flex flex-col ${isSimulationMode ? 'md:flex-row' : ''} max-h-[80vh] overflow-y-auto`}>
+          <div className={`p-8 space-y-6 flex-1 ${isSimulationMode ? 'border-r border-white/5' : ''}`}>
 
           {/* ── Buy / Sell ── */}
           {isEditMode ? (
@@ -400,23 +446,40 @@ const SmartTransactionModal: React.FC<Props> = ({
             )}
           </div>
 
-          {/* ── Confirm button ── */}
-          <button
-            disabled={showBalanceWarning || numShares <= 0 || numPrice <= 0 || isSubmitting}
-            onClick={handleConfirm}
-            className="glass-button w-full shadow-[0_0_20px_rgba(26,92,255,0.3)] disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
-          >
-            {isSubmitting ? (
-              <RefreshCcw className="w-5 h-5 animate-spin mx-auto" />
-            ) : isSuccess ? (
-              <span className="flex items-center gap-2 justify-center">
-                <CheckCircle2 className="w-5 h-5" />
-                {isEditMode ? '¡Cambios Guardados!' : '¡Operación Registrada!'}
-              </span>
-            ) : (
-              isEditMode ? 'Guardar Cambios' : 'Confirmar y Registrar Operación'
-            )}
-          </button>
+            {/* ── Confirm button ── */}
+            <button
+              disabled={showBalanceWarning || numShares <= 0 || numPrice <= 0 || isSubmitting}
+              onClick={handleConfirm}
+              className={`glass-button w-full shadow-[0_0_20px_rgba(26,92,255,0.3)] disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none ${isSimulationMode ? 'bg-transparent border-primary/50 text-primary hover:bg-primary/10' : ''}`}
+            >
+              {isSubmitting ? (
+                <RefreshCcw className="w-5 h-5 animate-spin mx-auto" />
+              ) : isSuccess ? (
+                <span className="flex items-center gap-2 justify-center">
+                  <CheckCircle2 className="w-5 h-5" />
+                  {isEditMode ? '¡Cambios Guardados!' : '¡Operación Registrada!'}
+                </span>
+              ) : isSimulationMode ? (
+                'Modo Simulación Activo (Solo Vista)'
+              ) : isEditMode ? (
+                'Guardar Cambios'
+              ) : (
+                'Confirmar y Registrar Operación'
+              )}
+            </button>
+          </div>
+
+          {/* ── Simulation Donut ── */}
+          {isSimulationMode && (
+            <div className="flex-1 p-8 bg-black/20 flex flex-col items-center justify-center min-h-[400px]">
+              <h3 className="text-sm text-primary font-bold tracking-widest uppercase mb-6 flex items-center gap-2">
+                 <Calculator className="w-4 h-4" /> Proyección de Asignación
+              </h3>
+              <div className="w-full h-full max-h-[400px]">
+                 <AllocationDonut customPortfolio={getSimulatedPortfolio()} />
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

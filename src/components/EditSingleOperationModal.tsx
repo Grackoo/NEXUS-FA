@@ -25,6 +25,7 @@ const EditSingleOperationModal: React.FC<Props> = ({ isOpen, onClose, operationT
       ? new Date(operationToEdit.date).toISOString().split('T')[0] 
       : new Date().toISOString().split('T')[0]
   );
+  const [thesis, setThesis] = useState<string>(operationToEdit?.thesis ?? '');
   
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -35,6 +36,7 @@ const EditSingleOperationModal: React.FC<Props> = ({ isOpen, onClose, operationT
       setShares(operationToEdit.shares);
       setPrice(operationToEdit.price);
       setCommission(operationToEdit.commission);
+      setThesis(operationToEdit.thesis ?? '');
       try {
         setDate(new Date(operationToEdit.date).toISOString().split('T')[0]);
       } catch (e) {
@@ -90,7 +92,9 @@ const EditSingleOperationModal: React.FC<Props> = ({ isOpen, onClose, operationT
             Comisión: numCommission,
             Moneda: op.currency,
             Total_MXN: calculatedTotalMXN,
-            date: date
+            date: date,
+            Tesis_Inversion: thesis,
+            thesis: thesis
           });
         } else {
           // Submit the ORIGINAL operation
@@ -117,7 +121,9 @@ const EditSingleOperationModal: React.FC<Props> = ({ isOpen, onClose, operationT
             Comisión: op.commission,
             Moneda: op.currency,
             Total_MXN: originalTotalMXN,
-            date: op.date
+            date: op.date,
+            Tesis_Inversion: op.thesis || '',
+            thesis: op.thesis || ''
           });
         }
       }
@@ -217,6 +223,16 @@ const EditSingleOperationModal: React.FC<Props> = ({ isOpen, onClose, operationT
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
                 className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-primary/50 transition-colors"
+              />
+            </div>
+            
+            <div className="col-span-2 space-y-1 mt-2">
+              <label className="text-[10px] font-semibold text-gray-400 uppercase">Tesis de Inversión (Opcional)</label>
+              <textarea
+                value={thesis}
+                onChange={(e) => setThesis(e.target.value)}
+                placeholder="¿Cuál es la razón principal detrás de este movimiento?"
+                className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-primary/50 transition-colors min-h-[60px]"
               />
             </div>
           </div>

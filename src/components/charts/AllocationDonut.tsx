@@ -20,13 +20,14 @@ const CustomTooltip = ({ active, payload, formatValue }: any) => {
   return null;
 };
 
-export const AllocationDonut: React.FC = () => {
+export const AllocationDonut: React.FC<{ customPortfolio?: any[] }> = ({ customPortfolio }) => {
   const { clientPortfolio } = usePortfolio();
+  const portfolioToUse = customPortfolio || clientPortfolio;
   const { currency, exchangeRate, convertToView, formatValue } = useCurrency();
 
   const { data, total } = useMemo(() => {
     let totalValue = 0;
-    const allocation = clientPortfolio.reduce((acc: any[], asset) => {
+    const allocation = portfolioToUse.reduce((acc: any[], asset) => {
       const existing = acc.find(item => item.name === asset.type);
       const currentPriceMXN = asset.nativeCurrency === 'USD' ? asset.realTimePrice * exchangeRate : asset.realTimePrice;
       const val = convertToView(asset.sharesOwned * currentPriceMXN, 'MXN');
@@ -39,7 +40,7 @@ export const AllocationDonut: React.FC = () => {
       return acc;
     }, []);
     return { data: allocation, total: totalValue };
-  }, [clientPortfolio, exchangeRate, currency, convertToView]);
+  }, [portfolioToUse, exchangeRate, currency, convertToView]);
 
   return (
     <div className="relative w-full h-full min-h-[350px] glass-card p-6 bg-slate-900/50 backdrop-blur-xl border border-white/5 rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] overflow-hidden">
