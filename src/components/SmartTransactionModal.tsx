@@ -87,6 +87,7 @@ const SmartTransactionModal: React.FC<Props> = ({
   const [commission, setCommission] = useState<number | string>(isEditMode ? 0 : '');
   const [currency, setCurrency] = useState<'USD' | 'MXN'>(initialCurrency);
   const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [thesis, setThesis] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isSimulationMode, setIsSimulationMode] = useState(false);
@@ -167,7 +168,9 @@ const SmartTransactionModal: React.FC<Props> = ({
       Comisión: numCommission,
       Moneda: currency,
       Total_MXN: calculatedTotalMXN,
-      date: date
+      date: date,
+      Tesis_Inversion: thesis,
+      thesis: thesis
     });
 
     setIsSubmitting(false);
@@ -407,17 +410,31 @@ const SmartTransactionModal: React.FC<Props> = ({
             </div>
           </div>
 
-          {/* ── Date ── */}
-          <div className="space-y-2">
-            <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase ml-1">
-              Fecha de Operación
-            </label>
-            <input
-              type="date"
-              value={date}
-              onChange={e => setDate(e.target.value)}
-              className="glass-input cursor-pointer w-full"
-            />
+          {/* ── Date and Thesis ── */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase ml-1">
+                Fecha de Operación
+              </label>
+              <input
+                type="date"
+                value={date}
+                onChange={e => setDate(e.target.value)}
+                className="glass-input cursor-pointer w-full"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[11px] font-semibold text-gray-500 tracking-wider uppercase ml-1">
+                Tesis de Inversión (Opcional)
+              </label>
+              <input
+                type="text"
+                value={thesis}
+                onChange={e => setThesis(e.target.value)}
+                placeholder="Razón de la operación..."
+                className="glass-input w-full"
+              />
+            </div>
           </div>
 
           {/* ── Summary ── */}
