@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { usePortfolio } from '../../contexts/PortfolioContext';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { useAuth, type ClientProfile } from '../../contexts/AuthContext';
-import { ChevronDown, ChevronUp, Save, LogIn, CheckCircle2 } from 'lucide-react';
+import { ChevronDown, ChevronUp, Save, LogIn } from 'lucide-react';
 import { updateKYC } from '../../services/sheetsService';
 import toast from 'react-hot-toast';
 
