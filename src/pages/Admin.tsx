@@ -18,6 +18,17 @@ const Admin: React.FC = () => {
     return !sessionStorage.getItem('hasSeenAdminLoading');
   });
 
+  if (showLoadingScreen) {
+    return (
+      <NexusLoadingScreen 
+        onComplete={() => {
+          sessionStorage.setItem('hasSeenAdminLoading', 'true');
+          setShowLoadingScreen(false);
+        }} 
+      />
+    );
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen">
@@ -27,17 +38,6 @@ const Admin: React.FC = () => {
           <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Sincronizando Carteras...</p>
         </div>
       </div>
-    );
-  }
-
-  if (showLoadingScreen) {
-    return (
-      <NexusLoadingScreen 
-        onComplete={() => {
-          sessionStorage.setItem('hasSeenAdminLoading', 'true');
-          setShowLoadingScreen(false);
-        }} 
-      />
     );
   }
 
