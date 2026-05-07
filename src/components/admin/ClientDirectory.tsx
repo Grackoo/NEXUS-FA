@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { usePortfolio } from '../../contexts/PortfolioContext';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { useAuth, type ClientProfile } from '../../contexts/AuthContext';
@@ -277,7 +278,7 @@ const AssetBreakdownModal: React.FC<{
     setIsSubmitting(false);
   };
 
-  return (
+  return createPortal(
     <div className="modal-overlay">
       <div className="glass-card w-full max-w-3xl p-0 overflow-hidden shadow-2xl border-white/10 animate-fade-in mx-auto">
         <div className="px-6 md:px-8 py-5 md:py-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
@@ -352,7 +353,8 @@ const AssetBreakdownModal: React.FC<{
           </table>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
@@ -362,7 +364,7 @@ const ClientReportModal: React.FC<{
 }> = ({ reportData, onClose }) => {
   if (!reportData) return null;
 
-  return (
+  return createPortal(
     <div className="modal-overlay print:p-0 print:bg-white print:block">
       <div className="glass-card w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-[#0B0B0B] p-0 shadow-2xl border-white/10 mx-auto print:p-0 print:m-0 print:shadow-none print:border-none print:max-h-none print:bg-white print:text-black">
         
@@ -503,7 +505,8 @@ const ClientReportModal: React.FC<{
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

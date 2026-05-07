@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Calculator, RefreshCcw, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { usePortfolio } from '../contexts/PortfolioContext';
@@ -222,7 +223,7 @@ const SmartTransactionModal: React.FC<Props> = ({
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div className="modal-overlay animate-fade-in flex items-center justify-center p-4 overflow-y-auto bg-black/60 backdrop-blur-sm" style={{ zIndex: 100 }}>
       <div className={`w-full ${isSimulationMode ? 'max-w-4xl' : 'max-w-lg'} p-0 overflow-hidden transition-all duration-500 bg-slate-900/50 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)] rounded-2xl`}>
 
@@ -507,7 +508,8 @@ const SmartTransactionModal: React.FC<Props> = ({
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
