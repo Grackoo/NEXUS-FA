@@ -141,6 +141,26 @@ export async function submitOperation(data: any) {
   }
 }
 
+export async function updateKYC(clientId: string, data: { investmentHorizon: string, liquidityNeeds: string, lastCommunication: string }) {
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        clientId,
+        type: 'UpdateKYC',
+        ...data
+      }),
+    });
+    invalidateCache();
+    return true;
+  } catch (error) {
+    console.error('Error updating KYC:', error);
+    return false;
+  }
+}
+
 export async function deletePosition(clientId: string, ticker: string, assetType: string) {
   try {
     await fetch(SCRIPT_URL, {

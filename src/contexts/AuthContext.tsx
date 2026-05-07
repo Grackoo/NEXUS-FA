@@ -15,6 +15,9 @@ export interface ClientProfile {
   email?: string;
   phone?: string;
   riskProfile?: 'Conservador' | 'Moderado' | 'Agresivo';
+  investmentHorizon?: string;
+  liquidityNeeds?: string;
+  lastCommunication?: string;
 }
 
 interface AuthContextType {
@@ -23,6 +26,8 @@ interface AuthContextType {
   logout: () => void;
   isLoading: boolean;
   impersonateClient?: (client: ClientProfile) => void;
+  isAdminImpersonating: boolean;
+  stopImpersonating: () => void;
   isPrivacyMode: boolean;
   togglePrivacyMode: () => void;
 }
@@ -34,6 +39,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [authorizedClients, setAuthorizedClients] = useState<ClientProfile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isPrivacyMode, setIsPrivacyMode] = useState(false);
+  const [isAdminImpersonating, setIsAdminImpersonating] = useState(false);
 
   const togglePrivacyMode = () => setIsPrivacyMode(prev => !prev);
 
@@ -55,7 +61,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             password: find(['Password', 'PASSWORD']),
             email: find(['Email', 'EMAIL']),
             phone: find(['Telefono', 'TELEFONO']),
-            riskProfile: (find(['Perfil_Riesgo', 'PERFIL_RIESGO', 'RiskProfile']) as any) || 'Moderado'
+            riskProfile: (find(['Perfil_Riesgo', 'PERFIL_RIESGO', 'RiskProfile']) as any) || 'Moderado',
+            investmentHorizon: find(['Horizonte_Inversion', 'HorizonteInversion']),
+            liquidityNeeds: find(['Necesidades_Liquidez', 'NecesidadesLiquidez']),
+            lastCommunication: find(['Ultima_Comunicacion', 'UltimaComunicacion'])
           };
         }).filter((c: any) => c.id);
         setAuthorizedClients(mapped);
@@ -86,7 +95,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 name: find(['Nombre', 'NOMBRE']),
                 role: 'client' as 'client',
                 password: find(['Password', 'PASSWORD']),
-                riskProfile: (find(['Perfil_Riesgo', 'PERFIL_RIESGO', 'RiskProfile']) as any) || 'Moderado'
+                riskProfile: (find(['Perfil_Riesgo', 'PERFIL_RIESGO', 'RiskProfile']) as any) || 'Moderado',
+                investmentHorizon: find(['Horizonte_Inversion', 'HorizonteInversion']),
+                liquidityNeeds: find(['Necesidades_Liquidez', 'NecesidadesLiquidez']),
+                lastCommunication: find(['Ultima_Comunicacion', 'UltimaComunicacion'])
             } as ClientProfile;
         }).filter((c: any) => c.id);
         setAuthorizedClients(currentClients);
@@ -104,14 +116,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const logout = () => {
     setUser(null);
+    setIsAdminImpersonating(false);
   };
 
   const impersonateClient = (client: ClientProfile) => {
     setUser(client);
+    setIsAdminImpersonating(true);
+  };
+
+  const stopImpersonating = () => {
+    setUser({ id: 'Admin', name: 'Administrador', role: 'admin' });
+    setIsAdminImpersonating(false);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading, impersonateClient, isPrivacyMode, togglePrivacyMode }}>
+    <AuthContext.Provider value={{ user, login, logout, isLoading, impersonateClient, isAdminImpersonating, stopImpersonating, isPrivacyMode, togglePrivacyMode }}>
       {children}
     </AuthContext.Provider>
   );

@@ -5,6 +5,7 @@ import Admin from './pages/Admin.tsx';
 import Watchlist from './pages/Watchlist.tsx';
 import { useAuth } from './contexts/AuthContext';
 import { Toaster } from 'react-hot-toast';
+import ImpersonationBanner from './components/admin/ImpersonationBanner.tsx';
 
 function App() {
   const { user } = useAuth();
@@ -13,6 +14,7 @@ function App() {
     <>
       <Toaster position="top-right" />
       <Router>
+        <ImpersonationBanner />
         <Routes>
         <Route path="/login" element={!user ? <Login /> : <Navigate to={user.role === 'admin' ? '/admin' : '/dashboard'} />} />
         
