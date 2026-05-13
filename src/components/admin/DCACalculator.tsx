@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Calculator, Target, Info } from 'lucide-react';
 import { useCurrency } from '../../contexts/CurrencyContext';
 
-export const DcaCalculator: React.FC = () => {
+export const DCACalculator: React.FC = () => {
   const { formatValue } = useCurrency();
   const [ticker, setTicker] = useState('');
   const [targetAvg, setTargetAvg] = useState('');
@@ -138,4 +138,4 @@ export const DcaCalculator: React.FC = () => {
   );
 };
 
-export default DcaCalculator;
+export default DCACalculator;
