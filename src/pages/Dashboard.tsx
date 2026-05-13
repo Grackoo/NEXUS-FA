@@ -30,6 +30,7 @@ import NexusLoadingScreen from '../components/NexusLoadingScreen';
 import GoalTracker from '../components/GoalTracker';
 import AcademyCarousel from '../components/AcademyCarousel';
 import DocumentVault from '../components/DocumentVault';
+import TaxHelper from '../components/TaxHelper';
 
 // ─── Delete Confirmation Modal ────────────────────────────────────────────────
 interface DeleteConfirmProps {
@@ -420,9 +421,7 @@ const Dashboard: React.FC = () => {
                 <Plus className="w-3.5 h-3.5" />
                 Operar {selectedCategory !== 'All' ? selectedCategory : ''}
               </button>
-              <button className="glass-button secondary px-3 md:px-4 py-1.5 md:py-2 text-[10px] md:text-xs">
-                Exportar
-              </button>
+              <TaxHelper />
             </div>
           </div>
 
