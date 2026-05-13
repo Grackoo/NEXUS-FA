@@ -1,6 +1,5 @@
 import React from 'react';
 import { FileText, Download, Shield } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
 
 interface Document {
   id: string;
@@ -17,8 +16,6 @@ const mockDocuments: Document[] = [
 ];
 
 export const DocumentVault: React.FC = () => {
-  const { user } = useAuth();
-
   return (
     <div className="glass-card p-6 md:p-8 bg-slate-900/50 backdrop-blur-md border border-white/5 rounded-3xl shadow-2xl relative overflow-hidden">
       <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-3xl rounded-full" />
