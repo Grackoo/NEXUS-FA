@@ -27,10 +27,21 @@ export interface PortfolioAsset {
 }
 
 /**
+ * Representa una meta financiera del cliente
+ */
+export interface ClientGoal {
+  id: string;
+  clientId: string;
+  name: string;
+  targetAmount: number;
+}
+
+/**
  * Representa una operación o transacción financiera
  */
 export interface Operation {
   id?: string;
+  orderId: string; // ID de pedidos único
   clientId: string;
   type: string;
   assetType: AssetCategory | string;

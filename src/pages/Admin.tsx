@@ -6,11 +6,13 @@ import NexusLoadingScreen from '../components/NexusLoadingScreen';
 import GlobalOverview from '../components/admin/GlobalOverview';
 import ClientDirectory from '../components/admin/ClientDirectory';
 import OperationsTerminal from '../components/admin/OperationsTerminal';
+import AuditLog from '../components/admin/AuditLog';
+import BillingEngine from '../components/admin/BillingEngine';
 
 const Admin: React.FC = () => {
   const { isLoading } = usePortfolio();
   
-  const [activeTab, setActiveTab] = useState<'overview' | 'directory' | 'terminal'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'directory' | 'terminal' | 'audit' | 'billing'>('overview');
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddClientInfo, setShowAddClientInfo] = useState(false);
 
@@ -120,6 +122,34 @@ const Admin: React.FC = () => {
               <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary shadow-[0_0_8px_rgba(0,240,255,0.8)]" />
             )}
           </button>
+          
+          <button
+            onClick={() => setActiveTab('audit')}
+            className={`flex items-center gap-2 px-6 py-3 text-sm font-bold transition-all relative ${
+              activeTab === 'audit' 
+                ? 'text-primary' 
+                : 'text-gray-500 hover:text-gray-300'
+            }`}
+          >
+            <Shield className="w-4 h-4" /> Audit Log
+            {activeTab === 'audit' && (
+              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary shadow-[0_0_8px_rgba(0,240,255,0.8)]" />
+            )}
+          </button>
+
+          <button
+            onClick={() => setActiveTab('billing')}
+            className={`flex items-center gap-2 px-6 py-3 text-sm font-bold transition-all relative ${
+              activeTab === 'billing' 
+                ? 'text-primary' 
+                : 'text-gray-500 hover:text-gray-300'
+            }`}
+          >
+            <BarChart3 className="w-4 h-4" /> Comisiones
+            {activeTab === 'billing' && (
+              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary shadow-[0_0_8px_rgba(0,240,255,0.8)]" />
+            )}
+          </button>
         </div>
 
         {/* Tab Content Area */}
@@ -127,6 +157,8 @@ const Admin: React.FC = () => {
           {activeTab === 'overview' && <GlobalOverview />}
           {activeTab === 'directory' && <ClientDirectory searchTerm={searchTerm} />}
           {activeTab === 'terminal' && <OperationsTerminal />}
+          {activeTab === 'audit' && <AuditLog />}
+          {activeTab === 'billing' && <BillingEngine />}
         </div>
       </main>
 

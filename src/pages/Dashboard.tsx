@@ -27,6 +27,9 @@ import { PerformanceArea } from '../components/charts/PerformanceArea';
 import { AllocationDonut } from '../components/charts/AllocationDonut';
 import { PortfolioHealthDashboard } from '../components/charts/PortfolioHealthDashboard';
 import NexusLoadingScreen from '../components/NexusLoadingScreen';
+import GoalTracker from '../components/GoalTracker';
+import AcademyCarousel from '../components/AcademyCarousel';
+import DocumentVault from '../components/DocumentVault';
 
 // ─── Delete Confirmation Modal ────────────────────────────────────────────────
 interface DeleteConfirmProps {
@@ -320,7 +323,7 @@ const Dashboard: React.FC = () => {
       <main className="max-w-7xl mx-auto px-4 md:px-8 mt-6 md:mt-10 space-y-6 md:space-y-8 animate-fade-in">
 
         {/* ── Header cards ── */}
-        <section className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <section className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           <div className="lg:col-span-1 glass-card flex flex-col justify-between overflow-hidden relative p-8 bg-slate-900/50 backdrop-blur-md border border-white/5 shadow-2xl rounded-3xl">
             <div className="relative z-10 space-y-2">
               <p className="text-xs uppercase tracking-wide font-medium text-white/60 mb-2">Balance Total</p>
@@ -351,11 +354,25 @@ const Dashboard: React.FC = () => {
           <div className="lg:col-span-1">
             <AllocationDonut />
           </div>
+
+          <div className="lg:col-span-1">
+            <GoalTracker />
+          </div>
+        </section>
+
+        {/* ── Academy Widget ── */}
+        <section className="w-full">
+          <AcademyCarousel />
         </section>
 
         {/* ── Portfolio Health Dashboard ── */}
         <section className="w-full">
           <PortfolioHealthDashboard />
+        </section>
+
+        {/* ── Document Vault ── */}
+        <section className="w-full">
+          <DocumentVault />
         </section>
 
         {/* ── Category Tabs ── */}

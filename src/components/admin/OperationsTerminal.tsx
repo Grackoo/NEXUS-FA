@@ -4,6 +4,7 @@ import { Users, Banknote, Calendar, Zap, CheckCircle2 } from 'lucide-react';
 import SmartTransactionModal from '../SmartTransactionModal';
 import { submitOperation } from '../../services/sheetsService';
 import toast from 'react-hot-toast';
+import DcaCalculator from './DcaCalculator';
 
 const OperationsTerminal: React.FC = () => {
   const { allClients } = usePortfolio();
@@ -201,6 +202,9 @@ const OperationsTerminal: React.FC = () => {
         </div>
 
       </div>
+
+      {/* DCA Calculator Widget */}
+      <DcaCalculator />
 
       {isTxModalOpen && selectedClientId && (
         <SmartTransactionModal 

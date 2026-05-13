@@ -119,6 +119,8 @@ export async function fetchPortfolioData(clientId: string) {
 
 export async function submitOperation(data: any) {
   try {
+    const orderId = data.orderId || `ORD-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+    
     await fetch(SCRIPT_URL, {
       method: 'POST',
       mode: 'no-cors', // Apps Script requires no-cors sometimes for simple POSTs
@@ -127,6 +129,7 @@ export async function submitOperation(data: any) {
       },
       body: JSON.stringify({
         ...data,
+        orderId,
         Nombre: encryptData(data.Nombre), // En caso de que se cree un cliente
         Tesis_Inversion: encryptData(data.Tesis_Inversion),
         thesis: encryptData(data.thesis),
@@ -183,6 +186,49 @@ export async function deletePosition(clientId: string, ticker: string, assetType
     return true;
   } catch (error) {
     console.error('Error deleting position:', error);
+    return false;
+  }
+}
+
+export async function fetchGoals(clientId: string) {
+  try {
+    const url = `${SCRIPT_URL}?action=getGoals&clientId=${encodeURIComponent(clientId)}`;
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+    const text = await response.text();
+    try {
+      const parsed = JSON.parse(text);
+      return parsed.goals || [];
+    } catch (e) {
+      return [];
+    }
+  } catch (error) {
+    console.error('Error fetching goals from GAS:', error);
+    return [];
+  }
+}
+
+export async function logAudit(action: string, orderId: string, details: any) {
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'AuditLog',
+        action,
+        orderId,
+        details,
+        date: new Date().toISOString()
+      }),
+    });
+    return true;
+  } catch (error) {
+    console.error('Error logging audit:', error);
     return false;
   }
 }
