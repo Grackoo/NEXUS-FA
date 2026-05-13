@@ -43,7 +43,7 @@ export const MOCK_CLIENTS: Client[] = [
 
 // Operations are now defined in src/types/index.ts
 export const MOCK_OPERACIONES: Operation[] = [
-  { id: 'op1', clientId: 'client-1', type: 'Buy', assetType: 'Renta Variable', ticker: 'AAPL', shares: 10, price: 145, commission: 2, originalCurrency: 'USD', date: '2024-01-10' },
-  { id: 'op2', clientId: 'client-1', type: 'Buy', assetType: 'Renta Variable', ticker: 'IVV', shares: 5, price: 450, commission: 5, originalCurrency: 'USD', date: '2024-02-15' },
-  { id: 'op3', clientId: 'client-2', type: 'Buy', assetType: 'Renta Variable', ticker: 'NVDA', shares: 20, price: 550, commission: 10, originalCurrency: 'USD', date: '2024-03-01' }
+  { id: 'op1', orderId: 'ORD-001', clientId: 'client-1', type: 'Buy', assetType: 'Renta Variable', ticker: 'AAPL', shares: 10, price: 145, commission: 2, originalCurrency: 'USD', date: '2024-01-10' },
+  { id: 'op2', orderId: 'ORD-002', clientId: 'client-1', type: 'Buy', assetType: 'Renta Variable', ticker: 'IVV', shares: 5, price: 450, commission: 5, originalCurrency: 'USD', date: '2024-02-15' },
+  { id: 'op3', orderId: 'ORD-003', clientId: 'client-2', type: 'Buy', assetType: 'Renta Variable', ticker: 'NVDA', shares: 20, price: 550, commission: 10, originalCurrency: 'USD', date: '2024-03-01' }
 ];
