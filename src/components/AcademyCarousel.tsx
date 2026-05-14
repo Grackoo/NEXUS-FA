@@ -13,31 +13,38 @@ interface AcademyModule {
 const mockModules: AcademyModule[] = [
   {
     id: '1',
-    title: 'Fundamentos de Inversión',
+    title: 'Fundamentos y Mentalidad Financiera',
     thumbnail: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?q=80&w=400&auto=format&fit=crop',
-    link: '#',
+    link: 'https://fa-academy.vercel.app/academy/fase-1',
     duration: '15 min'
   },
   {
     id: '2',
-    title: 'Gestión de Riesgos',
+    title: 'El Ecosistema de Inversión',
     thumbnail: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&w=400&auto=format&fit=crop',
-    link: '#',
+    link: 'https://fa-academy.vercel.app/academy/fase-2',
     duration: '22 min'
   },
   {
     id: '3',
-    title: 'Análisis Fundamental',
+    title: 'Análisis Técnico y Gráficos',
     thumbnail: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=400&auto=format&fit=crop',
-    link: '#',
+    link: 'https://fa-academy.vercel.app/academy/fase-3',
     duration: '30 min'
   },
   {
     id: '4',
-    title: 'Psicología del Trading',
+    title: 'Gestión de Riesgo y Portafolio',
     thumbnail: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=400&auto=format&fit=crop',
-    link: '#',
+    link: 'https://fa-academy.vercel.app/academy/fase-4',
     duration: '18 min'
+  },
+  {
+    id: '5',
+    title: 'Estrategias Especializadas',
+    thumbnail: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?q=80&w=400&auto=format&fit=crop',
+    link: 'https://fa-academy.vercel.app/academy/fase-5',
+    duration: '25 min'
   }
 ];
 
