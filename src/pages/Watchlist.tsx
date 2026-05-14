@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
-import { SymbolOverview, StockMarket } from 'react-ts-tradingview-widgets';
+import { AdvancedRealTimeChart, StockMarket } from 'react-ts-tradingview-widgets';
 import { Plus, Search, Star, ArrowDownToLine, ArrowUpToLine, BellRing } from 'lucide-react';
+import MarketHeatmap from '../components/MarketHeatmap';
+import EconomicEvents from '../components/EconomicEvents';
 
 interface WatchlistItem {
   symbol: string;
@@ -210,19 +212,31 @@ const Watchlist: React.FC = () => {
             </div>
             
             <div className="flex-1 w-full rounded-2xl overflow-hidden border border-white/5 bg-black/40">
-              <SymbolOverview 
-                colorTheme="dark" 
-                chartType="area" 
-                downColor="#ef4444" 
-                upColor="#10b981" 
-                dateFormat="dd MMM 'yy"
-                symbols={[[selectedAsset.name, selectedAsset.symbol]]}
+              <AdvancedRealTimeChart 
+                theme="dark" 
+                symbol={selectedAsset.symbol}
                 width="100%"
                 height="100%"
                 locale="es"
+                interval="D"
+                timezone="Etc/UTC"
+                style="1"
+                hide_side_toolbar={false}
+                allow_symbol_change={false}
+                save_image={false}
+                studies={[
+                  "MASimple@tv-basicstudies",
+                  "RSI@tv-basicstudies"
+                ]}
               />
             </div>
           </div>
+        </div>
+
+        {/* Heatmap and Economic Calendar Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 pt-10">
+          <MarketHeatmap />
+          <EconomicEvents />
         </div>
 
         {/* Trending Section */}
