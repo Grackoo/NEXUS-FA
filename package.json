@@ -12,6 +12,7 @@
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@types/crypto-js": "^4.2.2",
     "crypto-js": "^4.2.0",
     "framer-motion": "^12.38.0",

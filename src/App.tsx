@@ -7,6 +7,7 @@ import Reports from './pages/Reports.tsx';
 import { useAuth } from './contexts/AuthContext';
 import { Toaster } from 'react-hot-toast';
 import ImpersonationBanner from './components/admin/ImpersonationBanner.tsx';
+import NexusAgent from './components/NexusAgent.tsx';
 
 function App() {
   const { user } = useAuth();
@@ -42,6 +43,7 @@ function App() {
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </Router>
+    <NexusAgent />
     </>
   );
 }
