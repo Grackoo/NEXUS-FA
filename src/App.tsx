@@ -3,6 +3,7 @@ import Login from './pages/Login.tsx';
 import Dashboard from './pages/Dashboard.tsx';
 import Admin from './pages/Admin.tsx';
 import Watchlist from './pages/Watchlist.tsx';
+import Reports from './pages/Reports.tsx';
 import { useAuth } from './contexts/AuthContext';
 import { Toaster } from 'react-hot-toast';
 import ImpersonationBanner from './components/admin/ImpersonationBanner.tsx';
@@ -31,6 +32,11 @@ function App() {
         <Route 
           path="/markets" 
           element={user ? <Watchlist /> : <Navigate to="/login" />} 
+        />
+
+        <Route 
+          path="/reports" 
+          element={user ? <Reports /> : <Navigate to="/login" />} 
         />
 
         <Route path="*" element={<Navigate to="/login" />} />

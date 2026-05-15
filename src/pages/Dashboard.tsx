@@ -29,7 +29,6 @@ import { PortfolioHealthDashboard } from '../components/charts/PortfolioHealthDa
 import NexusLoadingScreen from '../components/NexusLoadingScreen';
 import GoalTracker from '../components/GoalTracker';
 import AcademyCarousel from '../components/AcademyCarousel';
-import DocumentVault from '../components/DocumentVault';
 import TaxHelper from '../components/TaxHelper';
 
 // ─── Delete Confirmation Modal ────────────────────────────────────────────────
@@ -371,10 +370,6 @@ const Dashboard: React.FC = () => {
           <PortfolioHealthDashboard />
         </section>
 
-        {/* ── Document Vault ── */}
-        <section className="w-full">
-          <DocumentVault />
-        </section>
 
         {/* ── Category Tabs ── */}
         <section className="flex items-center gap-2 overflow-x-auto scrollbar-hide py-2">

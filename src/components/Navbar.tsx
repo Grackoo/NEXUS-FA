@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCurrency } from '../contexts/CurrencyContext';
-import { LogOut, RefreshCw, Settings, ShieldCheck, TrendingUp, LayoutDashboard, Eye, EyeOff } from 'lucide-react';
+import { LogOut, RefreshCw, Settings, ShieldCheck, TrendingUp, LayoutDashboard, Eye, EyeOff, FileText } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 const Navbar: React.FC = () => {
@@ -12,6 +12,7 @@ const Navbar: React.FC = () => {
   const navLinks = [
     { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
     { name: 'Mercados', path: '/markets', icon: <TrendingUp className="w-4 h-4" /> },
+    { name: 'Reportes', path: '/reports', icon: <FileText className="w-4 h-4" /> },
   ];
   if (user?.role === 'admin') {
     navLinks.unshift({ name: 'Panel Admin', path: '/admin', icon: <ShieldCheck className="w-4 h-4" /> });
