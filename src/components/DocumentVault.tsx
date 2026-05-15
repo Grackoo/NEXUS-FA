@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, Download, Shield, Calendar, BarChart3, ExternalLink } from 'lucide-react';
+import { FileText, Shield, Calendar, BarChart3, ExternalLink } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { usePortfolio } from '../contexts/PortfolioContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { prepareReportData } from '../services/reportService';
-import ClientReportModal from './admin/ClientReportModal';
+import ClientReportModal from './admin/ClientReportModal'; // modal component
 import toast from 'react-hot-toast';
 
 export const DocumentVault: React.FC = () => {
