@@ -65,7 +65,14 @@ const NexusAgent: React.FC = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Error al conectar con Nexus AI');
+        let errorMessage = 'Error al conectar con Nexus AI';
+        try {
+          const errorData = await response.json();
+          if (errorData.error) errorMessage = errorData.error;
+        } catch (e) {
+          console.error('No se pudo parsear el error:', e);
+        }
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
