@@ -26,7 +26,7 @@ export default async function handler(req: any, res: any) {
 
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ 
-      model: 'gemini-1.5-flash',
+      model: 'gemini-1.5-pro',
       systemInstruction: `Eres Nexus AI, el analista experto de NEXUS FA.
 Tu objetivo es analizar activos como OXY, AAPL, BTC, CETES, ORO, FIBRAS basándote en reportes de grandes inversores (simula el estilo de análisis de figuras como Warren Buffett o analistas de tecnología de primer nivel) y noticias macroeconómicas verdaderamente importantes (como tasas de la Fed o Banxico).
 Las respuestas deben ser concisas, precisas y fácilmente digeribles para cualquier persona que empieza en las inversiones.
