@@ -16,6 +16,7 @@ const ClientDirectory: React.FC<{ searchTerm: string }> = ({ searchTerm }) => {
 
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [kycForm, setKycForm] = useState({ investmentHorizon: '', liquidityNeeds: '', lastCommunication: '' });
+  const [contractUrlForm, setContractUrlForm] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
@@ -36,14 +37,22 @@ const ClientDirectory: React.FC<{ searchTerm: string }> = ({ searchTerm }) => {
         liquidityNeeds: client.liquidityNeeds || '',
         lastCommunication: client.lastCommunication || ''
       });
+      setContractUrlForm(localStorage.getItem(`contractUrl_${client.id}`) || '');
     }
   };
 
   const handleSaveKYC = async (clientId: string) => {
     setIsSaving(true);
+    // Guardar URL de contrato en localStorage para la demo
+    if (contractUrlForm.trim() !== '') {
+      localStorage.setItem(`contractUrl_${clientId}`, contractUrlForm.trim());
+    } else {
+      localStorage.removeItem(`contractUrl_${clientId}`);
+    }
+
     const success = await updateKYC(clientId, kycForm);
     if (success) {
-      toast.success('Expediente KYC actualizado correctamente');
+      toast.success('Expediente KYC y documentos actualizados correctamente');
     } else {
       toast.error('Error al actualizar el expediente');
     }
@@ -193,6 +202,22 @@ const ClientDirectory: React.FC<{ searchTerm: string }> = ({ searchTerm }) => {
                                 />
                               </div>
                             </div>
+                            
+                            <h4 className="text-xs font-bold text-blue-400 uppercase tracking-widest mt-6 mb-4">Documentos Legales</h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Enlace del Contrato (PDF/Drive)</label>
+                                <input 
+                                  type="text"
+                                  value={contractUrlForm}
+                                  onChange={e => setContractUrlForm(e.target.value)}
+                                  className="glass-input w-full text-sm py-2 px-3"
+                                  placeholder="https://drive.google.com/..."
+                                />
+                                <p className="text-[9px] text-gray-500 mt-1">Este enlace aparecerá en la Bóveda de Documentos del cliente.</p>
+                              </div>
+                            </div>
+
                             <div className="flex justify-end pt-2">
                               <button 
                                 onClick={() => handleSaveKYC(client.id)}
