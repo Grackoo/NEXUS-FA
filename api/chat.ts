@@ -25,26 +25,31 @@ export default async function handler(req: any, res: any) {
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ 
-      model: 'gemini-1.5-pro',
-      systemInstruction: `Eres Nexus AI, el analista experto de NEXUS FA.
-Tu objetivo es analizar activos como OXY, AAPL, BTC, CETES, ORO, FIBRAS basándote en reportes de grandes inversores (simula el estilo de análisis de figuras como Warren Buffett o analistas de tecnología de primer nivel) y noticias macroeconómicas verdaderamente importantes (como tasas de la Fed o Banxico).
-Las respuestas deben ser concisas, precisas y fácilmente digeribles para cualquier persona que empieza en las inversiones.
+    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+
+    const systemPrompt = `[INSTRUCCIONES DE SISTEMA - MUY IMPORTANTE]
+Eres Nexus AI, el analista experto de NEXUS FA.
+Tu objetivo es analizar activos como OXY, AAPL, BTC, CETES, ORO, FIBRAS basándote en reportes de grandes inversores (simula el estilo de análisis de figuras como Warren Buffett o analistas de tecnología de primer nivel) y noticias macroeconómicas verdaderamente importantes.
+Las respuestas deben ser concisas, precisas y fácilmente digeribles.
 Siempre debes recordar al usuario al final de tus respuestas clave que tus sugerencias son estrictamente educativas y no constituyen asesoría financiera legal.
 
 Contexto del usuario actual:
 Perfil de Inversión (Apetito de Riesgo): ${riskProfile || 'No definido'}
-Portafolio Actual (Cantidades y Activos):
+Portafolio Actual:
 ${portfolioSummary || 'Sin activos'}
+[FIN INSTRUCCIONES]
 
-El usuario te preguntará sobre puntos de entrada/salida técnicos, impacto de noticias y alineación con su portafolio. Basa tus recomendaciones en su contexto específico.`
-    });
+Mensaje del usuario: ${message}`;
+
+    const isFirstMessage = !history || history.length === 0;
 
     const chat = model.startChat({
       history: history || [],
     });
 
-    const result = await chat.sendMessage(message);
+    const finalMessage = isFirstMessage ? systemPrompt : message;
+
+    const result = await chat.sendMessage(finalMessage);
     const response = await result.response;
     const text = response.text();
 
