@@ -84,9 +84,9 @@ const NexusAgent: React.FC = () => {
       };
 
       setMessages((prev) => [...prev, newBotMsg]);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      toast.error('Nexus AI no está disponible en este momento.');
+      toast.error(error.message || 'Error desconocido al conectar con Nexus AI.');
     } finally {
       setIsLoading(false);
     }

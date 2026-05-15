@@ -51,6 +51,6 @@ El usuario te preguntará sobre puntos de entrada/salida técnicos, impacto de n
     res.status(200).json({ text });
   } catch (error: any) {
     console.error('Error en AI chat:', error);
-    res.status(500).json({ error: 'Error al procesar la solicitud de IA. Por favor, intenta de nuevo.' });
+    res.status(500).json({ error: `Error de IA: ${error.message || JSON.stringify(error)}` });
   }
 }
