@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { usePortfolio } from '../contexts/PortfolioContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { prepareReportData } from '../services/reportService';
-import ClientReportModal from './admin/ClientReportModal'; // modal component
+import ClientReportModal from './admin/ClientReportModal.tsx'; // modal component
 import toast from 'react-hot-toast';
 
 export const DocumentVault: React.FC = () => {
