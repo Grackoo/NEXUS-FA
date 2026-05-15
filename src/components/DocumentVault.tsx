@@ -6,6 +6,7 @@ import { useCurrency } from '../contexts/CurrencyContext';
 import { prepareReportData } from '../services/reportService';
 import ClientReportModal from './admin/ClientReportModal.tsx'; // modal component
 import toast from 'react-hot-toast';
+import TaxHelper from './TaxHelper';
 
 export const DocumentVault: React.FC = () => {
   const { user } = useAuth();
@@ -125,13 +126,14 @@ export const DocumentVault: React.FC = () => {
                 <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
               </div>
             </div>
-            <div className="w-full md:w-1/3">
+            <div className="w-full md:w-1/3 flex flex-col gap-2">
               <button 
                 onClick={handleGenerateReport}
                 className="glass-button w-full py-2.5 flex items-center justify-center gap-2 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border-emerald-500/30"
               >
                 <FileText className="w-4 h-4" /> Generar Reporte
               </button>
+              <TaxHelper startDate={startDate} endDate={endDate} />
             </div>
           </div>
         </div>

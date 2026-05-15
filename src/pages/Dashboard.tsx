@@ -29,8 +29,6 @@ import { PortfolioHealthDashboard } from '../components/charts/PortfolioHealthDa
 import NexusLoadingScreen from '../components/NexusLoadingScreen';
 import GoalTracker from '../components/GoalTracker';
 import AcademyCarousel from '../components/AcademyCarousel';
-import TaxHelper from '../components/TaxHelper';
-
 // ─── Delete Confirmation Modal ────────────────────────────────────────────────
 interface DeleteConfirmProps {
   ticker: string;
@@ -416,7 +414,6 @@ const Dashboard: React.FC = () => {
                 <Plus className="w-3.5 h-3.5" />
                 Operar {selectedCategory !== 'All' ? selectedCategory : ''}
               </button>
-              <TaxHelper />
             </div>
           </div>
 
