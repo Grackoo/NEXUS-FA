@@ -158,20 +158,22 @@ const NexusAgent: React.FC = () => {
                   className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
                 >
                   <div
-                    className={`max-w-[85%] p-3 rounded-2xl text-sm leading-relaxed ${
+                    className={`max-w-[85%] p-4 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
                       msg.role === 'user'
                         ? 'bg-primary text-white rounded-tr-sm shadow-[0_0_15px_rgba(26,92,255,0.3)]'
-                        : 'bg-white/5 border border-white/10 text-gray-200 rounded-tl-sm'
+                        : 'bg-slate-800 border border-white/20 text-gray-100 rounded-tl-sm shadow-md'
                     }`}
                   >
-                    {msg.parts[0].text}
+                    {msg.role === 'user' 
+                      ? msg.parts[0].text 
+                      : msg.parts[0].text.split('**').map((chunk, i) => i % 2 === 1 ? <strong key={i} className="text-white font-bold">{chunk}</strong> : chunk)}
                   </div>
                 </div>
               ))}
 
               {isLoading && (
                 <div className="flex flex-col items-start">
-                  <div className="max-w-[85%] p-3 rounded-2xl bg-white/5 border border-white/10 text-gray-200 rounded-tl-sm flex items-center gap-2">
+                  <div className="max-w-[85%] p-4 rounded-2xl bg-slate-800 border border-white/20 text-gray-100 rounded-tl-sm shadow-md flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                     <span className="w-2 h-2 rounded-full bg-primary animate-pulse delay-75" />
                     <span className="w-2 h-2 rounded-full bg-primary animate-pulse delay-150" />
