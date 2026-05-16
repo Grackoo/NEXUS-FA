@@ -198,7 +198,7 @@ const NexusAgent: React.FC = () => {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder="Pregúntale a Nexus AI..."
-                  className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-4 pr-12 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
+                  className="w-full bg-slate-800/90 border border-white/20 rounded-xl py-3 pl-4 pr-12 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/50 focus:bg-slate-800 transition-all shadow-sm"
                   disabled={isLoading}
                 />
                 <button
