@@ -191,22 +191,22 @@ const NexusAgent: React.FC = () => {
             </div>
 
             {/* Input Form */}
-            <form onSubmit={handleSendMessage} className="p-3 border-t border-white/10 bg-white/[0.02]">
+            <form onSubmit={handleSendMessage} className="p-4 border-t border-white/20 bg-slate-900 rounded-b-2xl">
               <div className="relative flex items-center">
                 <input
                   type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="Pregúntale a Nexus AI..."
-                  className="w-full bg-slate-800/90 border border-white/20 rounded-xl py-3 pl-4 pr-12 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/50 focus:bg-slate-800 transition-all shadow-sm"
+                  placeholder="Escribe tu consulta aquí..."
+                  className="w-full bg-slate-800 border-2 border-white/20 rounded-xl py-3 pl-4 pr-12 text-sm text-white placeholder-gray-300 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/50 transition-all shadow-md"
                   disabled={isLoading}
                 />
                 <button
                   type="submit"
                   disabled={!inputValue.trim() || isLoading}
-                  className="absolute right-2 p-2 rounded-lg text-primary hover:bg-primary/20 disabled:opacity-50 disabled:hover:bg-transparent transition-all"
+                  className="absolute right-2 p-2 rounded-lg bg-primary/10 text-primary hover:bg-primary hover:text-white disabled:opacity-50 disabled:hover:bg-transparent transition-all"
                 >
-                  <Send className="w-4 h-4" />
+                  <Send className="w-5 h-5" />
                 </button>
               </div>
             </form>
