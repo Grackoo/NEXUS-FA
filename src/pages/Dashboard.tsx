@@ -29,6 +29,8 @@ import { PortfolioHealthDashboard } from '../components/charts/PortfolioHealthDa
 import NexusLoadingScreen from '../components/NexusLoadingScreen';
 import GoalTracker from '../components/GoalTracker';
 import AcademyCarousel from '../components/AcademyCarousel';
+import RecentActivityFeed from '../components/RecentActivityFeed';
+import ExecutiveSummary from '../components/ExecutiveSummary';
 // ─── Delete Confirmation Modal ────────────────────────────────────────────────
 interface DeleteConfirmProps {
   ticker: string;
@@ -368,6 +370,15 @@ const Dashboard: React.FC = () => {
           <PortfolioHealthDashboard />
         </section>
 
+        {/* ── Client Management & Activity ── */}
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 h-[350px]">
+            <RecentActivityFeed />
+          </div>
+          <div className="lg:col-span-1 h-[350px]">
+            <ExecutiveSummary />
+          </div>
+        </section>
 
         {/* ── Category Tabs ── */}
         <section className="flex items-center gap-2 overflow-x-auto scrollbar-hide py-2">
