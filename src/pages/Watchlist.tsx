@@ -78,9 +78,9 @@ const Watchlist: React.FC = () => {
         </header>
 
         {/* Top Section: Watchlist + Main Chart */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
           {/* Sidebar Watchlist */}
-          <div className="md:col-span-5 lg:col-span-3 glass-card p-0 flex flex-col bg-gradient-to-b from-slate-900/80 to-black/60 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden h-[550px] shadow-2xl">
+          <div className="lg:col-span-4 glass-card p-0 flex flex-col bg-gradient-to-b from-slate-900/80 to-black/60 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden h-[550px] shadow-2xl">
             <div className="p-5 md:p-6 border-b border-white/5 space-y-4 bg-white/[0.02]">
               <h2 className="text-sm font-bold text-white tracking-widest uppercase flex items-center gap-2">
                 <Star className="w-4 h-4 text-primary" /> Mis Listas
@@ -111,14 +111,14 @@ const Watchlist: React.FC = () => {
                     <button
                       key={item.symbol}
                       onClick={() => setSelectedAsset(item)}
-                      className={`w-full text-left px-4 py-3.5 rounded-2xl flex items-center justify-between transition-all duration-300 group ${
+                      className={`w-full text-left px-4 py-3.5 rounded-2xl flex items-center gap-6 transition-all duration-300 group ${
                         selectedAsset.symbol === item.symbol 
                           ? 'bg-gradient-to-r from-primary/20 to-transparent border-l-2 border-primary shadow-lg' 
                           : 'hover:bg-white/[0.04] border-l-2 border-transparent'
                       }`}
                     >
-                      <div className="flex items-center gap-3.5">
-                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs transition-colors relative ${
+                      <div className="flex items-center gap-3.5 flex-1">
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs transition-colors relative shrink-0 ${
                           selectedAsset.symbol === item.symbol 
                             ? 'bg-primary text-white shadow-[0_0_15px_rgba(26,92,255,0.4)]' 
                             : 'bg-white/5 text-white/50 group-hover:bg-white/10 group-hover:text-white'
@@ -131,23 +131,25 @@ const Watchlist: React.FC = () => {
                             </span>
                           )}
                         </div>
-                        <div>
-                          <p className={`text-sm font-semibold tracking-tight transition-colors ${
-                            selectedAsset.symbol === item.symbol ? 'text-white' : 'text-white/70 group-hover:text-white'
-                          }`}>
-                            {item.name}
-                          </p>
-                          <div className="flex items-center gap-2 mt-0.5">
-                            <p className="text-[10px] text-white/40 tracking-widest uppercase">
-                              {item.ticker}
+                        <div className="flex-1 flex items-center gap-6">
+                          <div className="w-24 shrink-0">
+                            <p className={`text-sm font-semibold tracking-tight transition-colors truncate ${
+                              selectedAsset.symbol === item.symbol ? 'text-white' : 'text-white/70 group-hover:text-white'
+                            }`}>
+                              {item.name}
                             </p>
-                            {isBuyZone && <span className="text-[8px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/30">ZONA COMPRA</span>}
-                            {isSellZone && <span className="text-[8px] bg-rose-500/20 text-rose-400 px-1.5 py-0.5 rounded border border-rose-500/30">ZONA VENTA</span>}
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <p className="text-[10px] text-white/40 tracking-widest uppercase truncate">
+                                {item.ticker}
+                              </p>
+                              {isBuyZone && <span className="text-[8px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/30">COMPRA</span>}
+                              {isSellZone && <span className="text-[8px] bg-rose-500/20 text-rose-400 px-1.5 py-0.5 rounded border border-rose-500/30">VENTA</span>}
+                            </div>
+                          </div>
+                          <div className="text-left shrink-0">
+                            <p className="text-sm font-bold text-white/90 tabular-nums">${item.mockPrice}</p>
                           </div>
                         </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-xs font-bold text-white/90">${item.mockPrice}</p>
                       </div>
                     </button>
                   );
@@ -163,7 +165,7 @@ const Watchlist: React.FC = () => {
           </div>
 
           {/* Main Chart Area */}
-          <div className="md:col-span-7 lg:col-span-9 glass-card p-6 md:p-8 bg-black/60 backdrop-blur-xl border border-white/10 rounded-3xl h-[550px] flex flex-col shadow-2xl relative overflow-hidden">
+          <div className="lg:col-span-8 glass-card p-6 md:p-8 bg-black/60 backdrop-blur-xl border border-white/10 rounded-3xl h-[550px] flex flex-col shadow-2xl relative overflow-hidden">
             {/* Background glow for chart */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 blur-[100px] rounded-full pointer-events-none -z-10"></div>
             
@@ -234,9 +236,13 @@ const Watchlist: React.FC = () => {
         </div>
 
         {/* Heatmap and Economic Calendar Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 pt-10">
-          <MarketHeatmap />
-          <EconomicEvents />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 pt-10">
+          <div className="lg:col-span-7">
+            <MarketHeatmap />
+          </div>
+          <div className="lg:col-span-5">
+            <EconomicEvents />
+          </div>
         </div>
 
         {/* Trending Section */}
@@ -250,7 +256,7 @@ const Watchlist: React.FC = () => {
              <StockMarket 
                 colorTheme="dark" 
                 width="100%" 
-                height={550} 
+                height={350} 
                 locale="es"
                 isTransparent={true}
                 showChart={true}
