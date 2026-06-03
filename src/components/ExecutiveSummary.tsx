@@ -7,7 +7,7 @@ export const ExecutiveSummary: React.FC = () => {
   
   // In a real app, this would be fetched from the database based on the client.
   // For now, we'll mock a generic professional note.
-  const advisorNote = "El portafolio mantiene una fuerte exposición en tecnología y liquidez en moneda fuerte. Sugerimos mantener la posición en renta fija (CETES) para aprovechar las altas tasas actuales mientras evaluamos reentradas escalonadas en Renta Variable tras el próximo reporte de inflación.";
+  const advisorNote = `Estimado ${user?.name || 'Cliente'}, el portafolio mantiene una fuerte exposición en tecnología y liquidez en moneda fuerte. Sugerimos mantener la posición en renta fija (CETES) para aprovechar las altas tasas actuales mientras evaluamos reentradas escalonadas en Renta Variable tras el próximo reporte de inflación.`;
 
   return (
     <div className="glass-card p-6 bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 rounded-3xl h-full shadow-2xl flex flex-col relative overflow-hidden">
