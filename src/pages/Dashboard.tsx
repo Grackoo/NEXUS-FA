@@ -322,55 +322,47 @@ const Dashboard: React.FC = () => {
 
       <main className="max-w-7xl mx-auto px-4 md:px-8 mt-6 md:mt-10 space-y-6 md:space-y-8 animate-fade-in">
 
-        {/* ── Header cards ── */}
-        <section className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          <div className="lg:col-span-1 glass-card flex flex-col justify-between overflow-hidden relative p-8 bg-slate-900/50 backdrop-blur-md border border-white/5 shadow-2xl rounded-3xl">
-            <div className="relative z-10 space-y-2">
-              <p className="text-xs uppercase tracking-wide font-medium text-white/60 mb-2">Balance Total</p>
-              <h1 className="text-3xl lg:text-4xl font-semibold tracking-tight mb-4 tabular-nums text-white break-words">
-                {formatValue(netWorth)}
-              </h1>
-              <div className="flex flex-col gap-4 mt-6">
-                <div className={`inline-flex self-start items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border ${isGlobalPositive ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'}`}>
-                  {isGlobalPositive ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                  {isGlobalPositive ? '+' : ''}{globalPLPercent.toFixed(2)}%
-                </div>
-                <div className="flex flex-col">
-                  <p className="text-[10px] uppercase tracking-wide font-medium text-white/50">
-                    Rendimiento Histórico
-                  </p>
-                  <p className={`text-sm font-semibold ${isGlobalPositive ? 'text-emerald-400' : 'text-rose-400'}`}>
-                    {isGlobalPositive ? '+' : ''}{formatValue(globalPL)}
-                  </p>
+        {/* ── Fila 1: Resumen de Balance e Histórico ── */}
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="lg:col-span-4 flex flex-col gap-6">
+            <div className="glass-card flex flex-col justify-between overflow-hidden relative p-8 bg-slate-900/50 backdrop-blur-md border border-white/5 shadow-2xl rounded-2xl">
+              <div className="relative z-10 space-y-2">
+                <p className="text-xs uppercase tracking-wide font-medium text-white/60 mb-2">Balance Total</p>
+                <h1 className="text-3xl lg:text-4xl font-semibold tracking-tight mb-4 tabular-nums text-white break-words">
+                  {formatValue(netWorth)}
+                </h1>
+                <div className="flex flex-col gap-4 mt-6">
+                  <div className={`inline-flex self-start items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border ${isGlobalPositive ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'}`}>
+                    {isGlobalPositive ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                    {isGlobalPositive ? '+' : ''}{globalPLPercent.toFixed(2)}%
+                  </div>
+                  <div className="flex flex-col">
+                    <p className="text-[10px] uppercase tracking-wide font-medium text-white/50">
+                      Rendimiento Histórico
+                    </p>
+                    <p className={`text-sm font-semibold ${isGlobalPositive ? 'text-emerald-400' : 'text-rose-400'}`}>
+                      {isGlobalPositive ? '+' : ''}{formatValue(globalPL)}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-
-          <div className="lg:col-span-2">
-            <PerformanceArea />
-          </div>
-
-          <div className="lg:col-span-1">
+            
             <AllocationDonut />
-          </div>
-
-          <div className="lg:col-span-1">
             <GoalTracker />
           </div>
+
+          <div className="lg:col-span-8">
+            <PerformanceArea />
+          </div>
         </section>
 
-        {/* ── Academy Widget ── */}
-        <section className="w-full">
-          <AcademyCarousel />
-        </section>
-
-        {/* ── Portfolio Health Dashboard ── */}
+        {/* ── Fila 2: Métricas de Control y Estrategia ── */}
         <section className="w-full">
           <PortfolioHealthDashboard />
         </section>
 
-        {/* ── Client Management & Activity ── */}
+        {/* ── Fila 2.5: Client Management & Activity (Opción A) ── */}
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 h-[350px]">
             <RecentActivityFeed />
@@ -408,9 +400,9 @@ const Dashboard: React.FC = () => {
           })}
         </section>
 
-        {/* ── Positions Table ── */}
-        <section className="glass-card p-0 overflow-hidden bg-slate-900/50 backdrop-blur-md border border-white/5 rounded-3xl shadow-2xl">
-          <div className="px-6 md:px-8 py-6 border-b border-white/5 flex items-center justify-between bg-white/[0.01]">
+        {/* ── Fila 3: Operaciones Core (Tabla de Posiciones) ── */}
+        <section className="glass-card p-0 overflow-hidden bg-slate-900/50 backdrop-blur-md border border-white/5 rounded-2xl shadow-2xl flex flex-col max-h-[550px]">
+          <div className="px-6 md:px-8 py-6 border-b border-white/5 flex items-center justify-between bg-white/[0.01] shrink-0">
             <h3 className="text-sm uppercase tracking-wide font-medium text-white/80 flex items-center gap-3">
               <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20">
                 <List className="w-4 h-4 md:w-5 md:h-5 text-primary" />
@@ -428,7 +420,7 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="overflow-x-auto scrollbar-hide">
+          <div className="flex-1 overflow-auto scrollbar-hide">
             <table className="w-full text-left border-collapse min-w-[780px] md:min-w-0">
               <thead>
                 <tr className="border-b border-white/5 text-white/50 text-[10px] md:text-[11px] uppercase tracking-widest bg-white/[0.01]">
@@ -700,6 +692,12 @@ const Dashboard: React.FC = () => {
             </table>
           </div>
         </section>
+
+        {/* ── Fila 4: Contenido Secundario / Educativo ── */}
+        <section className="w-full mt-8">
+          <AcademyCarousel />
+        </section>
+
       </main>
 
       {/* ── Transaction Modal (Nueva Operación / Editar) ── */}

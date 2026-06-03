@@ -64,9 +64,9 @@ export const DividendProjectionChart: React.FC = () => {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="glass-card p-3 bg-slate-900/90 border border-white/10 rounded-xl shadow-xl">
-          <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-1">{label}</p>
-          <p className="text-emerald-400 font-bold text-sm">
+        <div className="bg-black/95 backdrop-blur-xl border-2 border-white/20 p-3 rounded-xl shadow-[0_0_25px_rgba(0,0,0,0.8)]">
+          <p className="text-white/90 text-[10px] font-extrabold uppercase tracking-widest mb-1">{label}</p>
+          <p className="text-emerald-400 font-extrabold text-sm drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]">
             {formatValue(payload[0].value)}
           </p>
         </div>

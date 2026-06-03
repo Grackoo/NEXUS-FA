@@ -20,15 +20,17 @@ export const PortfolioHealthDashboard: React.FC = () => {
         <p className="text-gray-400 text-sm mt-1">Rendimiento, riesgo y diversificación.</p>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <div className="xl:col-span-2 space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-1 h-full">
           <PnLBarChart />
         </div>
-        <div className="xl:col-span-1 space-y-6">
+        <div className="lg:col-span-1 h-full">
           <RiskMetricsCard />
+        </div>
+        <div className="lg:col-span-1 space-y-6 flex flex-col h-full">
           <StrategyCompliance />
           
-          <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/5 relative overflow-hidden flex flex-col h-[300px]">
+          <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/5 relative overflow-hidden flex flex-col flex-1 min-h-[300px]">
              <div className="absolute top-0 right-0 p-4 opacity-10">
                 <Coins className="w-16 h-16 text-primary" />
              </div>

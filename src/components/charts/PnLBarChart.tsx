@@ -10,11 +10,11 @@ const CustomTooltip = ({ active, payload, formatValue }: any) => {
     const data = payload[0].payload;
     const isPositive = data.pnl >= 0;
     return (
-      <div className="bg-[#0f172a]/90 backdrop-blur-md border border-white/10 p-3 rounded-2xl shadow-[0_0_20px_rgba(0,0,0,0.5)] flex items-center gap-4">
-        <div className={`w-2 h-8 rounded-full ${isPositive ? 'bg-emerald-400' : 'bg-rose-500'}`} style={{ boxShadow: `0 0 10px ${isPositive ? '#34d399' : '#f43f5e'}` }} />
+      <div className="bg-black/95 backdrop-blur-xl border-2 border-white/20 p-3 rounded-xl shadow-[0_0_25px_rgba(0,0,0,0.8)] flex items-center gap-4">
+        <div className={`w-2 h-8 rounded-full ${isPositive ? 'bg-emerald-400' : 'bg-rose-500'}`} style={{ boxShadow: `0 0 15px ${isPositive ? '#34d399' : '#f43f5e'}` }} />
         <div>
-          <p className="text-white/60 text-[10px] uppercase tracking-widest font-semibold mb-1">{data.name}</p>
-          <p className={`font-bold text-lg tabular-nums ${isPositive ? 'text-emerald-400' : 'text-rose-500'}`}>
+          <p className="text-white/90 text-[10px] uppercase tracking-widest font-extrabold mb-1">{data.name}</p>
+          <p className={`font-extrabold text-lg tabular-nums ${isPositive ? 'text-emerald-400' : 'text-rose-500'}`}>
             {isPositive ? '+' : ''}{formatValue(data.pnl)}
           </p>
         </div>
@@ -72,13 +72,13 @@ export const PnLBarChart: React.FC = () => {
   }, [clientPortfolio, currency, exchangeRate]);
 
   return (
-    <div className="w-full h-[350px] glass-card p-6 bg-slate-900/50 backdrop-blur-xl border border-white/5 rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
-      <div className="mb-6">
+    <div className="w-full h-[350px] glass-card p-6 bg-slate-900/50 backdrop-blur-xl border border-white/5 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] flex flex-col">
+      <div className="mb-6 shrink-0">
         <h3 className="text-white/80 font-semibold text-sm uppercase tracking-widest">Top & Bottom Performers</h3>
         <p className="text-white/40 text-[11px] mt-1">Ganancia y pérdida absoluta ({currency})</p>
       </div>
 
-      <div className="w-full h-[250px]">
+      <div className="w-full flex-1 min-h-0">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} layout="vertical" margin={{ top: 0, right: 30, left: 10, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="rgba(255,255,255,0.05)" />

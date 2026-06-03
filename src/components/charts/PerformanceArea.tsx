@@ -6,16 +6,16 @@ import { useCurrency } from '../../contexts/CurrencyContext';
 const CustomTooltip = ({ active, payload, label, formatValue }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-[#0f172a]/70 backdrop-blur-xl border border-cyan-400/50 p-4 rounded-2xl shadow-[0_0_20px_rgba(34,211,238,0.3)]">
-        <p className="text-white/50 text-[11px] uppercase tracking-widest font-bold mb-3 border-b border-white/10 pb-2">{label} 2026</p>
+      <div className="bg-black/95 backdrop-blur-xl border-2 border-cyan-400/60 p-4 rounded-xl shadow-[0_0_25px_rgba(34,211,238,0.4)]">
+        <p className="text-white text-[11px] uppercase tracking-widest font-extrabold mb-3 border-b border-white/20 pb-2">{label} 2026</p>
         <div className="space-y-2">
           {payload.map((entry: any, index: number) => (
             <div key={index} className="flex items-center justify-between gap-6">
               <div className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: entry.color, boxShadow: `0 0 10px ${entry.color}` }} />
-                <span className="text-white/70 text-xs font-medium">{entry.name}</span>
+                <span className="text-white/90 text-xs font-bold">{entry.name}</span>
               </div>
-              <span className="text-white font-bold text-sm tabular-nums">
+              <span className="text-white font-extrabold text-sm tabular-nums" style={{ color: entry.color }}>
                 {formatValue(entry.value)}
               </span>
             </div>
