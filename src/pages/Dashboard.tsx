@@ -323,24 +323,24 @@ const Dashboard: React.FC = () => {
       <main className="max-w-7xl mx-auto px-4 md:px-8 mt-6 md:mt-10 space-y-6 md:space-y-8 animate-fade-in">
 
         {/* ── Fila 1: Resumen de Balance e Histórico ── */}
-        <section className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div className="lg:col-span-4 flex flex-col gap-6">
-            <div className="glass-card flex flex-col justify-between overflow-hidden relative p-8 bg-slate-900/50 backdrop-blur-md border border-white/5 shadow-2xl rounded-2xl">
-              <div className="relative z-10 space-y-2">
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="md:col-span-1 flex flex-col gap-6">
+            <div className="glass-card relative p-6 bg-slate-900/50 backdrop-blur-md border border-white/5 shadow-2xl rounded-2xl overflow-hidden">
+              <div className="relative z-10">
                 <p className="text-xs uppercase tracking-wide font-medium text-white/60 mb-2">Balance Total</p>
-                <h1 className="text-3xl lg:text-4xl font-semibold tracking-tight mb-4 tabular-nums text-white break-words">
+                <h1 className="text-3xl lg:text-4xl font-bold tracking-tight tabular-nums text-white break-words">
                   {formatValue(netWorth)}
                 </h1>
-                <div className="flex flex-col gap-4 mt-6">
-                  <div className={`inline-flex self-start items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border ${isGlobalPositive ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'}`}>
+                <div className="flex items-center justify-between mt-4">
+                  <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border ${isGlobalPositive ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'}`}>
                     {isGlobalPositive ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
                     {isGlobalPositive ? '+' : ''}{globalPLPercent.toFixed(2)}%
                   </div>
-                  <div className="flex flex-col">
+                  <div className="text-right">
                     <p className="text-[10px] uppercase tracking-wide font-medium text-white/50">
                       Rendimiento Histórico
                     </p>
-                    <p className={`text-sm font-semibold ${isGlobalPositive ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    <p className={`text-sm font-bold ${isGlobalPositive ? 'text-emerald-400' : 'text-rose-400'}`}>
                       {isGlobalPositive ? '+' : ''}{formatValue(globalPL)}
                     </p>
                   </div>
@@ -352,7 +352,7 @@ const Dashboard: React.FC = () => {
             <GoalTracker />
           </div>
 
-          <div className="lg:col-span-8">
+          <div className="md:col-span-2">
             <PerformanceArea />
           </div>
         </section>
@@ -363,11 +363,11 @@ const Dashboard: React.FC = () => {
         </section>
 
         {/* ── Fila 2.5: Client Management & Activity (Opción A) ── */}
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 h-[350px]">
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="md:col-span-2 h-[350px]">
             <RecentActivityFeed />
           </div>
-          <div className="lg:col-span-1 h-[350px]">
+          <div className="md:col-span-1 h-[350px]">
             <ExecutiveSummary />
           </div>
         </section>

@@ -99,7 +99,7 @@ export const PerformanceArea: React.FC = () => {
   }, [clientPortfolio, clientOperations, currency, exchangeRate, timeFilter]);
 
   return (
-    <div className="w-full h-full min-h-[350px] glass-card p-6 bg-slate-900/50 backdrop-blur-xl border border-white/5 rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] flex flex-col">
+    <div className="w-full h-full min-h-[350px] glass-card p-6 bg-slate-900/50 backdrop-blur-xl border border-white/5 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] flex flex-col">
       <div className="flex items-start sm:items-center justify-between mb-6 flex-col sm:flex-row gap-4">
         <div>
           <h3 className="text-white/80 font-semibold text-sm uppercase tracking-widest">Rendimiento Histórico</h3>
