@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { usePortfolio } from '../../contexts/PortfolioContext';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { useAuth, type ClientProfile } from '../../contexts/AuthContext';
-import { ChevronDown, ChevronUp, Save, LogIn, Eye, FileText, X, Pencil, Check, Plus, Search, UserCheck } from 'lucide-react';
+import { ChevronDown, ChevronUp, Save, LogIn, Eye, FileText, X, Pencil, Check, Plus, UserCheck } from 'lucide-react';
 import { updateKYC, submitOperation } from '../../services/sheetsService';
 import toast from 'react-hot-toast';
 import { prepareReportData } from '../../services/reportService';
