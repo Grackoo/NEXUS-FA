@@ -240,7 +240,7 @@ const Dashboard: React.FC = () => {
     return !sessionStorage.getItem('hasSeenNexusLoading');
   });
 
-  const { getNote, markAsRead } = useAdvisorNotes();
+  const { getNote } = useAdvisorNotes();
   const clientNoteData = user ? getNote(user.id) : null;
   const [showNoteAlert, setShowNoteAlert] = useState(false);
 
