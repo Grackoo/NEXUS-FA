@@ -80,8 +80,8 @@ const Watchlist: React.FC = () => {
         {/* Top Section: Watchlist + Main Chart */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
           {/* Sidebar Watchlist */}
-          <div className="lg:col-span-4 glass-card p-0 flex flex-col bg-gradient-to-b from-slate-900/80 to-black/60 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden h-[550px] shadow-2xl">
-            <div className="p-5 md:p-6 border-b border-white/5 space-y-4 bg-white/[0.02]">
+          <div className="lg:col-span-4 glass-card p-0 flex flex-col bg-gradient-to-b from-slate-900/80 to-black/60 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden h-auto shadow-2xl">
+            <div className="p-4 md:p-5 border-b border-white/5 space-y-4 bg-white/[0.02]">
               <h2 className="text-sm font-bold text-white tracking-widest uppercase flex items-center gap-2">
                 <Star className="w-4 h-4 text-primary" /> Mis Listas
               </h2>
@@ -97,7 +97,7 @@ const Watchlist: React.FC = () => {
               </div>
             </div>
             
-            <div className="flex-1 overflow-y-auto scrollbar-hide p-3">
+            <div className="flex-1 max-h-[450px] overflow-y-auto scrollbar-hide p-3">
               <div className="text-[9px] uppercase tracking-widest font-bold text-white/30 px-3 py-2 mb-2">
                 Activos Monitoreados
               </div>
@@ -157,7 +157,7 @@ const Watchlist: React.FC = () => {
               </div>
             </div>
             
-            <div className="p-5 border-t border-white/5 bg-white/[0.01]">
+            <div className="p-4 md:p-5 border-t border-white/5 bg-white/[0.01]">
               <button className="w-full py-3 rounded-xl border border-dashed border-white/20 text-white/60 text-xs font-bold uppercase tracking-widest hover:border-primary/50 hover:text-primary hover:bg-primary/5 transition-all flex items-center justify-center gap-2">
                 <Plus className="w-4 h-4" /> Añadir Activo
               </button>
@@ -165,7 +165,7 @@ const Watchlist: React.FC = () => {
           </div>
 
           {/* Main Chart Area */}
-          <div className="lg:col-span-8 glass-card p-6 md:p-8 bg-black/60 backdrop-blur-xl border border-white/10 rounded-3xl h-[550px] flex flex-col shadow-2xl relative overflow-hidden">
+          <div className="lg:col-span-8 glass-card p-4 md:p-6 bg-black/60 backdrop-blur-xl border border-white/10 rounded-3xl h-auto shadow-2xl relative overflow-hidden">
             {/* Background glow for chart */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 blur-[100px] rounded-full pointer-events-none -z-10"></div>
             
@@ -252,15 +252,17 @@ const Watchlist: React.FC = () => {
             <p className="text-xs md:text-sm text-white/50 max-w-2xl">Monitor en tiempo real de los principales movimientos del mercado: descubre los activos con mayor crecimiento y volumen.</p>
           </div>
           
-          <div className="glass-card p-4 md:p-8 bg-gradient-to-tr from-slate-900/80 to-black/80 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
-             <StockMarket 
-                colorTheme="dark" 
-                width="100%" 
-                height={350} 
-                locale="es"
-                isTransparent={true}
-                showChart={true}
-             />
+          <div className="glass-card p-4 md:p-6 bg-gradient-to-tr from-slate-900/80 to-black/80 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden shadow-2xl max-h-[250px] flex items-center">
+             <div className="w-full h-full">
+               <StockMarket 
+                  colorTheme="dark" 
+                  width="100%" 
+                  height={250} 
+                  locale="es"
+                  isTransparent={true}
+                  showChart={true}
+               />
+             </div>
           </div>
         </div>
       </main>
