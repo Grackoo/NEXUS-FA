@@ -213,7 +213,7 @@ const Watchlist: React.FC = () => {
               </div>
             </div>
             
-            <div className="flex-1 w-full rounded-2xl overflow-hidden border border-white/5 bg-black/40">
+            <div className="flex-1 w-full rounded-2xl overflow-hidden border border-white/5 bg-black/40 min-h-[450px]">
               <AdvancedRealTimeChart 
                 theme="dark" 
                 symbol={selectedAsset.symbol}

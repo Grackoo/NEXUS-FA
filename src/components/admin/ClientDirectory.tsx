@@ -10,7 +10,6 @@ import { prepareReportData } from '../../services/reportService';
 import { useAdvisorNotes } from '../../hooks/useAdvisorNotes';
 
 import ClientReportModal from './ClientReportModal';
-import NewClientModal from './NewClientModal';
 
 const ClientDirectory: React.FC<{ searchTerm: string }> = ({ searchTerm }) => {
   const { allClients } = usePortfolio();
@@ -21,7 +20,6 @@ const ClientDirectory: React.FC<{ searchTerm: string }> = ({ searchTerm }) => {
   const [kycForm, setKycForm] = useState({ investmentHorizon: '', liquidityNeeds: '', lastCommunication: '' });
   const [contractUrlForm, setContractUrlForm] = useState('');
   const [isSaving, setIsSaving] = useState(false);
-  const [showNewClientModal, setShowNewClientModal] = useState(false);
 
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [isAssetsModalOpen, setIsAssetsModalOpen] = useState(false);
@@ -91,13 +89,6 @@ const ClientDirectory: React.FC<{ searchTerm: string }> = ({ searchTerm }) => {
             {clients.length} ACTIVOS
           </span>
         </h2>
-        <button 
-          onClick={() => setShowNewClientModal(true)}
-          className="glass-button bg-primary/20 border-primary/50 text-primary hover:bg-primary hover:text-white px-4 h-[42px] whitespace-nowrap shadow-[0_0_15px_rgba(26,92,255,0.2)]"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Nuevo Cliente
-        </button>
       </div>
       <div className="glass-card overflow-hidden animate-fade-in bg-white/[0.01]">
         <div className="overflow-x-auto">
@@ -309,8 +300,6 @@ const ClientDirectory: React.FC<{ searchTerm: string }> = ({ searchTerm }) => {
           onClose={() => setReportData(null)} 
         />
       )}
-
-      {showNewClientModal && <NewClientModal onClose={() => setShowNewClientModal(false)} />}
     </>
   );
 };

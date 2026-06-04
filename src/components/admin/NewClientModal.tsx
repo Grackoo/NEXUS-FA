@@ -85,8 +85,8 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ onClose }) => {
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="glass-card w-full max-w-md p-0 overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,1)] border-white/10 animate-fade-in mx-auto">
+    <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+      <div className="bg-[#0A0E17] w-full max-w-md p-0 rounded-3xl overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,1)] border border-white/10 animate-fade-in mx-auto">
         <div className="px-6 py-5 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
            <div>
               <h2 className="text-lg font-bold flex items-center gap-2">

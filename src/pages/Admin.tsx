@@ -8,13 +8,14 @@ import ClientDirectory from '../components/admin/ClientDirectory';
 import OperationsTerminal from '../components/admin/OperationsTerminal';
 import AuditLog from '../components/admin/AuditLog';
 import BillingEngine from '../components/admin/BillingEngine';
+import NewClientModal from '../components/admin/NewClientModal';
 
 const Admin: React.FC = () => {
   const { isLoading } = usePortfolio();
   
   const [activeTab, setActiveTab] = useState<'overview' | 'directory' | 'terminal' | 'audit' | 'billing'>('overview');
   const [searchTerm, setSearchTerm] = useState('');
-  const [showAddClientInfo, setShowAddClientInfo] = useState(false);
+  const [showNewClientModal, setShowNewClientModal] = useState(false);
 
   const [showLoadingScreen, setShowLoadingScreen] = useState(() => {
     return !sessionStorage.getItem('hasSeenAdminLoading');
@@ -71,7 +72,7 @@ const Admin: React.FC = () => {
               </div>
             )}
             <button 
-              onClick={() => setShowAddClientInfo(true)}
+              onClick={() => setShowNewClientModal(true)}
               className="glass-button flex items-center justify-center gap-2 px-4 py-2.5 text-xs whitespace-nowrap"
             >
               <PlusCircle className="w-4 h-4" /> Nuevo Cliente
@@ -161,31 +162,7 @@ const Admin: React.FC = () => {
           {activeTab === 'billing' && <BillingEngine />}
         </div>
       </main>
-
-      {/* Info Modal */}
-      {showAddClientInfo && (
-        <div className="modal-overlay">
-          <div className="glass-card w-full max-w-md p-6 md:p-8 space-y-6 mx-auto animate-fade-in">
-            <div className="flex items-center gap-3 text-primary mb-2">
-              <Info className="w-6 h-6" />
-              <h2 className="text-xl font-bold">Registro de Clientes</h2>
-            </div>
-            <p className="text-xs md:text-sm text-gray-400 leading-relaxed">
-              El registro oficial se realiza manualmente en Google Sheets tras recibir la solicitud vía WhatsApp.
-            </p>
-            <div className="space-y-4 bg-white/5 p-4 rounded-xl border border-white/10">
-              <p className="text-[10px] font-bold text-primary uppercase tracking-widest">Procedimiento:</p>
-              <ul className="text-[11px] text-gray-400 space-y-3 list-decimal list-inside">
-                <li>Recibe la <span className="text-white">solicitud vía WhatsApp</span> con el perfil económico.</li>
-                <li>Abre tu hoja de <span className="text-white">Google Sheets</span> (Pestaña OPERACIONES).</li>
-                <li>Agrega una nueva fila con el <span className="text-white">ID de cliente</span> y su primera operación.</li>
-                <li>La App sincronizará al nuevo usuario al instante.</li>
-              </ul>
-            </div>
-            <button onClick={() => setShowAddClientInfo(false)} className="glass-button w-full py-3">Entendido</button>
-          </div>
-        </div>
-      )}
+      {showNewClientModal && <NewClientModal onClose={() => setShowNewClientModal(false)} />}
     </div>
   );
 };
