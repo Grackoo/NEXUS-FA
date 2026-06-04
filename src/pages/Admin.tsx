@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import { usePortfolio } from '../contexts/PortfolioContext';
-import { Shield, PlusCircle, Info, Search, BarChart3, Users, Terminal } from 'lucide-react';
+import { Shield, PlusCircle, Search, BarChart3, Users, Terminal } from 'lucide-react';
 import NexusLoadingScreen from '../components/NexusLoadingScreen';
 import GlobalOverview from '../components/admin/GlobalOverview';
 import ClientDirectory from '../components/admin/ClientDirectory';
