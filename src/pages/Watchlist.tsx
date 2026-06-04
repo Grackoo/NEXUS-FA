@@ -78,9 +78,9 @@ const Watchlist: React.FC = () => {
         </header>
 
         {/* Top Section: Watchlist + Main Chart */}
-        <div style={{ display: 'flex', gap: '24px', width: '100%', alignItems: 'flex-start' }} className="flex-col lg:flex-row">
+        <div className="flex flex-col md:flex-row gap-6 w-full items-start">
           {/* Sidebar Watchlist */}
-          <div style={{ flex: '1 1 30%', width: '100%' }} className="glass-card p-0 flex flex-col bg-gradient-to-b from-slate-900/80 to-black/60 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden h-auto shadow-2xl">
+          <div className="w-full md:w-[35%] lg:w-[30%] glass-card p-0 flex flex-col bg-gradient-to-b from-slate-900/80 to-black/60 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden h-auto shadow-2xl">
             <div className="p-4 md:p-5 border-b border-white/5 space-y-4 bg-white/[0.02]">
               <h2 className="text-sm font-bold text-white tracking-widest uppercase flex items-center gap-2">
                 <Star className="w-4 h-4 text-primary" /> Mis Listas
@@ -165,7 +165,7 @@ const Watchlist: React.FC = () => {
           </div>
 
           {/* Main Chart Area */}
-          <div style={{ flex: '1 1 70%', width: '100%' }} className="glass-card p-4 md:p-6 bg-black/60 backdrop-blur-xl border border-white/10 rounded-3xl h-auto shadow-2xl relative overflow-hidden">
+          <div className="w-full md:w-[65%] lg:w-[70%] glass-card p-4 md:p-6 bg-black/60 backdrop-blur-xl border border-white/10 rounded-3xl h-auto shadow-2xl relative overflow-hidden">
             {/* Background glow for chart */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 blur-[100px] rounded-full pointer-events-none -z-10"></div>
             
@@ -261,6 +261,7 @@ const Watchlist: React.FC = () => {
                   locale="es"
                   isTransparent={true}
                   showChart={true}
+                  exchange="NASDAQ"
                />
              </div>
           </div>
