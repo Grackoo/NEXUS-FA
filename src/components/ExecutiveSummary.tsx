@@ -1,13 +1,20 @@
 import React from 'react';
-import { Sparkles, MessageSquareQuote } from 'lucide-react';
+import { Sparkles, MessageSquareQuote, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useAdvisorNotes } from '../hooks/useAdvisorNotes';
 
 export const ExecutiveSummary: React.FC = () => {
   const { user } = useAuth();
+  const { getNote, markAsRead } = useAdvisorNotes();
   
-  // In a real app, this would be fetched from the database based on the client.
-  // For now, we'll mock a generic professional note.
-  const advisorNote = `Estimado ${user?.name || 'Cliente'}, el portafolio mantiene una fuerte exposición en tecnología y liquidez en moneda fuerte. Sugerimos mantener la posición en renta fija (CETES) para aprovechar las altas tasas actuales mientras evaluamos reentradas escalonadas en Renta Variable tras el próximo reporte de inflación.`;
+  const clientNoteData = user ? getNote(user.id) : null;
+  const isCustomNote = !!clientNoteData?.note;
+  
+  const advisorNote = isCustomNote 
+    ? clientNoteData.note 
+    : `Estimado ${user?.name || 'Cliente'}, el portafolio mantiene una fuerte exposición en tecnología y liquidez en moneda fuerte. Sugerimos mantener la posición en renta fija (CETES) para aprovechar las altas tasas actuales mientras evaluamos reentradas escalonadas en Renta Variable tras el próximo reporte de inflación.`;
+
+  const needsToRead = isCustomNote && !clientNoteData.isRead;
 
   return (
     <div className="glass-card p-6 bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 rounded-3xl h-full shadow-2xl flex flex-col relative overflow-hidden">
@@ -28,6 +35,17 @@ export const ExecutiveSummary: React.FC = () => {
         <p className="text-sm text-gray-300 leading-relaxed pl-4 border-l-2 border-primary/30 py-1">
           {advisorNote}
         </p>
+        
+        {needsToRead && (
+          <div className="mt-4 pl-4">
+            <button 
+              onClick={() => user && markAsRead(user.id)}
+              className="flex items-center gap-2 bg-primary/20 hover:bg-primary/40 text-primary border border-primary/50 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-[0_0_15px_rgba(26,92,255,0.2)] hover:shadow-[0_0_20px_rgba(26,92,255,0.4)]"
+            >
+              <CheckCircle2 className="w-4 h-4" /> Marcar como Leído
+            </button>
+          </div>
+        )}
       </div>
       
       <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between">
@@ -37,7 +55,16 @@ export const ExecutiveSummary: React.FC = () => {
           </div>
           <span className="text-xs text-gray-400">Nexus Advisor</span>
         </div>
-        <span className="text-[10px] text-gray-500">{new Date().toLocaleDateString()}</span>
+        <div className="flex items-center gap-3">
+          {clientNoteData?.isRead && (
+            <span className="flex items-center gap-1 text-[10px] text-emerald-400 font-bold">
+              <CheckCircle2 className="w-3 h-3" /> Visto
+            </span>
+          )}
+          <span className="text-[10px] text-gray-500">
+            {clientNoteData?.updatedAt ? new Date(clientNoteData.updatedAt).toLocaleDateString() : new Date().toLocaleDateString()}
+          </span>
+        </div>
       </div>
     </div>
   );

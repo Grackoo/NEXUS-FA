@@ -3,6 +3,7 @@ import Navbar from '../components/Navbar';
 import { usePortfolio } from '../contexts/PortfolioContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useAdvisorNotes } from '../hooks/useAdvisorNotes';
 import { deletePosition } from '../services/sheetsService';
 import {
   TrendingUp,
@@ -20,6 +21,8 @@ import {
   ChevronDown,
   ChevronUp,
   AlertTriangle,
+  MessageSquareQuote,
+  X,
 } from 'lucide-react';
 import SmartTransactionModal, { type EditAsset } from '../components/SmartTransactionModal';
 import EditSingleOperationModal from '../components/EditSingleOperationModal';
@@ -236,6 +239,23 @@ const Dashboard: React.FC = () => {
   const [showLoadingScreen, setShowLoadingScreen] = useState(() => {
     return !sessionStorage.getItem('hasSeenNexusLoading');
   });
+
+  const { getNote, markAsRead } = useAdvisorNotes();
+  const clientNoteData = user ? getNote(user.id) : null;
+  const [showNoteAlert, setShowNoteAlert] = useState(false);
+
+  React.useEffect(() => {
+    if (clientNoteData && !clientNoteData.isRead && !showLoadingScreen && !sessionStorage.getItem(`hasSeenNoteAlert_${user?.id}`)) {
+      setShowNoteAlert(true);
+    }
+  }, [clientNoteData, showLoadingScreen, user?.id]);
+
+  const handleDismissNoteAlert = () => {
+    setShowNoteAlert(false);
+    if (user) {
+      sessionStorage.setItem(`hasSeenNoteAlert_${user.id}`, 'true');
+    }
+  };
 
   const displayedPortfolio =
     selectedCategory === 'All'
@@ -729,6 +749,41 @@ const Dashboard: React.FC = () => {
           onCancel={() => setDeleteTarget(null)}
           isDeleting={isDeleting}
         />
+      )}
+
+      {/* ── Advisor Note Alert Modal ── */}
+      {showNoteAlert && (
+        <div className="modal-overlay animate-fade-in z-50">
+          <div className="glass-card w-full max-w-sm p-6 relative bg-gradient-to-br from-primary/10 to-transparent border border-primary/30 shadow-[0_0_40px_rgba(26,92,255,0.2)]">
+            <button 
+              onClick={handleDismissNoteAlert}
+              className="absolute top-4 right-4 p-1 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <div className="flex flex-col items-center text-center mt-2 space-y-4">
+              <div className="w-16 h-16 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center mb-2">
+                <MessageSquareQuote className="w-8 h-8 text-primary" />
+              </div>
+              <h2 className="text-xl font-bold text-white tracking-tight">
+                Nueva Nota de tu Asesor
+              </h2>
+              <p className="text-sm text-gray-300 leading-relaxed">
+                Tienes un nuevo mensaje sobre la estrategia de tu portafolio en la sección <span className="text-white font-bold">Resumen Ejecutivo</span>.
+              </p>
+              <button 
+                onClick={() => {
+                  handleDismissNoteAlert();
+                  // Optional: scroll to bottom where ExecutiveSummary is usually placed
+                  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                }}
+                className="w-full mt-4 py-3 bg-primary text-black font-bold rounded-xl hover:scale-[1.02] transition-all shadow-[0_0_20px_rgba(26,92,255,0.4)]"
+              >
+                Ir a leerlo
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -7,6 +7,7 @@ import { ChevronDown, ChevronUp, Save, LogIn, Eye, FileText, X, Pencil, Check } 
 import { updateKYC, submitOperation } from '../../services/sheetsService';
 import toast from 'react-hot-toast';
 import { prepareReportData } from '../../services/reportService';
+import { useAdvisorNotes } from '../../hooks/useAdvisorNotes';
 
 import ClientReportModal from './ClientReportModal';
 
@@ -24,6 +25,9 @@ const ClientDirectory: React.FC<{ searchTerm: string }> = ({ searchTerm }) => {
   const [isAssetsModalOpen, setIsAssetsModalOpen] = useState(false);
   const [reportData, setReportData] = useState<any>(null);
 
+  const { notes, updateNote } = useAdvisorNotes();
+  const [advisorNoteForm, setAdvisorNoteForm] = useState('');
+
   const clients = allClients.filter(c => 
     c.role === 'client' && c.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -39,6 +43,7 @@ const ClientDirectory: React.FC<{ searchTerm: string }> = ({ searchTerm }) => {
         lastCommunication: client.lastCommunication || ''
       });
       setContractUrlForm(localStorage.getItem(`contractUrl_${client.id}`) || '');
+      setAdvisorNoteForm(notes[client.id]?.note || '');
     }
   };
 
@@ -49,6 +54,10 @@ const ClientDirectory: React.FC<{ searchTerm: string }> = ({ searchTerm }) => {
       localStorage.setItem(`contractUrl_${clientId}`, contractUrlForm.trim());
     } else {
       localStorage.removeItem(`contractUrl_${clientId}`);
+    }
+
+    if (advisorNoteForm.trim() !== '') {
+      updateNote(clientId, advisorNoteForm.trim());
     }
 
     const success = await updateKYC(clientId, kycForm);
@@ -204,6 +213,27 @@ const ClientDirectory: React.FC<{ searchTerm: string }> = ({ searchTerm }) => {
                               </div>
                             </div>
                             
+                            <h4 className="text-xs font-bold text-emerald-400 uppercase tracking-widest mt-6 mb-4">Resumen Ejecutivo (Nota del Asesor)</h4>
+                            <div className="grid grid-cols-1 gap-4">
+                              <div>
+                                <div className="flex items-center justify-between mb-1">
+                                  <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Anotación para el Cliente</label>
+                                  {notes[client.id] && (
+                                    <span className={`text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full ${notes[client.id].isRead ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}`}>
+                                      {notes[client.id].isRead ? `Leído el ${new Date(notes[client.id].readAt!).toLocaleDateString()}` : 'Pendiente de Lectura'}
+                                    </span>
+                                  )}
+                                </div>
+                                <textarea 
+                                  value={advisorNoteForm}
+                                  onChange={e => setAdvisorNoteForm(e.target.value)}
+                                  className="glass-input w-full text-sm py-2 px-3 h-24 resize-none"
+                                  placeholder="Ej. Estimado cliente, su portafolio mantiene una fuerte exposición en tecnología..."
+                                />
+                                <p className="text-[9px] text-gray-500 mt-1">El cliente verá este mensaje en su pantalla principal y deberá confirmar de enterado.</p>
+                              </div>
+                            </div>
+
                             <h4 className="text-xs font-bold text-blue-400 uppercase tracking-widest mt-6 mb-4">Documentos Legales</h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div>
