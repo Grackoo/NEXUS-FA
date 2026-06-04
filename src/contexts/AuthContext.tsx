@@ -30,6 +30,7 @@ interface AuthContextType {
   stopImpersonating: () => void;
   isPrivacyMode: boolean;
   togglePrivacyMode: () => void;
+  registerLocalClient: (client: ClientProfile) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -67,7 +68,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             lastCommunication: find(['Ultima_Comunicacion', 'UltimaComunicacion'])
           };
         }).filter((c: any) => c.id);
-        setAuthorizedClients(mapped);
+        
+        const saved = localStorage.getItem('nexus_local_clients');
+        const localClients = saved ? JSON.parse(saved) : [];
+        
+        // Remove duplicates if the remote sheet already has the local client
+        const merged = [...mapped];
+        localClients.forEach((lc: ClientProfile) => {
+          if (!merged.find(m => m.id === lc.id)) {
+            merged.push(lc);
+          }
+        });
+
+        setAuthorizedClients(merged);
       }
       setIsLoading(false);
     };
@@ -101,6 +114,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 lastCommunication: find(['Ultima_Comunicacion', 'UltimaComunicacion'])
             } as ClientProfile;
         }).filter((c: any) => c.id);
+
+        const saved = localStorage.getItem('nexus_local_clients');
+        const localClients = saved ? JSON.parse(saved) : [];
+        
+        const merged = [...currentClients];
+        localClients.forEach((lc: ClientProfile) => {
+          if (!merged.find(m => m.id === lc.id)) {
+            merged.push(lc);
+          }
+        });
+
+        currentClients = merged;
         setAuthorizedClients(currentClients);
     }
 
@@ -129,8 +154,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setIsAdminImpersonating(false);
   };
 
+  const registerLocalClient = (client: ClientProfile) => {
+    const saved = localStorage.getItem('nexus_local_clients');
+    const localClients = saved ? JSON.parse(saved) : [];
+    localClients.push(client);
+    localStorage.setItem('nexus_local_clients', JSON.stringify(localClients));
+    setAuthorizedClients(prev => [...prev, client]);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading, impersonateClient, isAdminImpersonating, stopImpersonating, isPrivacyMode, togglePrivacyMode }}>
+    <AuthContext.Provider value={{ user, login, logout, isLoading, impersonateClient, isAdminImpersonating, stopImpersonating, isPrivacyMode, togglePrivacyMode, registerLocalClient }}>
       {children}
     </AuthContext.Provider>
   );

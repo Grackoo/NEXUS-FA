@@ -232,3 +232,28 @@ export async function logAudit(action: string, orderId: string, details: any) {
     return false;
   }
 }
+
+export async function registerNewClient(clientData: any) {
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'AddClient',
+        date: new Date().toISOString().split('T')[0],
+        Nombre: encryptData(clientData.name),
+        ID: clientData.id,
+        Password: clientData.password,
+        Email: clientData.email,
+        Telefono: clientData.phone,
+        Role: 'Client',
+      }),
+    });
+    invalidateCache();
+    return true;
+  } catch (error) {
+    console.error('Error registering new client:', error);
+    return false;
+  }
+}

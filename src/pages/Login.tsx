@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Shield, Lock, ChevronRight, Globe, TrendingUp, AlertCircle, UserPlus, X, Briefcase, HelpCircle, Eye, EyeOff, Loader2 } from 'lucide-react';
 import NexusBootScreen from '../components/NexusBootScreen';
@@ -12,6 +12,36 @@ const Login: React.FC = () => {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isBooting, setIsBooting] = useState(true);
   const { login, isLoading: isAuthLoading } = useAuth();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const urlId = params.get('id');
+    const urlPass = params.get('pass');
+    
+    if (urlId && urlPass) {
+      setUserId(urlId);
+      setPassword(urlPass);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isBooting && !isAuthLoading && userId && password) {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('id') && params.get('pass')) {
+        const doAutoLogin = async () => {
+          setIsSubmitting(true);
+          const result = await login(userId, password);
+          if (!result.success) {
+            setError(result.message || 'Error de acceso en auto-login.');
+            setIsSubmitting(false);
+          }
+        };
+        doAutoLogin();
+        // Clear params from URL so it doesn't trigger again on logout
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+  }, [isBooting, isAuthLoading, userId, password, login]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

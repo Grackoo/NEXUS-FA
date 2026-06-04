@@ -3,13 +3,14 @@ import { createPortal } from 'react-dom';
 import { usePortfolio } from '../../contexts/PortfolioContext';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { useAuth, type ClientProfile } from '../../contexts/AuthContext';
-import { ChevronDown, ChevronUp, Save, LogIn, Eye, FileText, X, Pencil, Check } from 'lucide-react';
+import { ChevronDown, ChevronUp, Save, LogIn, Eye, FileText, X, Pencil, Check, Plus, Search, UserCheck } from 'lucide-react';
 import { updateKYC, submitOperation } from '../../services/sheetsService';
 import toast from 'react-hot-toast';
 import { prepareReportData } from '../../services/reportService';
 import { useAdvisorNotes } from '../../hooks/useAdvisorNotes';
 
 import ClientReportModal from './ClientReportModal';
+import NewClientModal from './NewClientModal';
 
 const ClientDirectory: React.FC<{ searchTerm: string }> = ({ searchTerm }) => {
   const { allClients } = usePortfolio();
@@ -20,6 +21,7 @@ const ClientDirectory: React.FC<{ searchTerm: string }> = ({ searchTerm }) => {
   const [kycForm, setKycForm] = useState({ investmentHorizon: '', liquidityNeeds: '', lastCommunication: '' });
   const [contractUrlForm, setContractUrlForm] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [showNewClientModal, setShowNewClientModal] = useState(false);
 
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [isAssetsModalOpen, setIsAssetsModalOpen] = useState(false);
@@ -81,6 +83,22 @@ const ClientDirectory: React.FC<{ searchTerm: string }> = ({ searchTerm }) => {
 
   return (
     <>
+      <div className="mb-6 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+        <h2 className="text-xl font-bold flex items-center gap-3">
+          <UserCheck className="w-5 h-5 text-primary" />
+          Directorio de Inversionistas
+          <span className="px-2.5 py-0.5 rounded-full bg-primary/20 text-primary text-[10px] uppercase tracking-widest font-bold">
+            {clients.length} ACTIVOS
+          </span>
+        </h2>
+        <button 
+          onClick={() => setShowNewClientModal(true)}
+          className="glass-button bg-primary/20 border-primary/50 text-primary hover:bg-primary hover:text-white px-4 h-[42px] whitespace-nowrap shadow-[0_0_15px_rgba(26,92,255,0.2)]"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Nuevo Cliente
+        </button>
+      </div>
       <div className="glass-card overflow-hidden animate-fade-in bg-white/[0.01]">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse min-w-[900px]">
@@ -291,6 +309,8 @@ const ClientDirectory: React.FC<{ searchTerm: string }> = ({ searchTerm }) => {
           onClose={() => setReportData(null)} 
         />
       )}
+
+      {showNewClientModal && <NewClientModal onClose={() => setShowNewClientModal(false)} />}
     </>
   );
 };
