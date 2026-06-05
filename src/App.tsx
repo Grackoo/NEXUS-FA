@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Login from './pages/Login.tsx';
 import Dashboard from './pages/Dashboard.tsx';
 import Admin from './pages/Admin.tsx';
@@ -8,6 +8,11 @@ import { useAuth } from './contexts/AuthContext';
 import { Toaster } from 'react-hot-toast';
 import ImpersonationBanner from './components/admin/ImpersonationBanner.tsx';
 import NexusAgent from './components/NexusAgent.tsx';
+
+function GlobalRedirect() {
+  const location = useLocation();
+  return <Navigate to={`/login${location.search}`} replace />;
+}
 
 function App() {
   const { user } = useAuth();
@@ -40,7 +45,7 @@ function App() {
           element={user ? <Reports /> : <Navigate to="/login" />} 
         />
 
-        <Route path="*" element={<Navigate to="/login" />} />
+        <Route path="*" element={<GlobalRedirect />} />
       </Routes>
     </Router>
     <NexusAgent />

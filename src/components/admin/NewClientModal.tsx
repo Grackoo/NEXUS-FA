@@ -43,7 +43,7 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ onClose }) => {
 
     const newId = generateID(formData.name);
     const newPass = generatePassword();
-    const superLink = `${window.location.origin}/?id=${newId}&pass=${newPass}`;
+    const superLink = `${window.location.origin}/login?id=${newId}&pass=${newPass}`;
 
     const newClient = {
       id: newId,
