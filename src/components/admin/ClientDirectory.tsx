@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { usePortfolio } from '../../contexts/PortfolioContext';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { useAuth, type ClientProfile } from '../../contexts/AuthContext';
-import { ChevronDown, ChevronUp, Save, LogIn, Eye, FileText, X, Pencil, Check, UserCheck } from 'lucide-react';
+import { ChevronDown, ChevronUp, Save, LogIn, Eye, FileText, X, Pencil, Check, UserCheck, Loader2 } from 'lucide-react';
 import { updateKYC, submitOperation } from '../../services/sheetsService';
 import toast from 'react-hot-toast';
 import { prepareReportData } from '../../services/reportService';
@@ -20,6 +20,8 @@ const ClientDirectory: React.FC<{ searchTerm: string }> = ({ searchTerm }) => {
   const [kycForm, setKycForm] = useState({ investmentHorizon: '', liquidityNeeds: '', lastCommunication: '' });
   const [contractUrlForm, setContractUrlForm] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [editingRiskProfile, setEditingRiskProfile] = useState<{ [clientId: string]: string }>({});
+  const [isUpdatingRisk, setIsUpdatingRisk] = useState<{ [clientId: string]: boolean }>({});
 
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [isAssetsModalOpen, setIsAssetsModalOpen] = useState(false);
@@ -67,6 +69,34 @@ const ClientDirectory: React.FC<{ searchTerm: string }> = ({ searchTerm }) => {
       toast.error('Error al actualizar el expediente');
     }
     setIsSaving(false);
+  };
+
+  const handleSaveRiskProfile = async (clientId: string) => {
+    const newProfile = editingRiskProfile[clientId];
+    if (!newProfile) return;
+
+    setIsUpdatingRisk(prev => ({ ...prev, [clientId]: true }));
+    
+    try {
+      // In a real app we would call a specific sheetsService endpoint like updateRiskProfile(clientId, newProfile)
+      // For now we'll do the fetch manually here using the updateKYC pattern
+      const { SCRIPT_URL } = require('../../services/sheetsService');
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'UpdateRiskProfile',
+          clientId: clientId,
+          riskProfile: newProfile
+        }),
+      });
+      toast.success('Perfil de riesgo actualizado (Se requiere actualizar GAS para ver efecto en base de datos)');
+    } catch (e) {
+      toast.error('Error al actualizar el perfil de riesgo');
+    }
+
+    setIsUpdatingRisk(prev => ({ ...prev, [clientId]: false }));
   };
 
   const handleOpenAssetsModal = (clientId: string) => {
@@ -342,6 +372,30 @@ const ClientDirectory: React.FC<{ searchTerm: string }> = ({ searchTerm }) => {
                   <div>
                     <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Teléfono</label>
                     <p className="text-xs text-gray-300">{client.phone || 'N/A'}</p>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-white/5 mt-2">
+                  <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Perfil de Riesgo</label>
+                  <div className="flex gap-2">
+                    <select
+                      value={editingRiskProfile[client.id] || client.riskProfile || 'Moderado'}
+                      onChange={e => setEditingRiskProfile(prev => ({ ...prev, [client.id]: e.target.value }))}
+                      className="glass-input flex-1 text-xs py-1.5 px-3"
+                    >
+                      <option value="Conservador">Conservador</option>
+                      <option value="Moderado">Moderado</option>
+                      <option value="Agresivo">Agresivo</option>
+                    </select>
+                    {(editingRiskProfile[client.id] && editingRiskProfile[client.id] !== (client.riskProfile || 'Moderado')) && (
+                      <button 
+                        onClick={() => handleSaveRiskProfile(client.id)}
+                        disabled={isUpdatingRisk[client.id]}
+                        className="glass-button bg-primary/20 text-primary border-primary/50 text-xs px-3 py-1 flex items-center justify-center min-w-[70px]"
+                      >
+                        {isUpdatingRisk[client.id] ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Guardar'}
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
