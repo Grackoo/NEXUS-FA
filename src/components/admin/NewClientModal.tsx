@@ -16,6 +16,7 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ onClose }) => {
     name: '',
     email: '',
     phone: '',
+    riskProfile: 'Moderado',
   });
 
   const [generatedCreds, setGeneratedCreds] = useState<{ id: string, pass: string, link: string } | null>(null);
@@ -56,6 +57,7 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ onClose }) => {
       phone: formData.phone,
       password: newPass,
       role: 'client' as 'client',
+      riskProfile: formData.riskProfile as 'Conservador' | 'Moderado' | 'Agresivo',
     };
 
     // 1. Guardar en memoria/local storage para login inmediato
@@ -75,6 +77,7 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ onClose }) => {
     const text = `Hola ${formData.name.split(' ')[0]},\n\n` +
                  `Bienvenido a *NEXUS FA - Wealth Management*.\n\n` +
                  `Se ha creado tu perfil de inversionista con éxito.\n` +
+                 `Perfil asignado: *${formData.riskProfile}*\n\n` +
                  `Aquí tienes tus credenciales de acceso:\n\n` +
                  `👤 *ID de Socio:* ${generatedCreds.id}\n` +
                  `🔑 *Contraseña:* ${generatedCreds.pass}\n\n` +
@@ -139,6 +142,19 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ onClose }) => {
                   className="glass-input" 
                   placeholder="Ej: 52 1 555 123 4567" 
                 />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest ml-1">Perfil de Inversor</label>
+                <select
+                  value={formData.riskProfile}
+                  onChange={(e) => setFormData({...formData, riskProfile: e.target.value})}
+                  className="glass-input"
+                >
+                  <option value="Conservador">Conservador</option>
+                  <option value="Moderado">Moderado</option>
+                  <option value="Agresivo">Agresivo</option>
+                </select>
               </div>
 
               <div className="pt-4">

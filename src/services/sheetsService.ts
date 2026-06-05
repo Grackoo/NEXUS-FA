@@ -248,6 +248,7 @@ export async function registerNewClient(clientData: any) {
         Email: clientData.email,
         Telefono: clientData.phone,
         Role: 'Client',
+        Perfil_Riesgo: clientData.riskProfile || 'Moderado',
       }),
     });
     invalidateCache();
