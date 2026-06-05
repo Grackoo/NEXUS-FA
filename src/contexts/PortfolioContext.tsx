@@ -74,7 +74,7 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
         mappedClients = clientsRaw.map((row: any) => ({
           id: row.ID || row.id || '',
           name: row.Nombre || row.name || '',
-          role: (row.Role || row.role || 'client') as 'admin' | 'client',
+          role: (String(row.Role || row.role || 'client').toLowerCase()) as 'admin' | 'client',
           email: row.Email || row.email || '',
           phone: row.Telefono || row.phone || '',
           portfolio: [], // El portfolio se cargará desde el servidor
