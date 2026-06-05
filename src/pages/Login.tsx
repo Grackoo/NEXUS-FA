@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Shield, Lock, ChevronRight, Globe, TrendingUp, AlertCircle, UserPlus, X, Briefcase, HelpCircle, Eye, EyeOff, Loader2 } from 'lucide-react';
 import NexusBootScreen from '../components/NexusBootScreen';
+import { decryptData } from '../services/sheetsService';
 
 const Login: React.FC = () => {
   const [userId, setUserId] = useState('');
@@ -15,19 +16,34 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const urlId = params.get('id');
-    const urlPass = params.get('pass');
+    const token = params.get('token');
     
-    if (urlId && urlPass) {
-      setUserId(urlId);
-      setPassword(urlPass);
+    if (token) {
+      try {
+        const decrypted = decryptData(token);
+        const { id, pass } = JSON.parse(decrypted);
+        if (id && pass) {
+          setUserId(id);
+          setPassword(pass);
+        }
+      } catch (e) {
+        console.error("Token inválido");
+      }
+    } else {
+      const urlId = params.get('id');
+      const urlPass = params.get('pass');
+      
+      if (urlId && urlPass) {
+        setUserId(urlId);
+        setPassword(urlPass);
+      }
     }
   }, []);
 
   useEffect(() => {
     if (!isBooting && !isAuthLoading && userId && password) {
       const params = new URLSearchParams(window.location.search);
-      if (params.get('id') && params.get('pass')) {
+      if (params.get('token') || (params.get('id') && params.get('pass'))) {
         const doAutoLogin = async () => {
           setIsSubmitting(true);
           const result = await login(userId, password);

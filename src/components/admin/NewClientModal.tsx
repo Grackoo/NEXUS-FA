@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, UserPlus, CheckCircle, Link as LinkIcon, MessageCircle, ChevronRight, Loader2 } from 'lucide-react';
-import { registerNewClient } from '../../services/sheetsService';
+import { registerNewClient, encryptData } from '../../services/sheetsService';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface NewClientModalProps {
@@ -43,7 +43,11 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ onClose }) => {
 
     const newId = generateID(formData.name);
     const newPass = generatePassword();
-    const superLink = `${window.location.origin}/login?id=${newId}&pass=${newPass}`;
+    const tokenData = JSON.stringify({ id: newId, pass: newPass });
+    // Note: We use btoa to ensure the encrypted string is url-safe without weird characters if needed, 
+    // but encryptData already returns a base64 string. We just need to encode it for the URL.
+    const token = encodeURIComponent(encryptData(tokenData));
+    const superLink = `${window.location.origin}/login?token=${token}`;
 
     const newClient = {
       id: newId,
