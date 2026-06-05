@@ -36,7 +36,7 @@ export const AuditLog: React.FC = () => {
               placeholder="Buscar por Cliente ID..." 
               value={searchId}
               onChange={(e) => setSearchId(e.target.value)}
-              className="glass-input pl-11 w-full text-sm py-2"
+              className="glass-input !pl-11 w-full text-sm py-2"
             />
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
           </div>

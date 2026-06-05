@@ -109,7 +109,7 @@ export const DocumentVault: React.FC = () => {
                   type="date" 
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="glass-input w-full text-sm pl-10"
+                  className="glass-input w-full text-sm !pl-10"
                 />
                 <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
               </div>
@@ -121,7 +121,7 @@ export const DocumentVault: React.FC = () => {
                   type="date" 
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="glass-input w-full text-sm pl-10"
+                  className="glass-input w-full text-sm !pl-10"
                 />
                 <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
               </div>

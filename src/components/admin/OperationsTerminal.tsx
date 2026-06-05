@@ -170,7 +170,7 @@ const OperationsTerminal: React.FC = () => {
                     placeholder="0.00"
                     value={dividendForm.dividendPerShare}
                     onChange={e => setDividendForm({...dividendForm, dividendPerShare: e.target.value})}
-                    className="glass-input w-full pl-9 text-sm py-2 px-3"
+                    className="glass-input w-full !pl-9 text-sm py-2 px-3"
                   />
                 </div>
               </div>
@@ -184,7 +184,7 @@ const OperationsTerminal: React.FC = () => {
                   required
                   value={dividendForm.date}
                   onChange={e => setDividendForm({...dividendForm, date: e.target.value})}
-                  className="glass-input w-full pl-9 text-sm py-2 px-3 [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert"
+                  className="glass-input w-full !pl-9 text-sm py-2 px-3 [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert"
                 />
               </div>
             </div>
