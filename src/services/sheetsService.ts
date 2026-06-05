@@ -5,7 +5,7 @@
 
 import CryptoJS from 'crypto-js';
 
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwRqbjaQj_qfvlF6Whe8wtxC6g83hWU75lMNDudCU1_Vl3Hcs22GWevoTreKY64K2S4sA/exec';
+export const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwRqbjaQj_qfvlF6Whe8wtxC6g83hWU75lMNDudCU1_Vl3Hcs22GWevoTreKY64K2S4sA/exec';
 
 const ENCRYPTION_KEY = import.meta.env.VITE_ENCRYPTION_KEY || 'default_nexus_key_2026';
 
