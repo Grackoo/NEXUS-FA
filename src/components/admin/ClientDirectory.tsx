@@ -4,7 +4,7 @@ import { usePortfolio } from '../../contexts/PortfolioContext';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { useAuth, type ClientProfile } from '../../contexts/AuthContext';
 import { ChevronDown, ChevronUp, Save, LogIn, Eye, FileText, X, Pencil, Check, UserCheck, Loader2 } from 'lucide-react';
-import { updateKYC, submitOperation } from '../../services/sheetsService';
+import { updateKYC, submitOperation, SCRIPT_URL } from '../../services/sheetsService';
 import toast from 'react-hot-toast';
 import { prepareReportData } from '../../services/reportService';
 import { useAdvisorNotes } from '../../hooks/useAdvisorNotes';
@@ -78,9 +78,6 @@ const ClientDirectory: React.FC<{ searchTerm: string }> = ({ searchTerm }) => {
     setIsUpdatingRisk(prev => ({ ...prev, [clientId]: true }));
     
     try {
-      // In a real app we would call a specific sheetsService endpoint like updateRiskProfile(clientId, newProfile)
-      // For now we'll do the fetch manually here using the updateKYC pattern
-      const { SCRIPT_URL } = require('../../services/sheetsService');
       await fetch(SCRIPT_URL, {
         method: 'POST',
         mode: 'no-cors',
