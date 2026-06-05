@@ -97,7 +97,8 @@ const Login: React.FC = () => {
                 <input 
                   type="text" 
                   autoFocus
-                  className={`w-full bg-white/[0.04] border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-sm text-white placeholder:text-white/20 focus:bg-white/[0.08] focus:border-primary/60 focus:shadow-[0_0_20px_rgba(26,92,255,0.2)] transition-all outline-none ${error ? 'border-crimson/50' : ''}`} 
+                  className={`w-full bg-white/[0.04] border border-white/10 rounded-xl py-3.5 pr-4 text-sm text-white placeholder:text-white/20 focus:bg-white/[0.08] focus:border-primary/60 focus:shadow-[0_0_20px_rgba(26,92,255,0.2)] transition-all outline-none ${error ? 'border-crimson/50' : ''}`} 
+                  style={{ paddingLeft: '3rem' }}
                   placeholder="IDXXXXX" 
                   value={userId}
                   onChange={(e) => setUserId(e.target.value.trim().toUpperCase())}
@@ -112,7 +113,8 @@ const Login: React.FC = () => {
               <div className="relative group">
                 <input 
                   type={showPassword ? 'text' : 'password'} 
-                  className={`w-full bg-white/[0.04] border border-white/10 rounded-xl py-3.5 pl-12 pr-12 text-sm text-white placeholder:text-white/20 focus:bg-white/[0.08] focus:border-primary/60 focus:shadow-[0_0_20px_rgba(26,92,255,0.2)] transition-all outline-none ${error ? 'border-crimson/50' : ''}`} 
+                  className={`w-full bg-white/[0.04] border border-white/10 rounded-xl py-3.5 text-sm text-white placeholder:text-white/20 focus:bg-white/[0.08] focus:border-primary/60 focus:shadow-[0_0_20px_rgba(26,92,255,0.2)] transition-all outline-none ${error ? 'border-crimson/50' : ''}`} 
+                  style={{ paddingLeft: '3rem', paddingRight: '3rem' }}
                   placeholder="••••••••" 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
