@@ -252,12 +252,12 @@ const Watchlist: React.FC = () => {
             <p className="text-xs md:text-sm text-white/50 max-w-2xl">Monitor en tiempo real de los principales movimientos del mercado: descubre los activos con mayor crecimiento y volumen.</p>
           </div>
           
-          <div className="glass-card p-4 md:p-6 bg-gradient-to-tr from-slate-900/80 to-black/80 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden shadow-2xl h-[500px]">
-             <div className="w-full h-full">
+          <div className="glass-card p-4 md:p-6 bg-gradient-to-tr from-slate-900/80 to-black/80 backdrop-blur-xl border border-white/10 rounded-3xl overflow-y-auto shadow-2xl h-[500px] lg:h-[600px] scrollbar-hide">
+             <div className="w-full">
                <StockMarket 
                   colorTheme="dark" 
                   width="100%" 
-                  height="100%" 
+                  height={1200} 
                   locale="es"
                   isTransparent={true}
                   showChart={true}
