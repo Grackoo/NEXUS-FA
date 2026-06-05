@@ -79,6 +79,7 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
             id: row.ID || row.id || '',
             name: row.NOMBRE || row.Nombre || row.name || '',
             role: normalizedRole,
+            password: row.PASSWORD || row.Password || row.password || '',
             email: row.EMAIL || row.Email || row.email || '',
             phone: row.TELEFONO || row.Telefono || row.phone || '',
             portfolio: [], // El portfolio se cargará desde el servidor
