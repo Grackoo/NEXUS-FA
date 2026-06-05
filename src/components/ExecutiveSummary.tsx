@@ -30,11 +30,13 @@ export const ExecutiveSummary: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex-1 relative mt-3">
-        <MessageSquareQuote className="absolute top-1 left-4 w-6 h-6 text-primary/40 z-0" />
-        <p className="text-sm text-gray-300 leading-relaxed pl-12 border-l-2 border-primary/30 py-1 relative z-10">
-          {advisorNote}
-        </p>
+      <div className="flex-1 relative mt-4 z-10">
+        <MessageSquareQuote className="absolute -top-4 right-2 w-20 h-20 text-primary/5 -z-10" />
+        <div className="border-l-2 border-primary/30 pl-4 py-1">
+          <p className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">
+            {advisorNote}
+          </p>
+        </div>
         
         {needsToRead && (
           <div className="mt-4 pl-4">
