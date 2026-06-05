@@ -70,56 +70,58 @@ const Login: React.FC = () => {
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/20 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-primary/10 blur-[150px] pointer-events-none" />
       
-      <div className="w-full max-w-sm relative z-10 animate-fade-in">
+      <div className="w-full max-w-sm relative z-10 animate-fade-in flex flex-col items-center">
         <div className="flex flex-col items-center mb-10 group">
-          <div className="w-20 h-20 rounded-[28px] bg-primary flex items-center justify-center text-white mb-6 shadow-[0_0_40px_rgba(26,92,255,0.4)] group-hover:scale-105 group-hover:rotate-3 transition-all duration-500">
+          <div className="w-20 h-20 rounded-[24px] bg-primary flex items-center justify-center text-white mb-6 shadow-[0_0_40px_rgba(26,92,255,0.4)] group-hover:scale-105 group-hover:rotate-3 transition-all duration-500">
             <span className="text-4xl font-black">N</span>
           </div>
-          <h1 className="text-4xl font-bold tracking-tighter text-gradient leading-tight">NEXUS FA</h1>
+          <h1 className="text-4xl font-bold tracking-tighter text-white leading-tight" style={{ background: 'linear-gradient(135deg, #FFF 0%, #AAA 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>NEXUS FA</h1>
           <p className="text-[10px] text-gray-500 uppercase tracking-[0.3em] mt-2 font-medium">Digital Wealth Management</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="glass-card p-10 space-y-6 animate-fade-in shadow-[0_30px_60px_-15px_rgba(0,0,0,0.6)] border-white/5">
+        <form onSubmit={handleSubmit} className="w-full bg-[#050505]/80 backdrop-blur-2xl p-8 sm:p-10 rounded-[28px] border border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] space-y-7 relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-50"></div>
+          
           <div className="space-y-2 text-center">
-            <h2 className="text-xl font-bold tracking-tight">Acceso Exclusivo</h2>
-            <p className="text-[11px] text-gray-400 uppercase font-bold tracking-widest flex items-center justify-center gap-1.5 opacity-60">
-               <Shield className="w-3 h-3 text-primary" /> Security Protocol v4.0
+            <h2 className="text-2xl font-bold tracking-tight text-white">Acceso Exclusivo</h2>
+            <p className="text-[10px] text-primary uppercase font-bold tracking-widest flex items-center justify-center gap-1.5 opacity-80">
+               <Shield className="w-3 h-3" /> Security Protocol v4.0
             </p>
           </div>
 
           <div className="space-y-5">
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">ID de Socio</label>
+              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">ID de Socio</label>
               <div className="relative group">
                 <input 
                   type="text" 
                   autoFocus
-                  className={`glass-input pl-12 ${error ? 'border-crimson/50' : ''}`} 
+                  className={`w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3.5 pl-12 text-sm text-white placeholder:text-white/20 focus:bg-white/[0.06] focus:border-primary/50 transition-colors outline-none ${error ? 'border-crimson/50' : ''}`} 
                   placeholder="IDXXXXX" 
                   value={userId}
                   onChange={(e) => setUserId(e.target.value.trim().toUpperCase())}
                   required
                 />
-                <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-600 group-focus-within:text-primary transition-colors" />
+                <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-primary transition-colors" />
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Contraseña</label>
+              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Contraseña</label>
               <div className="relative group">
                 <input 
                   type={showPassword ? 'text' : 'password'} 
-                  className={`glass-input pl-12 pr-12 ${error ? 'border-crimson/50' : ''}`} 
+                  className={`w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3.5 pl-12 pr-12 text-sm text-white placeholder:text-white/20 focus:bg-white/[0.06] focus:border-primary/50 transition-colors outline-none ${error ? 'border-crimson/50' : ''}`} 
                   placeholder="••••••••" 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-600 group-focus-within:text-primary transition-colors" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-primary transition-colors" />
                 <button 
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 hover:text-white transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -127,17 +129,17 @@ const Login: React.FC = () => {
             </div>
             
             {error && (
-              <div className="flex items-center gap-2 p-3 rounded-xl bg-crimson/10 border border-crimson/20 text-crimson text-[10px] font-bold animate-shake">
-                <AlertCircle className="w-4 h-4" />
+              <div className="flex items-center gap-2 p-3 rounded-xl bg-crimson/10 border border-crimson/20 text-crimson text-[11px] font-bold animate-shake">
+                <AlertCircle className="w-4 h-4 shrink-0" />
                 {error}
               </div>
             )}
 
-            <div className="space-y-3 pt-2">
+            <div className="space-y-4 pt-2">
               <button 
                 type="submit" 
                 disabled={isSubmitting}
-                className="glass-button w-full shadow-[0_0_30px_rgba(26,92,255,0.3)] group h-14 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-primary text-white font-bold rounded-xl py-4 flex items-center justify-center shadow-[0_0_30px_rgba(26,92,255,0.2)] hover:shadow-[0_0_40px_rgba(26,92,255,0.4)] hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
               >
                 {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : (
                   <>
@@ -150,24 +152,24 @@ const Login: React.FC = () => {
               <button 
                 type="button"
                 onClick={() => setShowOnboarding(true)}
-                className="w-full flex items-center justify-center gap-2 py-3 text-[11px] font-bold text-gray-500 hover:text-primary transition-colors uppercase tracking-widest"
+                className="w-full flex items-center justify-center gap-2 py-3 text-[11px] font-bold text-gray-400 hover:text-white transition-colors uppercase tracking-widest"
               >
-                <UserPlus className="w-4 h-4 opacity-50" />
+                <UserPlus className="w-4 h-4" />
                 Nueva Solicitud de Cuenta
               </button>
             </div>
           </div>
 
-          <div className="pt-6 border-t border-white/5 flex flex-col items-center gap-4">
-             <div className="flex items-center gap-6 text-[10px] text-gray-600 uppercase font-bold tracking-[0.2em] opacity-40">
-                <span className="flex items-center gap-1"><TrendingUp className="w-3 h-3" /> Markets</span>
-                <span>Security</span>
-                <span>Insight</span>
+          <div className="pt-6 border-t border-white/10 flex flex-col items-center">
+             <div className="flex items-center gap-6 text-[10px] text-gray-500 uppercase font-bold tracking-[0.2em]">
+                <span className="flex items-center gap-1 hover:text-white transition-colors cursor-pointer"><TrendingUp className="w-3 h-3" /> Markets</span>
+                <span className="hover:text-white transition-colors cursor-pointer">Security</span>
+                <span className="hover:text-white transition-colors cursor-pointer">Insight</span>
              </div>
           </div>
         </form>
 
-        <p className="text-center text-[10px] text-gray-600 mt-10 uppercase tracking-widest font-medium opacity-50">© 2026 NEXUX Financial Architecture. All rights reserved.</p>
+        <p className="text-center text-[10px] text-gray-600 mt-10 uppercase tracking-widest font-medium opacity-60">© 2026 NEXUS Financial Architecture. All rights reserved.</p>
       </div>
 
       {/* Onboarding Modal */}
@@ -205,44 +207,46 @@ const OnboardingModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="glass-card w-full max-w-lg p-0 overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,1)] border-white/10 animate-fade-in mx-auto">
-        <div className="px-8 py-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+    <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 sm:p-6 bg-black/90 backdrop-blur-sm animate-fade-in">
+      <div className="bg-[#050505] w-full max-w-lg rounded-3xl overflow-hidden shadow-[0_0_100px_rgba(0,0,0,1)] border border-white/10 flex flex-col max-h-[95vh] relative">
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-50"></div>
+        
+        <div className="px-6 sm:px-8 py-5 border-b border-white/5 flex items-center justify-between bg-white/[0.02] shrink-0">
            <div>
-              <h2 className="text-xl font-bold flex items-center gap-2">
+              <h2 className="text-xl font-bold flex items-center gap-2 text-white">
                 <UserPlus className="w-5 h-5 text-primary" />
                 Nueva Solicitud
               </h2>
               <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-widest font-bold">Paso {step} de 2</p>
            </div>
-           <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-full transition-colors">
+           <button onClick={onClose} className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-colors">
               <X className="w-5 h-5" />
            </button>
         </div>
 
-        <div className="p-8 space-y-6">
+        <div className="p-6 sm:p-8 overflow-y-auto">
           {step === 1 ? (
             <div className="space-y-6 animate-fade-in">
               <div className="space-y-2">
-                <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest ml-1">Nombre Completo</label>
+                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest ml-1">Nombre Completo</label>
                 <input 
                   type="text" 
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  className="glass-input" 
+                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 focus:bg-white/[0.06] focus:border-primary/50 transition-colors outline-none" 
                   placeholder="Tu nombre aquí" 
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest ml-1 flex items-center gap-2">
+                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest ml-1 flex items-center gap-2">
                   <Briefcase className="w-3 h-3" /> Ocupación o Profesión
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   <select 
                     value={formData.occupation}
                     onChange={(e) => setFormData({...formData, occupation: e.target.value})}
-                    className="glass-input col-span-2 sm:col-span-1"
+                    className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-primary/50 transition-colors outline-none col-span-2 sm:col-span-1"
                   >
                     <option value="">Seleccionar...</option>
                     {occupations.map(occ => <option key={occ} value={occ}>{occ}</option>)}
@@ -252,7 +256,7 @@ const OnboardingModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                       type="text" 
                       value={formData.manualOccupation}
                       onChange={(e) => setFormData({...formData, manualOccupation: e.target.value})}
-                      className="glass-input col-span-2 sm:col-span-1" 
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 focus:bg-white/[0.06] focus:border-primary/50 transition-colors outline-none col-span-2 sm:col-span-1" 
                       placeholder="Especifica tu ocupación" 
                     />
                   )}
@@ -262,48 +266,49 @@ const OnboardingModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
               <button 
                 disabled={!formData.name || !formData.occupation}
                 onClick={() => setStep(2)}
-                className="glass-button w-full shadow-lg"
+                className="w-full bg-primary text-white font-bold rounded-xl py-3.5 flex items-center justify-center hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-4"
               >
                 Continuar <ChevronRight className="w-4 h-4 ml-2" />
               </button>
             </div>
           ) : (
-            <div className="space-y-5 animate-fade-in overflow-y-auto max-h-[60vh] pr-2 scrollbar-thin">
-              <div className="space-y-2 text-sm text-gray-300">
+            <div className="space-y-5 animate-fade-in">
+              <div className="space-y-2 text-sm text-gray-400">
                 <p>Por favor completa los detalles económicos para tu perfil de inversionista.</p>
               </div>
+              
               <div className="space-y-2">
-                <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest ml-1 flex items-center gap-2">
+                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest ml-1 flex items-center gap-2">
                   <HelpCircle className="w-3 h-3 text-primary" /> ¿Porcentaje de ahorro mensual?
                 </label>
                 <input 
                   type="text" 
                   value={formData.savings}
                   onChange={(e) => setFormData({...formData, savings: e.target.value})}
-                  className="glass-input" 
+                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 focus:bg-white/[0.06] focus:border-primary/50 transition-colors outline-none" 
                   placeholder="Ej: 10%, 20%..." 
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest ml-1">Meta Financiera Principal</label>
+                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest ml-1">Meta Financiera Principal</label>
                 <textarea 
                   value={formData.goal}
                   onChange={(e) => setFormData({...formData, goal: e.target.value})}
-                  className="glass-input min-h-[80px]" 
+                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 focus:bg-white/[0.06] focus:border-primary/50 transition-colors outline-none min-h-[80px]" 
                   placeholder="Ej: Retiro, Libertad financiera..." 
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest ml-1">Nivel de Riesgo</label>
+                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest ml-1">Nivel de Riesgo</label>
                 <div className="flex gap-2">
                   {['Bajo', 'Media', 'Alta'].map(r => (
                     <button
                       key={r}
                       type="button"
                       onClick={() => setFormData({...formData, risk: r})}
-                      className={`risk-btn ${formData.risk === r ? 'active' : ''}`}
+                      className={`flex-1 py-3 px-2 rounded-xl text-xs font-bold transition-colors border ${formData.risk === r ? 'bg-primary border-primary text-white shadow-[0_0_15px_rgba(26,92,255,0.4)]' : 'bg-white/[0.03] border-white/10 text-gray-400 hover:bg-white/[0.06]'}`}
                     >
                       {r}
                     </button>
@@ -312,19 +317,21 @@ const OnboardingModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest ml-1">Problema a Solucionar</label>
+                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest ml-1">Problema a Solucionar</label>
                 <input 
                   type="text" 
                   value={formData.problem}
                   onChange={(e) => setFormData({...formData, problem: e.target.value})}
-                  className="glass-input" 
+                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 focus:bg-white/[0.06] focus:border-primary/50 transition-colors outline-none" 
                   placeholder="Ej: Falta de ahorro, deudas..." 
                 />
               </div>
 
-              <div className="flex gap-4 pt-4">
-                <button onClick={() => setStep(1)} className="glass-button secondary flex-1">Atrás</button>
-                <button onClick={handleSend} className="glass-button flex-[2] bg-emerald/20 border border-emerald/50 text-emerald hover:bg-emerald/30 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+              <div className="flex gap-3 pt-4">
+                <button onClick={() => setStep(1)} className="flex-1 py-3.5 px-4 rounded-xl text-sm font-bold bg-white/[0.05] border border-white/10 text-white hover:bg-white/10 transition-colors">
+                  Atrás
+                </button>
+                <button onClick={handleSend} className="flex-[2] py-3.5 px-4 rounded-xl text-sm font-bold bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/30 transition-colors shadow-[0_0_20px_rgba(16,185,129,0.2)]">
                   Finalizar solicitud
                 </button>
               </div>
