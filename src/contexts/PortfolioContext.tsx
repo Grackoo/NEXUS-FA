@@ -72,15 +72,15 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
       if (SHEET_URLS.CLIENTS_DATA) {
         const clientsRaw = await fetchCsvCached(SHEET_URLS.CLIENTS_DATA);
         mappedClients = clientsRaw.map((row: any) => {
-          const rawRole = String(row.Role || row.role || 'client').toLowerCase();
+          const rawRole = String(row.ROLE || row.Role || row.role || 'client').toLowerCase();
           const normalizedRole = ['admin', 'administrador'].includes(rawRole) ? 'admin' : 'client';
           
           return {
             id: row.ID || row.id || '',
-            name: row.Nombre || row.name || '',
+            name: row.NOMBRE || row.Nombre || row.name || '',
             role: normalizedRole,
-            email: row.Email || row.email || '',
-            phone: row.Telefono || row.phone || '',
+            email: row.EMAIL || row.Email || row.email || '',
+            phone: row.TELEFONO || row.Telefono || row.phone || '',
             portfolio: [], // El portfolio se cargará desde el servidor
             operations: []
           };
