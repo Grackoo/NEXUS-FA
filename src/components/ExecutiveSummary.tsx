@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, MessageSquareQuote, CheckCircle2 } from 'lucide-react';
+import { Sparkles, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useAdvisorNotes } from '../hooks/useAdvisorNotes';
 
