@@ -30,9 +30,9 @@ export const ExecutiveSummary: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex-1 relative mt-2">
-        <MessageSquareQuote className="absolute -top-2 -left-2 w-8 h-8 text-primary/20" />
-        <p className="text-sm text-gray-300 leading-relaxed pl-8 border-l-2 border-primary/30 py-1 relative z-10">
+      <div className="flex-1 relative mt-3">
+        <MessageSquareQuote className="absolute top-1 left-4 w-6 h-6 text-primary/40 z-0" />
+        <p className="text-sm text-gray-300 leading-relaxed pl-12 border-l-2 border-primary/30 py-1 relative z-10">
           {advisorNote}
         </p>
         
