@@ -31,7 +31,7 @@ export const ExecutiveSummary: React.FC = () => {
       </div>
 
       <div className="flex-1 relative mt-4 z-10">
-        <div className="border-l-2 border-primary/30 pl-4 py-1">
+        <div className="py-1">
           <p className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">
             {advisorNote}
           </p>
