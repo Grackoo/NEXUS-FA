@@ -310,10 +310,27 @@ const ClientDirectory: React.FC<{ searchTerm: string }> = ({ searchTerm }) => {
               </div>
 
               <div className="space-y-3 flex-1">
-                <div>
-                  <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Contraseña de Acceso</label>
-                  <div className="glass-input w-full text-sm py-2 px-3 font-mono text-emerald-400 select-all">
-                    {client.password || 'No asignada'}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Contraseña de Acceso</label>
+                    <div className="glass-input w-full text-sm py-2 px-3 font-mono text-emerald-400 select-all">
+                      {client.password || 'No asignada'}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Super Link (Acceso Directo)</label>
+                    <div className="glass-input w-full text-sm py-2 px-3 font-mono text-blue-400 truncate cursor-pointer hover:bg-white/5 transition-colors"
+                         onClick={(e) => {
+                           const url = `${window.location.origin}/?id=${client.id}&pass=${client.password}`;
+                           navigator.clipboard.writeText(url);
+                           const target = e.target as HTMLElement;
+                           const originalText = target.innerText;
+                           target.innerText = '¡Copiado!';
+                           setTimeout(() => { target.innerText = originalText; }, 2000);
+                         }}
+                         title="Clic para copiar enlace mágico">
+                      {`${window.location.origin}/?id=${client.id}&pass=...`}
+                    </div>
                   </div>
                 </div>
 
