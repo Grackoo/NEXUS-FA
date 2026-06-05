@@ -114,6 +114,10 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
           });
           
           setAllClients(updatedClients);
+
+          // Populate allOperations for the admin by combining operations from all clients
+          const combinedOperations = updatedClients.flatMap(c => c.operations);
+          setAllOperations(combinedOperations);
           
           // También cargamos el portafolio del propio admin si tuviera (opcional, suele ser 0)
           const adminData = await fetchPortfolioCached(user.id);
