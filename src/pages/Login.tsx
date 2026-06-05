@@ -79,24 +79,25 @@ const Login: React.FC = () => {
           <p className="text-[10px] text-gray-500 uppercase tracking-[0.3em] mt-2 font-medium">Digital Wealth Management</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="w-full bg-[#050505]/80 backdrop-blur-2xl p-8 sm:p-10 rounded-[28px] border border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] space-y-7 relative overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-50"></div>
+        <form onSubmit={handleSubmit} className="w-full bg-white/[0.02] backdrop-blur-3xl p-8 sm:p-10 rounded-[32px] border border-white/10 shadow-[0_0_80px_rgba(26,92,255,0.15)] space-y-7 relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent opacity-80"></div>
+          <div className="absolute top-[-50px] left-1/2 -translate-x-1/2 w-[150px] h-[100px] bg-primary/20 blur-[50px] rounded-full pointer-events-none"></div>
           
-          <div className="space-y-2 text-center">
+          <div className="space-y-2 text-center relative z-10">
             <h2 className="text-2xl font-bold tracking-tight text-white">Acceso Exclusivo</h2>
             <p className="text-[10px] text-primary uppercase font-bold tracking-widest flex items-center justify-center gap-1.5 opacity-80">
                <Shield className="w-3 h-3" /> Security Protocol v4.0
             </p>
           </div>
 
-          <div className="space-y-5">
+          <div className="space-y-5 relative z-10">
             <div className="space-y-2">
               <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">ID de Socio</label>
               <div className="relative group">
                 <input 
                   type="text" 
                   autoFocus
-                  className={`w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3.5 pl-12 text-sm text-white placeholder:text-white/20 focus:bg-white/[0.06] focus:border-primary/50 transition-colors outline-none ${error ? 'border-crimson/50' : ''}`} 
+                  className={`w-full bg-white/[0.04] border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-sm text-white placeholder:text-white/20 focus:bg-white/[0.08] focus:border-primary/60 focus:shadow-[0_0_20px_rgba(26,92,255,0.2)] transition-all outline-none ${error ? 'border-crimson/50' : ''}`} 
                   placeholder="IDXXXXX" 
                   value={userId}
                   onChange={(e) => setUserId(e.target.value.trim().toUpperCase())}
@@ -111,7 +112,7 @@ const Login: React.FC = () => {
               <div className="relative group">
                 <input 
                   type={showPassword ? 'text' : 'password'} 
-                  className={`w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3.5 pl-12 pr-12 text-sm text-white placeholder:text-white/20 focus:bg-white/[0.06] focus:border-primary/50 transition-colors outline-none ${error ? 'border-crimson/50' : ''}`} 
+                  className={`w-full bg-white/[0.04] border border-white/10 rounded-xl py-3.5 pl-12 pr-12 text-sm text-white placeholder:text-white/20 focus:bg-white/[0.08] focus:border-primary/60 focus:shadow-[0_0_20px_rgba(26,92,255,0.2)] transition-all outline-none ${error ? 'border-crimson/50' : ''}`} 
                   placeholder="••••••••" 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -139,7 +140,7 @@ const Login: React.FC = () => {
               <button 
                 type="submit" 
                 disabled={isSubmitting}
-                className="w-full bg-primary text-white font-bold rounded-xl py-4 flex items-center justify-center shadow-[0_0_30px_rgba(26,92,255,0.2)] hover:shadow-[0_0_40px_rgba(26,92,255,0.4)] hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+                className="w-full bg-primary text-white font-bold rounded-xl py-4 flex items-center justify-center shadow-[0_0_30px_rgba(26,92,255,0.3)] hover:shadow-[0_0_50px_rgba(26,92,255,0.5)] hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
               >
                 {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : (
                   <>
@@ -160,7 +161,7 @@ const Login: React.FC = () => {
             </div>
           </div>
 
-          <div className="pt-6 border-t border-white/10 flex flex-col items-center">
+          <div className="pt-6 border-t border-white/10 flex flex-col items-center relative z-10">
              <div className="flex items-center gap-6 text-[10px] text-gray-500 uppercase font-bold tracking-[0.2em]">
                 <span className="flex items-center gap-1 hover:text-white transition-colors cursor-pointer"><TrendingUp className="w-3 h-3" /> Markets</span>
                 <span className="hover:text-white transition-colors cursor-pointer">Security</span>
