@@ -71,15 +71,20 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
       // Mantenemos la carga de la lista de clientes para usos administrativos
       if (SHEET_URLS.CLIENTS_DATA) {
         const clientsRaw = await fetchCsvCached(SHEET_URLS.CLIENTS_DATA);
-        mappedClients = clientsRaw.map((row: any) => ({
-          id: row.ID || row.id || '',
-          name: row.Nombre || row.name || '',
-          role: (String(row.Role || row.role || 'client').toLowerCase()) as 'admin' | 'client',
-          email: row.Email || row.email || '',
-          phone: row.Telefono || row.phone || '',
-          portfolio: [], // El portfolio se cargará desde el servidor
-          operations: []
-        })).filter((c: any) => c.id);
+        mappedClients = clientsRaw.map((row: any) => {
+          const rawRole = String(row.Role || row.role || 'client').toLowerCase();
+          const normalizedRole = ['admin', 'administrador'].includes(rawRole) ? 'admin' : 'client';
+          
+          return {
+            id: row.ID || row.id || '',
+            name: row.Nombre || row.name || '',
+            role: normalizedRole,
+            email: row.Email || row.email || '',
+            phone: row.Telefono || row.phone || '',
+            portfolio: [], // El portfolio se cargará desde el servidor
+            operations: []
+          };
+        }).filter((c: any) => c.id);
         
         setAllClients(mappedClients);
       }
