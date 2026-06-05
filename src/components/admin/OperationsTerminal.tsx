@@ -115,11 +115,12 @@ const OperationsTerminal: React.FC = () => {
               <select 
                 value={selectedClientId} 
                 onChange={e => setSelectedClientId(e.target.value)}
-                className="glass-input w-full text-sm py-3 px-4 appearance-none"
+                className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3.5 text-sm text-white focus:bg-white/[0.06] focus:border-primary/50 transition-colors outline-none appearance-none cursor-pointer"
+                style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1.2em' }}
               >
-                <option value="">-- Selecciona un cliente --</option>
+                <option value="" className="bg-[#111] text-white py-2">-- Selecciona un cliente --</option>
                 {clients.map(c => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
+                  <option key={c.id} value={c.id} className="bg-[#111] text-white py-2">{c.name}</option>
                 ))}
               </select>
             </div>

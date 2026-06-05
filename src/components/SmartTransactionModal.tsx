@@ -344,12 +344,13 @@ const SmartTransactionModal: React.FC<Props> = ({
                   const newType = e.target.value as any;
                   setAssetType(newType);
                 }}
-                className="glass-input cursor-pointer"
+                className="w-full bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3.5 text-sm text-white focus:bg-white/[0.08] focus:border-primary/60 transition-colors outline-none appearance-none cursor-pointer"
+                style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1.2em' }}
               >
-                <option value="Renta Variable">Renta Variable (Acciones/ETFs)</option>
-                <option value="Criptomonedas">Criptomonedas</option>
-                <option value="Renta Fija">Renta Fija (CETES/Bonos)</option>
-                <option value="Divisas">Divisas (Cash/Forex)</option>
+                <option value="Renta Variable" className="bg-[#111] text-white">Renta Variable (Acciones/ETFs)</option>
+                <option value="Criptomonedas" className="bg-[#111] text-white">Criptomonedas</option>
+                <option value="Renta Fija" className="bg-[#111] text-white">Renta Fija (CETES/Bonos)</option>
+                <option value="Divisas" className="bg-[#111] text-white">Divisas (Cash/Forex)</option>
               </select>
             </div>
           </div>
@@ -361,10 +362,11 @@ const SmartTransactionModal: React.FC<Props> = ({
               <select
                 value={currency}
                 onChange={e => setCurrency(e.target.value as any)}
-                className="glass-input cursor-pointer"
+                className="w-full bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3.5 text-sm text-white focus:bg-white/[0.08] focus:border-primary/60 transition-colors outline-none appearance-none cursor-pointer"
+                style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1.2em' }}
               >
-                <option value="USD">Dólar (USD)</option>
-                <option value="MXN">Peso (MXN)</option>
+                <option value="USD" className="bg-[#111] text-white">Dólar (USD)</option>
+                <option value="MXN" className="bg-[#111] text-white">Peso (MXN)</option>
               </select>
             </div>
             <div className="space-y-2">
