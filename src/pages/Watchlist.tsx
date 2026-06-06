@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
-import { AdvancedRealTimeChart, StockMarket } from 'react-ts-tradingview-widgets';
+import { AdvancedRealTimeChart, Screener } from 'react-ts-tradingview-widgets';
 import { Plus, Search, Star, ArrowDownToLine, ArrowUpToLine, BellRing } from 'lucide-react';
 import MarketHeatmap from '../components/MarketHeatmap';
 import EconomicEvents from '../components/EconomicEvents';
@@ -253,15 +253,17 @@ const Watchlist: React.FC = () => {
           </div>
           
           <div className="glass-card p-4 md:p-6 bg-gradient-to-tr from-slate-900/80 to-black/80 backdrop-blur-xl border border-white/10 rounded-3xl overflow-y-auto shadow-2xl h-[500px] lg:h-[600px] scrollbar-hide">
-             <div className="w-full">
-               <StockMarket 
+             <div className="w-full h-full">
+               <Screener 
                   colorTheme="dark" 
                   width="100%" 
-                  height={1200} 
+                  height="100%" 
                   locale="es"
                   isTransparent={true}
-                  showChart={true}
-                  exchange="NASDAQ"
+                  market="america"
+                  defaultColumn="overview"
+                  defaultScreen="most_capitalized"
+                  showToolbar={true}
                />
              </div>
           </div>
