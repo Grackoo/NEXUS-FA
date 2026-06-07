@@ -29,20 +29,25 @@ const Watchlist: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newAsset, setNewAsset] = useState({ symbol: '', name: '', type: 'Stock', ticker: '' });
+  const [newTicker, setNewTicker] = useState('');
 
   const handleAddAsset = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newAsset.symbol || !newAsset.name || !newAsset.ticker) return;
+    if (!newTicker.trim()) return;
+
+    const formattedTicker = newTicker.trim().toUpperCase();
 
     const newWatchlistItem: WatchlistItem = {
-      ...newAsset,
+      symbol: formattedTicker,
+      name: formattedTicker,
+      ticker: formattedTicker,
+      type: 'Activo',
       mockPrice: Math.floor(Math.random() * 1000) + 100
     };
 
     setWatchlistItems([...watchlistItems, newWatchlistItem]);
     setIsModalOpen(false);
-    setNewAsset({ symbol: '', name: '', type: 'Stock', ticker: '' });
+    setNewTicker('');
   };
   
   const [targets, setTargets] = useState<Record<string, { buy?: number, sell?: number }>>(() => {
@@ -305,55 +310,16 @@ const Watchlist: React.FC = () => {
               
               <form onSubmit={handleAddAsset} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-medium text-white/70 mb-1.5">Símbolo (TradingView)</label>
+                  <label className="block text-xs font-medium text-white/70 mb-1.5">Ticker o Símbolo del Activo</label>
                   <input 
                     type="text" 
                     required
-                    value={newAsset.symbol}
-                    onChange={(e) => setNewAsset({...newAsset, symbol: e.target.value})}
+                    value={newTicker}
+                    onChange={(e) => setNewTicker(e.target.value)}
                     className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-primary"
-                    placeholder="ej. TVC:SPX"
+                    placeholder="ej. AAPL, BTCUSD, SPX"
                   />
-                </div>
-                
-                <div>
-                  <label className="block text-xs font-medium text-white/70 mb-1.5">Nombre del Activo</label>
-                  <input 
-                    type="text" 
-                    required
-                    value={newAsset.name}
-                    onChange={(e) => setNewAsset({...newAsset, name: e.target.value})}
-                    className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-primary"
-                    placeholder="ej. S&P 500 Index"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-medium text-white/70 mb-1.5">Ticker</label>
-                    <input 
-                      type="text" 
-                      required
-                      value={newAsset.ticker}
-                      onChange={(e) => setNewAsset({...newAsset, ticker: e.target.value})}
-                      className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-primary"
-                      placeholder="ej. SPX"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-white/70 mb-1.5">Tipo</label>
-                    <select 
-                      value={newAsset.type}
-                      onChange={(e) => setNewAsset({...newAsset, type: e.target.value})}
-                      className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-primary appearance-none"
-                    >
-                      <option value="Stock">Stock</option>
-                      <option value="Cripto">Cripto</option>
-                      <option value="Forex">Forex</option>
-                      <option value="Commodity">Commodity</option>
-                      <option value="Index">Index</option>
-                    </select>
-                  </div>
+                  <p className="text-[10px] text-white/40 mt-1.5">Ingresa el ticker para visualizar el gráfico. Si no carga, intenta agregar el exchange (ej. NASDAQ:AAPL, BINANCE:BTCUSD).</p>
                 </div>
 
                 <button 
