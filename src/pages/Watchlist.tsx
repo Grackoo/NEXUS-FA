@@ -103,7 +103,7 @@ const Watchlist: React.FC = () => {
         {/* Top Section: Watchlist + Main Chart */}
         <div className="flex flex-col md:flex-row gap-6 w-full items-start">
           {/* Sidebar Watchlist */}
-          <div className="w-full md:w-[35%] lg:w-[30%] glass-card p-0 flex flex-col bg-gradient-to-b from-slate-900/80 to-black/60 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden h-auto shadow-2xl">
+          <div className="w-full md:w-[35%] lg:w-[30%] glass-card p-0 flex flex-col bg-gradient-to-b from-slate-900/80 to-black/60 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden h-auto shadow-2xl relative">
             <div className="p-4 md:p-5 border-b border-white/5 space-y-4 bg-white/[0.02]">
               <h2 className="text-sm font-bold text-white tracking-widest uppercase flex items-center gap-2">
                 <Star className="w-4 h-4 text-primary" /> Mis Listas
@@ -188,6 +188,43 @@ const Watchlist: React.FC = () => {
                 <Plus className="w-4 h-4" /> Añadir Activo
               </button>
             </div>
+            {/* Modal Añadir Activo (Overlay inside Sidebar) */}
+            {isModalOpen && (
+              <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4 rounded-3xl">
+                <div className="bg-[#0f0f13] border border-white/10 rounded-2xl w-full p-6 relative shadow-2xl animate-fade-in">
+                  <button 
+                    onClick={() => setIsModalOpen(false)}
+                    className="absolute top-4 right-4 text-white/50 hover:text-white transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                  
+                  <h3 className="text-xl font-bold text-white mb-6">Añadir Activo</h3>
+                  
+                  <form onSubmit={handleAddAsset} className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-medium text-white/70 mb-1.5">Ticker o Símbolo del Activo</label>
+                      <input 
+                        type="text" 
+                        required
+                        value={newTicker}
+                        onChange={(e) => setNewTicker(e.target.value)}
+                        className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-primary"
+                        placeholder="ej. AAPL, BTCUSD, SPX"
+                      />
+                      <p className="text-[10px] text-white/40 mt-1.5">Ingresa el ticker para visualizar el gráfico. Si no carga, intenta agregar el exchange (ej. NASDAQ:AAPL).</p>
+                    </div>
+
+                    <button 
+                      type="submit"
+                      className="w-full py-3 mt-4 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl transition-colors shadow-[0_0_15px_rgba(26,92,255,0.4)]"
+                    >
+                      Añadir a la lista
+                    </button>
+                  </form>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Main Chart Area */}
@@ -295,43 +332,6 @@ const Watchlist: React.FC = () => {
           </div>
         </div>
 
-        {/* Modal Añadir Activo */}
-        {isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
-            <div className="bg-[#0f0f13] border border-white/10 rounded-2xl w-full max-w-md p-6 relative shadow-2xl animate-fade-in">
-              <button 
-                onClick={() => setIsModalOpen(false)}
-                className="absolute top-4 right-4 text-white/50 hover:text-white transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-              
-              <h3 className="text-xl font-bold text-white mb-6">Añadir Nuevo Activo</h3>
-              
-              <form onSubmit={handleAddAsset} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-medium text-white/70 mb-1.5">Ticker o Símbolo del Activo</label>
-                  <input 
-                    type="text" 
-                    required
-                    value={newTicker}
-                    onChange={(e) => setNewTicker(e.target.value)}
-                    className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-primary"
-                    placeholder="ej. AAPL, BTCUSD, SPX"
-                  />
-                  <p className="text-[10px] text-white/40 mt-1.5">Ingresa el ticker para visualizar el gráfico. Si no carga, intenta agregar el exchange (ej. NASDAQ:AAPL, BINANCE:BTCUSD).</p>
-                </div>
-
-                <button 
-                  type="submit"
-                  className="w-full py-3 mt-4 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl transition-colors shadow-[0_0_15px_rgba(26,92,255,0.4)]"
-                >
-                  Añadir a la lista
-                </button>
-              </form>
-            </div>
-          </div>
-        )}
       </main>
     </div>
   );
