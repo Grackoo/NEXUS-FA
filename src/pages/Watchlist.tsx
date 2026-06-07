@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import { AdvancedRealTimeChart, Screener } from 'react-ts-tradingview-widgets';
-import { Plus, Search, Star, ArrowDownToLine, ArrowUpToLine, BellRing } from 'lucide-react';
+import { Plus, Search, Star, ArrowDownToLine, ArrowUpToLine, BellRing, X } from 'lucide-react';
 import MarketHeatmap from '../components/MarketHeatmap';
 import EconomicEvents from '../components/EconomicEvents';
 
@@ -24,8 +24,26 @@ const WATCHLIST_ITEMS: WatchlistItem[] = [
 ];
 
 const Watchlist: React.FC = () => {
+  const [watchlistItems, setWatchlistItems] = useState<WatchlistItem[]>(WATCHLIST_ITEMS);
   const [selectedAsset, setSelectedAsset] = useState<WatchlistItem>(WATCHLIST_ITEMS[0]);
   const [searchQuery, setSearchQuery] = useState('');
+  
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newAsset, setNewAsset] = useState({ symbol: '', name: '', type: 'Stock', ticker: '' });
+
+  const handleAddAsset = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newAsset.symbol || !newAsset.name || !newAsset.ticker) return;
+
+    const newWatchlistItem: WatchlistItem = {
+      ...newAsset,
+      mockPrice: Math.floor(Math.random() * 1000) + 100
+    };
+
+    setWatchlistItems([...watchlistItems, newWatchlistItem]);
+    setIsModalOpen(false);
+    setNewAsset({ symbol: '', name: '', type: 'Stock', ticker: '' });
+  };
   
   const [targets, setTargets] = useState<Record<string, { buy?: number, sell?: number }>>(() => {
     const saved = localStorage.getItem('nexus_watchlist_targets');
@@ -55,7 +73,7 @@ const Watchlist: React.FC = () => {
     localStorage.setItem('nexus_watchlist_targets', JSON.stringify(newTargets));
   };
 
-  const filteredItems = WATCHLIST_ITEMS.filter(item => 
+  const filteredItems = watchlistItems.filter(item => 
     item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
     item.ticker.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -158,7 +176,10 @@ const Watchlist: React.FC = () => {
             </div>
             
             <div className="p-4 md:p-5 border-t border-white/5 bg-white/[0.01]">
-              <button className="w-full py-3 rounded-xl border border-dashed border-white/20 text-white/60 text-xs font-bold uppercase tracking-widest hover:border-primary/50 hover:text-primary hover:bg-primary/5 transition-all flex items-center justify-center gap-2">
+              <button 
+                onClick={() => setIsModalOpen(true)}
+                className="w-full py-3 rounded-xl border border-dashed border-white/20 text-white/60 text-xs font-bold uppercase tracking-widest hover:border-primary/50 hover:text-primary hover:bg-primary/5 transition-all flex items-center justify-center gap-2"
+              >
                 <Plus className="w-4 h-4" /> Añadir Activo
               </button>
             </div>
@@ -268,6 +289,83 @@ const Watchlist: React.FC = () => {
              </div>
           </div>
         </div>
+
+        {/* Modal Añadir Activo */}
+        {isModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+            <div className="bg-[#0f0f13] border border-white/10 rounded-2xl w-full max-w-md p-6 relative shadow-2xl animate-fade-in">
+              <button 
+                onClick={() => setIsModalOpen(false)}
+                className="absolute top-4 right-4 text-white/50 hover:text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              
+              <h3 className="text-xl font-bold text-white mb-6">Añadir Nuevo Activo</h3>
+              
+              <form onSubmit={handleAddAsset} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-medium text-white/70 mb-1.5">Símbolo (TradingView)</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={newAsset.symbol}
+                    onChange={(e) => setNewAsset({...newAsset, symbol: e.target.value})}
+                    className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-primary"
+                    placeholder="ej. TVC:SPX"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-xs font-medium text-white/70 mb-1.5">Nombre del Activo</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={newAsset.name}
+                    onChange={(e) => setNewAsset({...newAsset, name: e.target.value})}
+                    className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-primary"
+                    placeholder="ej. S&P 500 Index"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-white/70 mb-1.5">Ticker</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={newAsset.ticker}
+                      onChange={(e) => setNewAsset({...newAsset, ticker: e.target.value})}
+                      className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-primary"
+                      placeholder="ej. SPX"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-white/70 mb-1.5">Tipo</label>
+                    <select 
+                      value={newAsset.type}
+                      onChange={(e) => setNewAsset({...newAsset, type: e.target.value})}
+                      className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-primary appearance-none"
+                    >
+                      <option value="Stock">Stock</option>
+                      <option value="Cripto">Cripto</option>
+                      <option value="Forex">Forex</option>
+                      <option value="Commodity">Commodity</option>
+                      <option value="Index">Index</option>
+                    </select>
+                  </div>
+                </div>
+
+                <button 
+                  type="submit"
+                  className="w-full py-3 mt-4 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl transition-colors shadow-[0_0_15px_rgba(26,92,255,0.4)]"
+                >
+                  Añadir a la lista
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
