@@ -1,13 +1,36 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Modelos soportados con orden de prioridad y respaldo automático
-const DEFAULT_CANDIDATE_MODELS = [
-  'gemini-2.0-flash',
-  'gemini-1.5-flash',
-  'gemini-2.0-flash-lite',
-  'gemini-1.5-flash-8b',
-  'gemini-1.5-pro',
-];
+// Cache en memoria para los modelos soportados por la API key
+let cachedAvailableModels: { models: string[]; timestamp: number } | null = null;
+const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutos
+
+async function getAvailableModelNames(apiKey: string): Promise<string[]> {
+  const now = Date.now();
+  if (cachedAvailableModels && (now - cachedAvailableModels.timestamp) < CACHE_TTL_MS) {
+    return cachedAvailableModels.models;
+  }
+
+  try {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data.models)) {
+        const supported = data.models
+          .filter((m: any) => Array.isArray(m.supportedGenerationMethods) && m.supportedGenerationMethods.includes('generateContent'))
+          .map((m: any) => m.name.replace(/^models\//, ''));
+        if (supported.length > 0) {
+          cachedAvailableModels = { models: supported, timestamp: now };
+          return supported;
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('[Nexus AI] No se pudo obtener listado dinámico de modelos de Google API:', e);
+  }
+
+  // Fallback con modelos vigentes
+  return ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-3.8-flash', 'gemini-1.5-flash'];
+}
 
 export default async function handler(req: any, res: any) {
   // Configuración de CORS
@@ -36,12 +59,12 @@ export default async function handler(req: any, res: any) {
 
     const apiKey = process.env.AI_AGENT_KEY;
     if (!apiKey) {
-      return res.status(500).json({ error: 'AI Agent API key no está configurada en el servidor (AI_AGENT_KEY).' });
+      return res.status(500).json({ error: 'La API Key de Nexus AI (AI_AGENT_KEY) no está configurada en las variables de entorno de Vercel.' });
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
 
-    // Calcular fecha y hora actual en tiempo real
+    // Fecha actual en tiempo real
     const now = new Date();
     const formattedDate = now.toLocaleDateString('es-MX', {
       weekday: 'long',
@@ -70,24 +93,40 @@ Contexto del inversionista:
 ${portfolioSummary || 'Sin activos registrados actualmente'}
 [FIN DE INSTRUCCIONES]`;
 
-    // Lista de modelos a intentar en orden de prioridad
-    const candidateModels = [
-      preferredModel,
-      ...DEFAULT_CANDIDATE_MODELS,
-    ].filter((m): m is string => Boolean(m) && typeof m === 'string' && m.trim().length > 0);
+    // 1. Obtener los modelos realmente disponibles para esta clave en Google AI Studio
+    const availableFromApi = await getAvailableModelNames(apiKey);
 
-    // Deduplicar manteniendo el orden de preferencia
-    const uniqueModels = Array.from(new Set(candidateModels));
+    // 2. Orden de preferencia prioritario
+    const preferredPriority = [
+      preferredModel,
+      'gemini-2.5-flash',
+      'gemini-2.5-flash-lite',
+      'gemini-3.8-flash',
+      'gemini-3.5-flash-lite',
+      'gemini-1.5-flash',
+    ].filter((m): m is string => Boolean(m) && typeof m === 'string' && m.trim().length > 0 && m !== 'auto');
+
+    // Combinar modelos preferidos que existan en la API + los demás disponibles
+    const matchedPreferred = preferredPriority.filter(m => availableFromApi.includes(m));
+    const remainingAvailable = availableFromApi.filter(m => !preferredPriority.includes(m));
+    
+    // Si ninguno coincidió, usamos los disponibles o la prioridad
+    const candidateModels = Array.from(new Set([
+      ...matchedPreferred,
+      ...preferredPriority,
+      ...remainingAvailable
+    ]));
 
     let lastError: any = null;
     let successfulText = '';
     let usedModel = '';
+    let hadQuotaError = false;
 
     const isFirstMessage = !history || history.length === 0;
 
-    for (const modelCandidate of uniqueModels) {
+    for (const modelCandidate of candidateModels) {
       try {
-        console.log(`[Nexus AI] Intentando generar respuesta con modelo: ${modelCandidate}`);
+        console.log(`[Nexus AI] Consultando modelo: ${modelCandidate}`);
         const model = genAI.getGenerativeModel({ model: modelCandidate });
 
         const chat = model.startChat({
@@ -105,20 +144,30 @@ ${portfolioSummary || 'Sin activos registrados actualmente'}
         if (text) {
           successfulText = text;
           usedModel = modelCandidate;
-          break; // Éxito: salimos del bucle
+          break; // Éxito
         }
       } catch (err: any) {
         lastError = err;
-        const errMsg = err?.message || String(err);
-        console.warn(`[Nexus AI] Error con modelo ${modelCandidate}: ${errMsg}. Probando siguiente modelo de respaldo...`);
-        // Si fue error de cuota (429 / RESOURCE_EXHAUSTED / model overloaded), continuamos con el siguiente candidato
+        const errMsg = (err?.message || String(err)).toLowerCase();
+        console.warn(`[Nexus AI] Fallo con ${modelCandidate}:`, err?.message);
+
+        if (errMsg.includes('429') || errMsg.includes('resource_exhausted') || errMsg.includes('quota') || errMsg.includes('too many requests')) {
+          hadQuotaError = true;
+        }
+        // Continuamos con el siguiente modelo disponible
       }
     }
 
     if (!successfulText) {
-      const errorMsg = lastError?.message || 'Todos los modelos de IA se encuentran temporalmente saturados. Inténtalo de nuevo en unos momentos.';
+      if (hadQuotaError) {
+        return res.status(429).json({
+          error: 'Has alcanzado el límite de solicitudes gratuitas de tu API Key de Gemini en Google AI Studio (Error 429: Cuota temporalmente agotada). Por favor espera un minuto antes de volver a consultar.',
+        });
+      }
+
+      const msg = lastError?.message || 'No se pudo conectar con los servidores de Gemini.';
       return res.status(503).json({
-        error: `Servicio de IA temporalmente saturado: ${errorMsg}`,
+        error: `Servicio de IA no disponible: ${msg}`,
       });
     }
 

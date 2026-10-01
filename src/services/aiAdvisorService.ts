@@ -71,7 +71,7 @@ Mantén un tono de wealth manager institucional, conciso y de alto valor.`;
         message: prompt,
         riskProfile: riskProfile || 'Moderado / Crecimiento',
         portfolioSummary: portfolioSummary || `- Compra reciente: ${shares} de ${ticker} a $${price} ${currency}`,
-        preferredModel: 'gemini-2.0-flash',
+        preferredModel: 'gemini-2.5-flash',
       }),
     });
 

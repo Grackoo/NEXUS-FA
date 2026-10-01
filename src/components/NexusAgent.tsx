@@ -15,10 +15,10 @@ interface Message {
 
 const GEMINI_MODELS = [
   { id: 'auto', name: 'Auto (Respaldo inteligente)', badge: 'Recomendado', desc: 'Conmuta automáticamente si hay saturación' },
-  { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash', badge: 'Alta velocidad', desc: 'Última generación, análisis rápido' },
-  { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash', badge: 'Respaldo estable', desc: 'Gran cuota y disponibilidad continua' },
-  { id: 'gemini-2.0-flash-lite', name: 'Gemini 2.0 Flash Lite', badge: 'Ultra ligero', desc: 'Bajo consumo para momentos de tráfico alto' },
-  { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro', badge: 'Razonamiento pro', desc: 'Análisis cuantitativo profundo y complejo' },
+  { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', badge: 'Alta velocidad', desc: 'Modelo insignia para análisis de mercado' },
+  { id: 'gemini-2.5-flash-lite', name: 'Gemini 2.5 Flash Lite', badge: 'Ultra ligero', desc: 'Bajo consumo para momentos de tráfico alto' },
+  { id: 'gemini-3.8-flash', name: 'Gemini 3.8 Flash', badge: 'Nueva generación', desc: 'Mayor agudeza y contexto extendido' },
+  { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash', badge: 'Respaldo', desc: 'Modelo probado de alta disponibilidad' },
 ];
 
 const SUGGESTED_PROMPTS = [
