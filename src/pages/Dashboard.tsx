@@ -383,11 +383,11 @@ const Dashboard: React.FC = () => {
         </section>
 
         {/* ── Fila 2.5: Client Management & Activity (Opción A) ── */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="md:col-span-2 h-[350px]">
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 min-h-[380px]">
             <RecentActivityFeed />
           </div>
-          <div className="md:col-span-1 h-[350px]">
+          <div className="lg:col-span-1 min-h-[380px]">
             <ExecutiveSummary />
           </div>
         </section>

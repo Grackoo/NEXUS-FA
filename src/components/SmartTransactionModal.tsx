@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Calculator, RefreshCcw, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { usePortfolio } from '../contexts/PortfolioContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { submitOperation, deletePosition } from '../services/sheetsService';
+import { generateExecutiveAINoteOnBuy } from '../services/aiAdvisorService';
 import { AllocationDonut } from './charts/AllocationDonut';
 import { Settings2 } from 'lucide-react';
 
@@ -25,6 +26,7 @@ interface Props {
   defaultAssetType?: 'Stocks' | 'ETFs' | 'Renta Fija' | 'Crypto' | 'FIBRAs' | 'Commodities' | 'Forex' | 'All';
   /** When passed, the modal opens pre-filled with this asset's data for editing */
   editAsset?: EditAsset;
+  initialTicker?: string;
 }
 
 const SUGGESTIONS: Record<string, { ticker: string; name: string }[]> = {
@@ -64,6 +66,7 @@ const SmartTransactionModal: React.FC<Props> = ({
   clientName,
   defaultAssetType,
   editAsset,
+  initialTicker,
 }) => {
   const isEditMode = !!editAsset;
 
@@ -73,8 +76,14 @@ const SmartTransactionModal: React.FC<Props> = ({
   const client = allClients.find(c => c.id === clientId);
 
   // All fields are identical to "Nueva Operación" — just pre-filled when editing
-  const [ticker, setTicker] = useState(editAsset?.ticker ?? 'AAPL');
+  const [ticker, setTicker] = useState(editAsset?.ticker ?? initialTicker ?? 'AAPL');
   const [type, setType] = useState<'Buy' | 'Sell'>('Buy');
+
+  useEffect(() => {
+    if (initialTicker && !editAsset) {
+      setTicker(initialTicker);
+    }
+  }, [initialTicker, editAsset]);
   const initialAssetType = isEditMode
     ? (editAsset!.type as any)
     : (defaultAssetType && defaultAssetType !== 'All') ? defaultAssetType : 'Renta Variable';
@@ -186,6 +195,29 @@ const SmartTransactionModal: React.FC<Props> = ({
     if (success) {
       setIsSuccess(true);
       
+      // Si la operación es de compra, actualizamos automáticamente la nota del agente IA en el Resumen Ejecutivo
+      if (operationType === 'Buy') {
+        const portfolioSummary = client?.portfolio
+          ?.map(a => `- ${a.ticker} (${a.type}): ${a.sharesOwned} títulos, Precio prom: $${a.avgPurchasePriceUSD || a.avgPurchasePriceMXN}`)
+          .join('\n');
+
+        toast('Nexus AI está actualizando el Resumen Ejecutivo...', { icon: '🤖' });
+
+        generateExecutiveAINoteOnBuy({
+          clientId,
+          clientName,
+          ticker,
+          shares: numShares,
+          price: numPrice,
+          currency,
+          assetType: finalAssetType,
+          portfolioSummary,
+          riskProfile: (client as any)?.riskProfile,
+        }).catch(err => {
+          console.error('Error al generar nota de IA en compra:', err);
+        });
+      }
+
       // Delay fetching the CSV by 2.5 seconds to give Google Sheets time to update its published CSV endpoint
       setTimeout(async () => {
         await refreshPortfolio();
