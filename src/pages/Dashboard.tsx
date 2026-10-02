@@ -358,7 +358,7 @@ const AssetLogo: React.FC<{ ticker: string; logoUrl?: string; type?: string; cla
 // ─── Dashboard ────────────────────────────────────────────────────────────────
 const Dashboard: React.FC = () => {
   const { clientPortfolio, clientOperations, refreshPortfolio, estimatedAnnualDividendsUSD } = usePortfolio();
-  const { currency, exchangeRate, formatValue, convertToView } = useCurrency();
+  const { currency, exchangeRate, formatValue } = useCurrency();
   const { user } = useAuth();
 
   const [isTxModalOpen, setIsTxModalOpen] = useState(false);
@@ -409,15 +409,16 @@ const Dashboard: React.FC = () => {
   let globalCurrentView = 0;
 
   clientPortfolio.forEach(asset => {
-    let avgNativeMXN = asset.avgPurchasePriceMXN;
-    if (!avgNativeMXN && asset.avgPurchasePriceUSD) avgNativeMXN = asset.avgPurchasePriceUSD * exchangeRate;
-    if (!avgNativeMXN) avgNativeMXN = 0;
+    const avgPriceInView = currency === 'USD' ? asset.avgPurchasePriceUSD : asset.avgPurchasePriceMXN;
 
-    const currentPriceMXN = asset.nativeCurrency === 'USD' ? asset.realTimePrice * exchangeRate : asset.realTimePrice;
-    const currentValueMXN = asset.sharesOwned * currentPriceMXN;
-    
-    const valueInView = convertToView(currentValueMXN, 'MXN');
-    const avgPriceInView = currency === 'USD' ? (avgNativeMXN / exchangeRate) : avgNativeMXN;
+    let currentPriceInView = 0;
+    if (currency === 'USD') {
+      currentPriceInView = asset.nativeCurrency === 'USD' ? asset.realTimePrice : (asset.realTimePrice / exchangeRate);
+    } else {
+      currentPriceInView = asset.nativeCurrency === 'USD' ? (asset.realTimePrice * exchangeRate) : asset.realTimePrice;
+    }
+
+    const valueInView = asset.sharesOwned * currentPriceInView;
     const costBasisInView = asset.sharesOwned * avgPriceInView;
 
     globalCurrentView += valueInView;

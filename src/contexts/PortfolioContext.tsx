@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { useAuth, type ClientProfile } from './AuthContext';
+import { useCurrency } from './CurrencyContext';
 import { SHEET_URLS } from '../services/sheetsService';
 import { useCachedData } from '../hooks/useCachedData';
 import { type PortfolioAsset, type Operation } from '../types';
@@ -9,6 +10,85 @@ export type { Operation };
 export interface ClientWithPortfolio extends ClientProfile {
   portfolio: PortfolioAsset[];
   operations: Operation[];
+}
+
+/**
+ * Reconcilia y armoniza los precios promedio de compra cuando un cliente tiene operaciones
+ * en monedas mixtas (USD y MXN), garantizando un costo base ponderado real y exacto en ambas divisas.
+ */
+export function reconcilePortfolioAssets(
+  portfolio: PortfolioAsset[],
+  operations: Operation[],
+  rate: number
+): PortfolioAsset[] {
+  const fx = rate > 0 ? rate : 18.0;
+
+  return portfolio.map(asset => {
+    // Buscar operaciones de compra de este activo
+    const buyOps = (operations || []).filter(op => {
+      const matchTicker = (op.ticker || '').trim().toUpperCase() === (asset.ticker || '').trim().toUpperCase();
+      const isBuy = op.type === 'Buy' || op.type === 'Compra';
+      return matchTicker && isBuy;
+    });
+
+    let avgUSD = asset.avgPurchasePriceUSD || 0;
+    let avgMXN = asset.avgPurchasePriceMXN || 0;
+
+    if (buyOps.length > 0) {
+      let totalShares = 0;
+      let totalCostUSD = 0;
+      let totalCostMXN = 0;
+
+      buyOps.forEach(op => {
+        const shares = Number(op.shares) || 0;
+        const price = Number(op.price) || 0;
+        const opCurr = (op.originalCurrency || op.currency || 'USD').toString().toUpperCase();
+
+        if (shares > 0 && price > 0) {
+          totalShares += shares;
+          if (opCurr === 'USD') {
+            const costUSD = shares * price;
+            const costMXN = (op.totalMXN && op.totalMXN > 0) ? op.totalMXN : (costUSD * fx);
+            totalCostUSD += costUSD;
+            totalCostMXN += costMXN;
+          } else {
+            // Operación registrada en MXN
+            const costMXN = (op.totalMXN && op.totalMXN > 0) ? op.totalMXN : (shares * price);
+            const costUSD = costMXN / fx;
+            totalCostMXN += costMXN;
+            totalCostUSD += costUSD;
+          }
+        }
+      });
+
+      if (totalShares > 0) {
+        avgUSD = totalCostUSD / totalShares;
+        avgMXN = totalCostMXN / totalShares;
+      }
+    } else {
+      // Si no hay operaciones detalladas registradas en la hoja de operaciones,
+      // asegurar consistencia bidireccional basada en la divisa nativa del activo
+      if (asset.nativeCurrency === 'USD') {
+        if (avgUSD > 0) {
+          avgMXN = avgUSD * fx;
+        } else if (avgMXN > 0) {
+          avgUSD = avgMXN / fx;
+        }
+      } else {
+        if (avgMXN > 0) {
+          avgUSD = avgMXN / fx;
+        } else if (avgUSD > 0) {
+          avgMXN = avgUSD * fx;
+        }
+      }
+    }
+
+    return {
+      ...asset,
+      avgPurchasePriceUSD: avgUSD,
+      avgPurchasePriceMXN: avgMXN
+    };
+  });
 }
 
 interface PortfolioContextType {
@@ -27,6 +107,7 @@ const PortfolioContext = createContext<PortfolioContextType | undefined>(undefin
 
 export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { user } = useAuth();
+  const { exchangeRate } = useCurrency();
   const { fetchCsvCached, fetchPortfolioCached } = useCachedData();
   const [clientPortfolio, setClientPortfolio] = useState<PortfolioAsset[]>([]);
   const [clientOperations, setClientOperations] = useState<Operation[]>([]);
@@ -105,9 +186,14 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
           const updatedClients = mappedClients.map(c => {
             const fetched = allPortfolios.find(p => p.id === c.id);
             if (fetched && fetched.data) {
+              const reconciled = reconcilePortfolioAssets(
+                fetched.data.portfolio || [],
+                fetched.data.operations || [],
+                exchangeRate
+              );
               return { 
                 ...c, 
-                portfolio: fetched.data.portfolio || [],
+                portfolio: reconciled,
                 operations: fetched.data.operations || []
               };
             }
@@ -123,7 +209,12 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
           // También cargamos el portafolio del propio admin si tuviera (opcional, suele ser 0)
           const adminData = await fetchPortfolioCached(user.id);
           if (adminData) {
-            setClientPortfolio(adminData.portfolio || []);
+            const reconciledAdminPortfolio = reconcilePortfolioAssets(
+              adminData.portfolio || [],
+              adminData.operations || [],
+              exchangeRate
+            );
+            setClientPortfolio(reconciledAdminPortfolio);
             setClientOperations(adminData.operations || []);
             if (adminData.totals) {
               setTotalNetWorthMXN(adminData.totals.netWorthMXN || 0);
@@ -135,7 +226,12 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
           const serverData = await fetchPortfolioCached(user.id);
           
           if (serverData) {
-            setClientPortfolio(serverData.portfolio || []);
+            const reconciledClientPortfolio = reconcilePortfolioAssets(
+              serverData.portfolio || [],
+              serverData.operations || [],
+              exchangeRate
+            );
+            setClientPortfolio(reconciledClientPortfolio);
             setClientOperations(serverData.operations || []);
             
             if (serverData.totals) {
@@ -146,7 +242,7 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
             const updatedClients = mappedClients.map(c => 
               c.id === user.id ? { 
                 ...c, 
-                portfolio: serverData.portfolio || [],
+                portfolio: reconciledClientPortfolio,
                 operations: serverData.operations || []
               } : c
             );
@@ -163,7 +259,7 @@ export const PortfolioProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   useEffect(() => {
     refreshPortfolio();
-  }, [user]);
+  }, [user, exchangeRate]);
 
   return (
     <PortfolioContext.Provider value={{ 
