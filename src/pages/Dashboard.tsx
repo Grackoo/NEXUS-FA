@@ -619,12 +619,13 @@ const Dashboard: React.FC = () => {
           </div>
 
           <div className="flex-1 overflow-auto scrollbar-hide">
-            <table className="w-full text-left border-collapse min-w-[780px] md:min-w-0">
+            <table className="w-full text-left border-collapse min-w-[850px] md:min-w-0">
               <thead>
                 <tr className="border-b border-white/5 text-white/50 text-[10px] md:text-[11px] uppercase tracking-widest bg-white/[0.01]">
                   <th className="px-6 py-4 font-semibold">Activo</th>
                   <th className="px-4 py-4 font-semibold text-right">Cantidad</th>
                   <th className="px-4 py-4 font-semibold text-right">Precio Prom.</th>
+                  <th className="px-4 py-4 font-semibold text-right">Precio Mercado</th>
                   <th className="px-4 py-4 font-semibold text-right">Target</th>
                   <th className="px-4 py-4 font-semibold text-right">Take Profit</th>
                   <th className="px-4 py-4 font-semibold text-right">Stop Loss</th>
@@ -661,6 +662,9 @@ const Dashboard: React.FC = () => {
                   // 3. Assign Main and Sub based on Dashboard selected `currency`
                   const valueMain = currency === 'USD' ? currentValueUSD : currentValueMXN;
                   const valueSub = currency === 'USD' ? currentValueMXN : currentValueUSD;
+
+                  const priceMain = currency === 'USD' ? currentPriceUSD : currentPriceMXN;
+                  const priceSub = currency === 'USD' ? currentPriceMXN : currentPriceUSD;
 
                   const avgMain = currency === 'USD' ? avgNativeUSD : avgNativeMXN;
                   const avgSub = currency === 'USD' ? avgNativeMXN : avgNativeUSD;
@@ -710,6 +714,18 @@ const Dashboard: React.FC = () => {
                             <span>{formatValue(avgMain)}</span>
                             {avgSub > 0 && <span className="text-[10px] text-white/40 font-medium">{formatValue(avgSub, oppositeCurrency)}</span>}
                           </div>
+                        </td>
+
+                        {/* Market Price (Precio de Mercado) */}
+                        <td className="px-4 py-3 text-right tabular-nums text-sm">
+                          {priceMain > 0 ? (
+                            <div className="flex flex-col gap-1 items-end">
+                              <span className="font-semibold text-white">{formatValue(priceMain)}</span>
+                              {priceSub > 0 && <span className="text-[10px] text-white/40 font-medium">{formatValue(priceSub, oppositeCurrency)}</span>}
+                            </div>
+                          ) : (
+                            <span className="text-white/40">-</span>
+                          )}
                         </td>
                         
                         {/* Target Price */}
@@ -831,7 +847,7 @@ const Dashboard: React.FC = () => {
                       {/* Expanded Operations Row */}
                       {expandedTicker === asset.ticker && (
                         <tr className="bg-black/20 border-b border-white/5">
-                          <td colSpan={10} className="p-0">
+                          <td colSpan={11} className="p-0">
                             <div className="p-6">
                               <h4 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
                                 <History className="w-4 h-4 text-blue-400" /> Historial de Operaciones
