@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { X, Calculator, RefreshCcw, AlertTriangle } from 'lucide-react';
+import { X, Calculator, RefreshCcw, AlertTriangle, Trash2 } from 'lucide-react';
 import { usePortfolio, type Operation } from '../contexts/PortfolioContext';
-import { submitOperation, deletePosition } from '../services/sheetsService';
+import { submitOperation, deletePosition, deleteSingleOperation } from '../services/sheetsService';
 import { useCurrency } from '../contexts/CurrencyContext';
 
 interface Props {
@@ -142,6 +142,40 @@ const EditSingleOperationModal: React.FC<Props> = ({ isOpen, onClose, operationT
     }
   };
 
+  const handleDeleteSingleOp = async () => {
+    if (!operationToEdit) return;
+    if (!window.confirm(`¿Estás seguro de que deseas eliminar esta operación de ${operationToEdit.ticker}?`)) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const allOpsForTicker = clientOperations
+        .filter(op => op.ticker === operationToEdit.ticker)
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+      await deleteSingleOperation({
+        clientId: operationToEdit.clientId,
+        ticker: operationToEdit.ticker,
+        assetType: operationToEdit.assetType,
+        allOpsForTicker,
+        indexToDelete: operationIndex,
+        exchangeRate
+      });
+
+      setTimeout(async () => {
+        await refreshPortfolio();
+        setIsSubmitting(false);
+        onClose();
+      }, 2500);
+    } catch (e) {
+      console.error('Failed to delete individual operation:', e);
+      setIsSubmitting(false);
+      onClose();
+    }
+  };
+
+
   return (
     <div className="modal-overlay animate-fade-in z-[100] bg-black/60 backdrop-blur-sm">
       <div className="w-full max-w-lg p-0 overflow-hidden relative bg-slate-900/50 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)] rounded-2xl">
@@ -250,6 +284,16 @@ const EditSingleOperationModal: React.FC<Props> = ({ isOpen, onClose, operationT
             className="w-full mt-4 bg-primary hover:bg-primary-hover text-white font-bold py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] disabled:opacity-50"
           >
             Guardar Edición de Operación
+          </button>
+
+          <button
+            type="button"
+            onClick={handleDeleteSingleOp}
+            disabled={isSubmitting}
+            className="w-full mt-2.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 border border-rose-500/20 font-medium py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 text-xs disabled:opacity-50"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            Eliminar esta operación del historial
           </button>
         </div>
       </div>

@@ -1,7 +1,9 @@
-import React from 'react';
-import { X, History, TrendingUp, TrendingDown, RefreshCcw } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, History, TrendingUp, TrendingDown, RefreshCcw, Trash2 } from 'lucide-react';
 import { usePortfolio } from '../contexts/PortfolioContext';
 import { useCurrency } from '../contexts/CurrencyContext';
+import { deleteSingleOperation } from '../services/sheetsService';
+import toast from 'react-hot-toast';
 
 interface Props {
   isOpen: boolean;
@@ -11,8 +13,9 @@ interface Props {
 }
 
 const OperationsHistoryModal: React.FC<Props> = ({ isOpen, onClose, ticker, clientId }) => {
-  const { allOperations } = usePortfolio();
-  const { formatValue } = useCurrency();
+  const { allOperations, refreshPortfolio } = usePortfolio();
+  const { formatValue, exchangeRate } = useCurrency();
+  const [isDeletingIndex, setIsDeletingIndex] = useState<number | null>(null);
 
   if (!isOpen) return null;
 
@@ -20,6 +23,39 @@ const OperationsHistoryModal: React.FC<Props> = ({ isOpen, onClose, ticker, clie
   const operations = allOperations
     .filter(op => op.clientId === clientId && op.ticker === ticker)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+  const handleDeleteOp = async (op: any, index: number) => {
+    if (!window.confirm(`¿Estás seguro de que deseas eliminar esta operación de ${op.type} (${op.shares} de ${ticker})?`)) {
+      return;
+    }
+
+    setIsDeletingIndex(index);
+    try {
+      const success = await deleteSingleOperation({
+        clientId,
+        ticker,
+        assetType: op.assetType || 'Renta Variable',
+        allOpsForTicker: operations,
+        indexToDelete: index,
+        exchangeRate
+      });
+
+      if (success) {
+        setTimeout(async () => {
+          await refreshPortfolio();
+          setIsDeletingIndex(null);
+          toast.success('Operación eliminada exitosamente');
+        }, 2500);
+      } else {
+        toast.error('Error al eliminar la operación');
+        setIsDeletingIndex(null);
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error('Error inesperado al eliminar la operación');
+      setIsDeletingIndex(null);
+    }
+  };
 
   return (
     <div className="modal-overlay animate-fade-in" style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}>
@@ -64,13 +100,27 @@ const OperationsHistoryModal: React.FC<Props> = ({ isOpen, onClose, ticker, clie
                       </div>
                     </div>
                     
-                    <div className="text-right">
-                      <p className="font-semibold text-white">
-                        {isBuy ? '+' : isSell ? '-' : ''}{op.shares} Acciones
-                      </p>
-                      <p className="text-xs text-gray-400">
-                        Precio: {formatValue(op.price, op.currency as 'USD' | 'MXN')}
-                      </p>
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <p className="font-semibold text-white">
+                          {isBuy ? '+' : isSell ? '-' : ''}{op.shares} Acciones
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          Precio: {formatValue(op.price, op.currency as 'USD' | 'MXN')}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => handleDeleteOp(op, idx)}
+                        disabled={isDeletingIndex !== null}
+                        className="p-2 rounded-lg hover:bg-rose-500/15 text-rose-400 hover:text-rose-300 border border-transparent hover:border-rose-500/20 transition-all disabled:opacity-50"
+                        title="Eliminar Operación"
+                      >
+                        {isDeletingIndex === idx ? (
+                          <RefreshCcw className="w-4 h-4 animate-spin text-rose-400" />
+                        ) : (
+                          <Trash2 className="w-4 h-4" />
+                        )}
+                      </button>
                     </div>
                   </div>
                 );
@@ -85,3 +135,4 @@ const OperationsHistoryModal: React.FC<Props> = ({ isOpen, onClose, ticker, clie
 };
 
 export default OperationsHistoryModal;
+

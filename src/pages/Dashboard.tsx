@@ -4,7 +4,8 @@ import { usePortfolio } from '../contexts/PortfolioContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useAdvisorNotes } from '../hooks/useAdvisorNotes';
-import { deletePosition } from '../services/sheetsService';
+import { deletePosition, deleteSingleOperation } from '../services/sheetsService';
+import toast from 'react-hot-toast';
 import {
   TrendingUp,
   TrendingDown,
@@ -130,6 +131,136 @@ const DeleteConfirmModal: React.FC<DeleteConfirmProps> = ({
   </div>
 );
 
+// ─── Delete Single Operation Confirmation Modal ──────────────────────────────
+interface DeleteSingleOpConfirmProps {
+  op: any;
+  onConfirm: () => void;
+  onCancel: () => void;
+  isDeleting: boolean;
+  formatValue: (val: number, cur?: 'USD' | 'MXN') => string;
+}
+
+const DeleteSingleOpConfirmModal: React.FC<DeleteSingleOpConfirmProps> = ({
+  op,
+  onConfirm,
+  onCancel,
+  isDeleting,
+  formatValue,
+}) => {
+  if (!op) return null;
+  const isBuy = op.type === 'Buy' || op.type === 'Compra';
+  const isSell = op.type === 'Sell' || op.type === 'Venta';
+  const totalAmount = (Number(op.shares) || 0) * (Number(op.price) || 0);
+
+  return (
+    <div className="modal-overlay animate-fade-in z-[110]">
+      <div
+        className="glass-card w-full max-w-md p-0 overflow-hidden"
+        style={{ border: '1px solid rgba(239,68,68,0.3)' }}
+      >
+        {/* Red gradient header bar */}
+        <div
+          style={{
+            height: '4px',
+            background: 'linear-gradient(90deg, #EF4444, #F87171)',
+          }}
+        />
+
+        <div className="p-6 md:p-8 space-y-6">
+          {/* Icon + title */}
+          <div className="flex items-start gap-4">
+            <div
+              className="shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center"
+              style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.25)' }}
+            >
+              <Trash2 className="w-6 h-6 text-rose-500" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold leading-tight text-white">
+                ¿Eliminar esta operación?
+              </h2>
+              <p className="text-xs text-gray-400 mt-1">
+                Activo: <span className="text-white font-bold">{op.ticker}</span>
+                <span className="ml-2 text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-gray-300 uppercase tracking-wider">{op.type}</span>
+              </p>
+            </div>
+          </div>
+
+          {/* Operation Details Card */}
+          <div className="p-4 rounded-xl space-y-2.5 bg-white/[0.03] border border-white/10">
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-gray-400">Fecha:</span>
+              <span className="text-white font-medium">{new Date(op.date).toLocaleDateString()}</span>
+            </div>
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-gray-400">Tipo:</span>
+              <span className={`font-semibold ${isBuy ? 'text-emerald-400' : isSell ? 'text-rose-400' : 'text-blue-400'}`}>
+                {op.type}
+              </span>
+            </div>
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-gray-400">Cantidad:</span>
+              <span className="text-white font-semibold">{op.shares} títulos / unidades</span>
+            </div>
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-gray-400">Precio unitario:</span>
+              <span className="text-white font-medium">{formatValue(op.price, op.currency as 'USD' | 'MXN')}</span>
+            </div>
+            <div className="pt-2 border-t border-white/5 flex justify-between items-center text-xs">
+              <span className="text-gray-400 font-medium">Importe total:</span>
+              <span className="text-white font-bold">{formatValue(totalAmount, op.currency as 'USD' | 'MXN')}</span>
+            </div>
+          </div>
+
+          {/* Warning message */}
+          <div
+            className="p-3.5 rounded-xl space-y-1"
+            style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}
+          >
+            <p className="text-xs font-semibold text-rose-300 leading-relaxed">
+              Solo se eliminará esta operación individual.
+            </p>
+            <p className="text-[11px] text-gray-300 leading-relaxed">
+              Las demás operaciones de <strong className="text-white">{op.ticker}</strong> permanecerán intactas y la posición de tu portafolio se recalculará automáticamente.
+            </p>
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex gap-3">
+            <button
+              onClick={onCancel}
+              disabled={isDeleting}
+              className="glass-button secondary flex-1 py-3 text-sm disabled:opacity-50"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={onConfirm}
+              disabled={isDeleting}
+              className="flex-1 py-3 rounded-xl text-sm font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              style={{
+                background: isDeleting ? 'rgba(239,68,68,0.2)' : 'rgba(239,68,68,0.85)',
+                border: '1px solid rgba(239,68,68,0.5)',
+                color: 'white',
+                boxShadow: isDeleting ? 'none' : '0 0 20px rgba(239,68,68,0.35)',
+              }}
+            >
+              {isDeleting ? (
+                <>
+                  <RefreshCcw className="w-4 h-4 animate-spin" />
+                  Eliminando...
+                </>
+              ) : (
+                'Eliminar Operación'
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // ─── Available categories ─────────────────────────────────────────────────────
 const CATEGORIES = ['All', 'Renta Variable', 'Criptomonedas', 'Renta Fija', 'Divisas'];
 
@@ -236,6 +367,10 @@ const Dashboard: React.FC = () => {
   // Single Operation Edit State
   const [editSingleOpTarget, setEditSingleOpTarget] = useState<{ op: any; index: number } | null>(null);
 
+  // Single Operation Delete State
+  const [deleteSingleOpTarget, setDeleteSingleOpTarget] = useState<{ op: any; index: number; assetType: string } | null>(null);
+  const [isDeletingSingleOp, setIsDeletingSingleOp] = useState(false);
+
   const [showLoadingScreen, setShowLoadingScreen] = useState(() => {
     return !sessionStorage.getItem('hasSeenNexusLoading');
   });
@@ -323,6 +458,49 @@ const Dashboard: React.FC = () => {
     await refreshPortfolio();
     setIsDeleting(false);
     setDeleteTarget(null);
+  };
+
+  const handleConfirmDeleteSingleOp = async () => {
+    if (!deleteSingleOpTarget || !user) return;
+    setIsDeletingSingleOp(true);
+
+    try {
+      const { op, index, assetType } = deleteSingleOpTarget;
+      
+      const allOpsForTicker = clientOperations
+        .filter(o => o.ticker === op.ticker)
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+      const success = await deleteSingleOperation({
+        clientId: user.id,
+        ticker: op.ticker,
+        assetType: op.assetType || assetType,
+        allOpsForTicker,
+        indexToDelete: index,
+        exchangeRate
+      });
+
+      if (success) {
+        if (allOpsForTicker.length <= 1) {
+          setExpandedTicker(null);
+        }
+        setTimeout(async () => {
+          await refreshPortfolio();
+          setIsDeletingSingleOp(false);
+          setDeleteSingleOpTarget(null);
+          toast.success('Operación eliminada exitosamente');
+        }, 2500);
+      } else {
+        toast.error('No se pudo eliminar la operación. Inténtalo de nuevo.');
+        setIsDeletingSingleOp(false);
+        setDeleteSingleOpTarget(null);
+      }
+    } catch (error) {
+      console.error('Error deleting single operation:', error);
+      toast.error('Ocurrió un error al eliminar la operación');
+      setIsDeletingSingleOp(false);
+      setDeleteSingleOpTarget(null);
+    }
   };
 
   if (showLoadingScreen) {
@@ -688,13 +866,22 @@ const Dashboard: React.FC = () => {
                                                 Precio: {formatValue(op.price, op.currency as 'USD' | 'MXN')}
                                               </p>
                                             </div>
-                                            <button 
-                                              onClick={() => setEditSingleOpTarget({ op, index: idx })}
-                                              className="p-1.5 rounded-md hover:bg-white/10 text-gray-400 hover:text-white transition-colors border border-transparent hover:border-white/10"
-                                              title="Editar Operación"
-                                            >
-                                              <Pencil className="w-3.5 h-3.5" />
-                                            </button>
+                                            <div className="flex items-center gap-1.5">
+                                              <button 
+                                                onClick={() => setEditSingleOpTarget({ op, index: idx })}
+                                                className="p-1.5 rounded-md hover:bg-white/10 text-gray-400 hover:text-white transition-colors border border-transparent hover:border-white/10"
+                                                title="Editar Operación"
+                                              >
+                                                <Pencil className="w-3.5 h-3.5" />
+                                              </button>
+                                              <button 
+                                                onClick={() => setDeleteSingleOpTarget({ op, index: idx, assetType: asset.type })}
+                                                className="p-1.5 rounded-md hover:bg-rose-500/15 text-rose-400 hover:text-rose-300 transition-colors border border-transparent hover:border-rose-500/20"
+                                                title="Eliminar Operación"
+                                              >
+                                                <Trash2 className="w-3.5 h-3.5" />
+                                              </button>
+                                            </div>
                                           </div>
                                         </div>
                                       );
@@ -748,6 +935,17 @@ const Dashboard: React.FC = () => {
           onConfirm={handleConfirmDelete}
           onCancel={() => setDeleteTarget(null)}
           isDeleting={isDeleting}
+        />
+      )}
+
+      {/* ── Delete Single Operation Confirmation Modal ── */}
+      {deleteSingleOpTarget && (
+        <DeleteSingleOpConfirmModal
+          op={deleteSingleOpTarget.op}
+          onConfirm={handleConfirmDeleteSingleOp}
+          onCancel={() => !isDeletingSingleOp && setDeleteSingleOpTarget(null)}
+          isDeleting={isDeletingSingleOp}
+          formatValue={formatValue}
         />
       )}
 

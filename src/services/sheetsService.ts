@@ -190,6 +190,81 @@ export async function deletePosition(clientId: string, ticker: string, assetType
   }
 }
 
+export async function deleteSingleOperation({
+  clientId,
+  ticker,
+  assetType,
+  allOpsForTicker,
+  indexToDelete,
+  exchangeRate,
+}: {
+  clientId: string;
+  ticker: string;
+  assetType: string;
+  allOpsForTicker: any[];
+  indexToDelete: number;
+  exchangeRate: number;
+}) {
+  try {
+    // 1. Limpiar la posición actual para este ticker
+    await deletePosition(clientId, ticker, assetType);
+    if (assetType === 'Divisas') {
+      await deletePosition(clientId, ticker, 'Forex');
+    } else if (assetType === 'Forex') {
+      await deletePosition(clientId, ticker, 'Divisas');
+    }
+
+    // 2. Filtrar la operación eliminada
+    const remainingOps = allOpsForTicker.filter((_, idx) => idx !== indexToDelete);
+
+    // 3. Re-enviar las operaciones restantes para reconstruir el historial sin la eliminada
+    for (let i = 0; i < remainingOps.length; i++) {
+      const op = remainingOps[i];
+      const numShares = parseFloat(op.shares?.toString()) || 0;
+      const numPrice = parseFloat(op.price?.toString()) || 0;
+      const numCommission = parseFloat((op.commission ?? 0).toString()) || 0;
+      const totalTrans = (numShares * numPrice) + numCommission;
+      const calculatedTotalMXN = op.currency === 'USD' ? totalTrans * exchangeRate : totalTrans;
+      const finalAssetType = op.assetType === 'Divisas' ? 'Forex' : (op.assetType || assetType);
+
+      await submitOperation({
+        clientId: op.clientId || clientId,
+        type: op.type,
+        assetType: finalAssetType,
+        ticker: op.ticker || ticker,
+        shares: numShares,
+        price: numPrice,
+        commission: numCommission,
+        originalCurrency: op.currency,
+        Cliente_ID: op.clientId || clientId,
+        Tipo_Operacion: op.type,
+        Ticker: op.ticker || ticker,
+        Tipo_Activo: finalAssetType,
+        Cantidad: numShares,
+        Precio: numPrice,
+        Comision: numCommission,
+        Comisión: numCommission,
+        Moneda: op.currency,
+        Total_MXN: calculatedTotalMXN,
+        date: op.date,
+        Tesis_Inversion: op.thesis || '',
+        thesis: op.thesis || ''
+      });
+
+      if (i < remainingOps.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
+    }
+
+    invalidateCache();
+    return true;
+  } catch (error) {
+    console.error('Error deleting single operation:', error);
+    return false;
+  }
+}
+
+
 export async function fetchGoals(clientId: string) {
   try {
     const url = `${SCRIPT_URL}?action=getGoals&clientId=${encodeURIComponent(clientId)}`;
