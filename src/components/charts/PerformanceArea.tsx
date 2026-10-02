@@ -36,28 +36,33 @@ export const PerformanceArea: React.FC = () => {
     let totalCurrentValue = 0;
     let totalCostBasis = 0;
 
+    const fx = exchangeRate > 0 ? exchangeRate : 18.0;
+
     clientPortfolio.forEach(asset => {
-      let avgNativeUSD = asset.avgPurchasePriceUSD;
-      let avgNativeMXN = asset.avgPurchasePriceMXN;
-      if (!avgNativeUSD && avgNativeMXN) avgNativeUSD = avgNativeMXN / exchangeRate;
-      if (!avgNativeMXN && avgNativeUSD) avgNativeMXN = avgNativeUSD * exchangeRate;
+      const shares = Number(asset.sharesOwned) || 0;
+      const realTimePrice = Number(asset.realTimePrice) || 0;
+
+      let avgUSD = Number(asset.avgPurchasePriceUSD) || 0;
+      let avgMXN = Number(asset.avgPurchasePriceMXN) || 0;
+      if (!avgUSD && avgMXN) avgUSD = avgMXN / fx;
+      if (!avgMXN && avgUSD) avgMXN = avgUSD * fx;
 
       let currentPriceUSD = 0;
       let currentPriceMXN = 0;
       if (asset.nativeCurrency === 'USD') {
-        currentPriceUSD = asset.realTimePrice;
-        currentPriceMXN = asset.realTimePrice * exchangeRate;
+        currentPriceUSD = realTimePrice;
+        currentPriceMXN = realTimePrice * fx;
       } else {
-        currentPriceMXN = asset.realTimePrice;
-        currentPriceUSD = asset.realTimePrice / exchangeRate;
+        currentPriceMXN = realTimePrice;
+        currentPriceUSD = realTimePrice / fx;
       }
 
-      const valueMain = currency === 'USD' ? (asset.sharesOwned * currentPriceUSD) : (asset.sharesOwned * currentPriceMXN);
-      const avgMain = currency === 'USD' ? avgNativeUSD : avgNativeMXN;
-      const costBasisMain = asset.sharesOwned * avgMain;
+      const valueMain = currency === 'USD' ? (shares * currentPriceUSD) : (shares * currentPriceMXN);
+      const avgMain = currency === 'USD' ? avgUSD : avgMXN;
+      const costBasisMain = shares * avgMain;
 
-      totalCurrentValue += valueMain;
-      totalCostBasis += costBasisMain;
+      totalCurrentValue += (Number(valueMain) || 0);
+      totalCostBasis += (Number(costBasisMain) || 0);
     });
 
     const months = [];
@@ -69,29 +74,40 @@ export const PerformanceArea: React.FC = () => {
     let numMonths = 5; // default 6M
     if (timeFilter === '1M') numMonths = 1;
     else if (timeFilter === '1Y') numMonths = 11;
-    else if (timeFilter === 'YTD') numMonths = now.getMonth();
+    else if (timeFilter === 'YTD') numMonths = Math.max(1, now.getMonth());
     else if (timeFilter === 'ALL') {
+      numMonths = 11;
       if (clientOperations.length > 0) {
-         const earliestOp = [...clientOperations].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
-         const earliestDate = new Date(earliestOp.date);
-         numMonths = (now.getFullYear() - earliestDate.getFullYear()) * 12 + now.getMonth() - earliestDate.getMonth();
-         if (numMonths < 5) numMonths = 5; // minimum 6 months for ALL if recent
-         if (numMonths > 60) numMonths = 60; // cap at 5 years
-      } else {
-         numMonths = 23;
+        try {
+          const sorted = [...clientOperations].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+          if (sorted[0]?.date) {
+            const earliestDate = new Date(sorted[0].date);
+            if (!isNaN(earliestDate.getTime())) {
+              const diff = (now.getFullYear() - earliestDate.getFullYear()) * 12 + now.getMonth() - earliestDate.getMonth();
+              if (!isNaN(diff) && diff > 0) numMonths = Math.min(60, Math.max(5, diff));
+            }
+          }
+        } catch {
+          numMonths = 11;
+        }
       }
     }
     
-    for (let i = numMonths; i >= 0; i--) {
+    // Si numMonths es 1 (ej 1M), agregamos al menos 2 puntos para que dibuje la curva
+    const pointsCount = Math.max(1, numMonths);
+    for (let i = pointsCount; i >= 0; i--) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const monthName = d.toLocaleDateString('es-ES', { month: 'short', year: numMonths > 11 ? '2-digit' : undefined });
+      const rawMonth = d.toLocaleDateString('es-ES', { month: 'short', year: pointsCount > 11 ? '2-digit' : undefined });
+      const monthName = rawMonth ? (rawMonth.charAt(0).toUpperCase() + rawMonth.slice(1)) : `M${i}`;
       
-      const factor = numMonths > 0 ? (numMonths - i) / numMonths : 1; 
+      const factor = pointsCount > 0 ? (pointsCount - i) / pointsCount : 1; 
+      const capitalVal = Number(totalCostBasis * (0.8 + (0.2 * factor))) || 0;
+      const currentVal = Number(capitalVal + (totalPnl * factor)) || capitalVal;
       
       months.push({
-        month: monthName.charAt(0).toUpperCase() + monthName.slice(1),
-        capital: totalCostBasis * (0.8 + (0.2 * factor)),
-        current: (totalCostBasis * (0.8 + (0.2 * factor))) + (totalPnl * factor)
+        month: monthName,
+        capital: Math.round(capitalVal),
+        current: Math.round(currentVal)
       });
     }
 
@@ -99,7 +115,7 @@ export const PerformanceArea: React.FC = () => {
   }, [clientPortfolio, clientOperations, currency, exchangeRate, timeFilter]);
 
   return (
-    <div className="w-full h-full min-h-[350px] glass-card p-6 bg-slate-900/50 backdrop-blur-xl border border-white/5 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] flex flex-col">
+    <div className="w-full glass-card p-6 bg-slate-900/50 backdrop-blur-xl border border-white/5 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] flex flex-col">
       <div className="flex items-start sm:items-center justify-between mb-6 flex-col sm:flex-row gap-4">
         <div>
           <h3 className="text-white/80 font-semibold text-sm uppercase tracking-widest">Rendimiento Histórico</h3>
@@ -128,9 +144,9 @@ export const PerformanceArea: React.FC = () => {
         </div>
       </div>
 
-      <div className="w-full flex-1 min-h-[220px]">
+      <div className="w-full h-[320px] min-h-[320px]" style={{ minHeight: '320px', height: '320px' }}>
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+          <AreaChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
             <defs>
               <linearGradient id="colorCurrent" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#22d3ee" stopOpacity={0.4}/>
@@ -153,7 +169,11 @@ export const PerformanceArea: React.FC = () => {
               axisLine={false} 
               tickLine={false} 
               tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 11 }}
-              tickFormatter={(value) => `$${value / 1000}k`}
+              tickFormatter={(value) => {
+                if (Math.abs(value) >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
+                if (Math.abs(value) >= 1000) return `$${(value / 1000).toFixed(0)}k`;
+                return `$${value}`;
+              }}
             />
             <RechartsTooltip 
               content={<CustomTooltip formatValue={formatValue} />} 
